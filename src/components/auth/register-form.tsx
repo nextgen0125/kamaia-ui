@@ -19,9 +19,14 @@ import { toast } from "sonner"
 import { z } from "zod"
 
 const registerSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters."),
-    email: z.string().email("Please enter a valid email."),
-    password: z.string().min(6, "Password must be at least 6 characters.").max(12, "O tamanho maximo sao 12 caracteres"),
+    name: z.string().min(2, "O nome deve ter no mínimo 2 caracteres."),
+    email: z.string().email("Por favor, insira um email válido."),
+    password: z.string()
+      .min(6, "A senha deve ter no mínimo 6 caracteres.")
+      .max(50, "A senha deve ter no máximo 50 caracteres.")
+      .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula.")
+      .regex(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula.")
+      .regex(/[0-9]/, "A senha deve conter pelo menos um número."),
 })
 
 type RegisterFormValues = z.infer<typeof registerSchema>
@@ -57,9 +62,9 @@ export function RegisterForm({
                 {...props}
             >
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-2xl font-bold">Create an account</h1>
+                    <h1 className="text-2xl font-bold">Criar uma conta</h1>
                     <p className="text-muted-foreground text-sm">
-                        Enter your details below to register
+                        Preencha seus dados para se cadastrar
                     </p>
                 </div>
 
@@ -69,9 +74,9 @@ export function RegisterForm({
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Name</FormLabel>
+                                <FormLabel>Nome completo</FormLabel>
                                 <FormControl>
-                                    <Input variant="kamaia" placeholder="John Doe" {...field} />
+                                    <Input variant="kamaia" placeholder="João Silva" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -85,7 +90,7 @@ export function RegisterForm({
                             <FormItem>
                                 <FormLabel>Email</FormLabel>
                                 <FormControl>
-                                    <Input type="email" variant="kamaia" placeholder="m@example.com" {...field} />
+                                    <Input type="email" variant="kamaia" placeholder="seu@email.com" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -97,7 +102,7 @@ export function RegisterForm({
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Password</FormLabel>
+                                <FormLabel>Senha</FormLabel>
                                 <FormControl>
                                     <InputPassword variant="kamaia" placeholder="********" {...field} />
                                 </FormControl>
@@ -107,14 +112,14 @@ export function RegisterForm({
                     />
 
                     <Button type="submit" className="w-full">
-                        Sign up
+                        Criar conta
                     </Button>
                 </div>
 
                 <div className="text-center text-sm">
-                    Already have an account?{" "}
+                    Já tem uma conta?{" "}
                     <Link href="/login" className="underline underline-offset-4">
-                        Login
+                        Fazer login
                     </Link>
                 </div>
             </form>

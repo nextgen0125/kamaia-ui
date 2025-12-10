@@ -11,7 +11,10 @@ import {
   Send,
   SquarePen,
   User2,
-  Users
+  Users,
+  Zap,
+  BarChart3,
+  Settings,
 } from "lucide-react"
 import * as React from "react"
 
@@ -37,20 +40,20 @@ const data = {
   },
   navMain: [
     {
-      title: "Area de Trabalho",
-      url: "/dashboard/workspace",
+      title: "Dashboard",
+      url: "/dashboard",
       icon: LayoutDashboard,
       isActive: true,
+    },
+    {
+      title: "Workspace",
+      url: "/dashboard/workspace",
+      icon: SquarePen,
     },
     {
       title: "Tarefas",
       url: "/dashboard/task",
       icon: ListTodo,
-    },
-    {
-      title: "Atendimento",
-      url: "/dashboard/service",
-      icon: SquarePen,
     },
     {
       title: "Agenda",
@@ -65,30 +68,50 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Support",
-      url: "/support",
+      title: "Serviços",
+      url: "/dashboard/service",
+      icon: SquarePen,
+    },
+    {
+      title: "Relatórios",
+      url: "/dashboard/reports",
       icon: LifeBuoy,
     },
     {
-      title: "Feedback",
-      url: "/feedback",
-      icon: Send,
+      title: "Templates",
+      url: "/dashboard/templates",
+      icon: File,
+    },
+    {
+      title: "Integrações",
+      url: "/dashboard/integrations",
+      icon: Zap,
+    },
+    {
+      title: "BI Dashboard",
+      url: "/dashboard/bi",
+      icon: BarChart3,
+    },
+    {
+      title: "Configurações",
+      url: "/dashboard/settings",
+      icon: Settings,
     },
   ],
   projects: [
     {
-      name: "Contactos",
-      url: "/dashboard/contact",
-      icon: User2,
-    },
-    {
       name: "Processos",
-      url: "/dashboard/process",
+      url: "/dashboard/cases",
       icon: Folder,
     },
     {
+      name: "Clientes",
+      url: "/dashboard/clients",
+      icon: User2,
+    },
+    {
       name: "Advogados",
-      url: "/dashboard/avocadoto",
+      url: "/dashboard/lawyers",
       icon: Users,
     },
     {

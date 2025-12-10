@@ -1,21 +1,19 @@
 "use client"
 import {
   MailIcon,
-  SearchIcon,
   Settings
 } from "lucide-react"
-import { useId } from "react"
+import { useQueryState } from "nuqs"
 
 import NotificationMenu from "@/components/dasboard/navbar-components/notification-menu"
 import UserMenu from "@/components/dasboard/navbar-components/user-menu"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useQueryState } from "nuqs"
 import { SidebarTrigger } from "../ui/sidebar"
 import SettingsDialog from "./settings-dialog"
+import { GlobalSearch } from "@/components/search/global-search"
+import { NotificationCenter } from "@/components/notifications/notification-center"
 
 export default function DashboardHeader() {
-  const id = useId()
   const [, setSettings] = useQueryState("settings")
 
   return (
@@ -23,30 +21,21 @@ export default function DashboardHeader() {
       <div className="flex h-16 items-center justify-between gap-4">
         {/* Left side */}
         <div className="flex flex-1 items-center gap-2">
-
           <div className="flex items-center gap-6">
             <a href="#" className="text-foreground hover:text-primary/90">
               <SidebarTrigger className="-ml-1" />
             </a>
-            {/* Search form */}
-
           </div>
         </div>
-        <div className="relative flex-1 sm:hidden md:block">
-          <Input
-            id={id}
-            className="peer w-96 h-8 ps-8 pe-2"
-            placeholder="Search..."
-            type="search"
-          />
-          <div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-2 peer-disabled:opacity-50">
-            <SearchIcon size={16} />
-          </div>
+        
+        {/* Center - Global Search */}
+        <div className="relative flex-1 max-w-md">
+          <GlobalSearch />
         </div>
+        
         {/* Right side */}
         <div className="flex flex-1 items-center justify-end gap-4">
           <div className="flex items-center gap-2">
-
             <Button
               size="icon"
               variant="ghost"
@@ -55,8 +44,8 @@ export default function DashboardHeader() {
               onClick={() => setSettings("notifications")}
             >
               <Settings size={16} aria-hidden="true" />
-
             </Button>
+            
             {/* Messages */}
             <Button
               size="icon"
@@ -70,9 +59,11 @@ export default function DashboardHeader() {
                 className="bg-primary absolute top-0.5 right-0.5 size-1 rounded-full"
               />
             </Button>
-            {/* Notification menu */}
-            <NotificationMenu />
+            
+            {/* Notification Center - New improved version */}
+            <NotificationCenter />
           </div>
+          
           {/* User menu */}
           <UserMenu />
         </div>
