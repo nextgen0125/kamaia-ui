@@ -87,14 +87,14 @@ export default function ContactPage() {
     {
       icon: <Phone className="size-5" />,
       title: "Telefone",
-      content: "+55 (11) 99999-9999",
-      link: "tel:+5511999999999",
+      content: "+244 949 273 453",
+      link: "tel:+244945837234",
       description: "Seg-Sex, 9h às 18h"
     },
     {
       icon: <MapPin className="size-5" />,
       title: "Endereço",
-      content: "São Paulo, SP - Brasil",
+      content: "Luanda, Angola",
       link: "#",
       description: "Av. Paulista, 1000"
     },
@@ -243,7 +243,7 @@ export default function ContactPage() {
                               <FormItem>
                                 <FormLabel>Telefone</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="(11) 99999-9999" {...field} />
+                                  <Input placeholder="+244 932938932" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -382,9 +382,9 @@ export default function ContactPage() {
                       </a>
                     </li>
                     <li>
-                      <a href="/docs#api" className="text-sm text-violet-600 hover:underline flex items-center gap-2">
+                      {/* <a href="/docs#api" className="text-sm text-violet-600 hover:underline flex items-center gap-2">
                         ⚙️ Documentação da API
-                      </a>
+                      </a> */}
                     </li>
                   </ul>
                 </CardContent>
@@ -410,7 +410,7 @@ export default function ContactPage() {
                 <div className="text-center">
                   <MapPin className="size-12 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground">Mapa do escritório</p>
-                  <p className="text-sm text-muted-foreground">Av. Paulista, 1000 - São Paulo, SP</p>
+                  <p className="text-sm text-muted-foreground">Av. Paulista, 1000 - Luanda, Angola</p>
                 </div>
               </div>
             </Card>

@@ -10,7 +10,7 @@ export default function LoginPage({
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
-          <a href="#" className="flex items-center gap-2 font-medium">
+          <a href="/" className="flex items-center gap-2 font-medium">
             <Logo />
           </a>
         </div>
@@ -22,9 +22,9 @@ export default function LoginPage({
       </div>
       <div className="bg-muted relative hidden lg:block">
         <img
-          src="/placeholder.svg"
+          src="/kamaia-banner.png"
           alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.5] dark:grayscale"
         />
       </div>
     </div>

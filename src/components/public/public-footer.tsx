@@ -167,7 +167,7 @@ export function PublicFooter() {
                 href="tel:+5511999999999" 
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                +55 (11) 99999-9999
+                +244 949 473 123
               </a>
             </div>
           </div>
@@ -177,7 +177,7 @@ export function PublicFooter() {
             <div>
               <p className="text-sm font-medium">Endereço</p>
               <p className="text-sm text-muted-foreground">
-                São Paulo, SP - Brasil
+                Luanda, Angola
               </p>
             </div>
           </div>
@@ -188,7 +188,7 @@ export function PublicFooter() {
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground text-center md:text-left">
-            © {new Date().getFullYear()} Kamaia SaaS. Todos os direitos reservados.
+            © {new Date().getFullYear()} Kamaia. Todos os direitos reservados.
           </p>
 
           {/* Social Links */}

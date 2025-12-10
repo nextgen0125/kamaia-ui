@@ -13,11 +13,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Moon, Sun, Laptop } from "lucide-react"
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { useLanguage } from "@/contexts/language-context"
 
 export function PublicHeader() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { setTheme, theme } = useTheme()
+  const { t } = useLanguage()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,10 +32,10 @@ export function PublicHeader() {
   }, [])
 
   const navigation = [
-    { name: "Início", href: "/" },
-    { name: "Preços", href: "/pricing" },
-    { name: "Documentação", href: "/docs" },
-    { name: "Contato", href: "/contact" },
+    { name: t("nav.home"), href: "/" },
+    { name: t("nav.pricing"), href: "/pricing" },
+    { name: t("nav.docs"), href: "/docs" },
+    { name: t("nav.contact"), href: "/contact" },
   ]
 
   return (
@@ -68,6 +71,11 @@ export function PublicHeader() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
+            {/* Language Switcher */}
+            <div className="hidden sm:block">
+              <LanguageSwitcher />
+            </div>
+
             {/* Theme Toggle */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -94,11 +102,11 @@ export function PublicHeader() {
             </DropdownMenu>
 
             <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-              <Link href="/login">Entrar</Link>
+              <Link href="/login">{t("nav.login")}</Link>
             </Button>
             
             <Button size="sm" asChild className="hidden sm:inline-flex">
-              <Link href="/register">Começar Grátis</Link>
+              <Link href="/contact">{t("nav.register")}</Link>
             </Button>
 
             {/* Mobile Menu Button */}
@@ -131,11 +139,14 @@ export function PublicHeader() {
               </Link>
             ))}
             <div className="px-4 pt-4 space-y-2 border-t">
+              <div className="mb-2">
+                <LanguageSwitcher />
+              </div>
               <Button variant="outline" size="sm" asChild className="w-full">
-                <Link href="/login">Entrar</Link>
+                <Link href="/login">{t("nav.login")}</Link>
               </Button>
               <Button size="sm" asChild className="w-full">
-                <Link href="/register">Começar Grátis</Link>
+                <Link href="/contact">{t("nav.register")}</Link>
               </Button>
             </div>
           </div>

@@ -17,6 +17,7 @@ import {
   HelpCircle,
   ChevronLeft,
   Menu,
+  User,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -56,6 +57,11 @@ const menuItems = [
 ]
 
 const bottomMenuItems = [
+  {
+    title: "Meu Perfil",
+    icon: User,
+    href: "/customers/dashboard/profile",
+  },
   {
     title: "Ajuda",
     icon: HelpCircle,

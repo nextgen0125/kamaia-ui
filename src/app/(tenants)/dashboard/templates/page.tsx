@@ -244,7 +244,7 @@ export default function TemplatesPage() {
               <div className="space-y-2">
                 <Label>Variáveis Disponíveis</Label>
                 <p className="text-xs text-muted-foreground">
-                  Use as seguintes variáveis no conteúdo: {{"{{"}}cliente_nome{{"}}"}}, {{"{{"}}processo_numero{{"}}"}}, {{"{{"}}data_hoje{{"}}"}}
+                  Use as seguintes variáveis no conteúdo: &#123;&#123;cliente_nome&#125;&#125;, &#123;&#123;processo_numero&#125;&#125;, &#123;&#123;data_hoje&#125;&#125;
                 </p>
               </div>
             </div>

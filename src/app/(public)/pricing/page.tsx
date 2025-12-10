@@ -217,7 +217,7 @@ export default function PricingPage() {
                   <div className="mt-6">
                     <div className="flex items-baseline justify-center gap-2">
                       <span className="text-5xl font-bold">
-                        R$ {plan.price[billingCycle]}
+                        {plan.price[billingCycle]} AOA
                       </span>
                       <span className="text-muted-foreground">/mês</span>
                     </div>

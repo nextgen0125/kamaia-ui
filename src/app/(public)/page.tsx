@@ -16,10 +16,14 @@ import {
   Zap,
   Sparkles,
   Star,
-  Quote
+  Quote,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
+import useEmblaCarousel from 'embla-carousel-react'
+import Autoplay from 'embla-carousel-autoplay'
 
-// Partículas animadas no Canvas
+// Partículas animadas no Canvas com ícones jurídicos
 const ParticleCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -33,6 +37,9 @@ const ParticleCanvas = () => {
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
 
+    // Ícones jurídicos em Unicode
+    const legalIcons = ['⚖️', '📜', '📝', '🏛️', '⚡', '🔒', '✓', '§']
+    
     const particles: Array<{
       x: number
       y: number
@@ -40,17 +47,24 @@ const ParticleCanvas = () => {
       speedX: number
       speedY: number
       opacity: number
+      icon?: string
+      isIcon: boolean
+      rotation: number
     }> = []
 
-    // Criar partículas
+    // Criar partículas (70% círculos, 30% ícones)
     for (let i = 0; i < 50; i++) {
+      const isIcon = Math.random() > 0.7
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 3 + 1,
+        size: isIcon ? Math.random() * 10 + 15 : Math.random() * 3 + 1,
         speedX: (Math.random() - 0.5) * 0.5,
         speedY: (Math.random() - 0.5) * 0.5,
-        opacity: Math.random() * 0.5 + 0.2
+        opacity: Math.random() * 0.5 + 0.2,
+        icon: isIcon ? legalIcons[Math.floor(Math.random() * legalIcons.length)] : undefined,
+        isIcon,
+        rotation: Math.random() * Math.PI * 2
       })
     }
 
@@ -61,6 +75,7 @@ const ParticleCanvas = () => {
         // Atualizar posição
         particle.x += particle.speedX
         particle.y += particle.speedY
+        particle.rotation += 0.01
 
         // Wrap around
         if (particle.x < 0) particle.x = canvas.width
@@ -69,26 +84,42 @@ const ParticleCanvas = () => {
         if (particle.y > canvas.height) particle.y = 0
 
         // Desenhar partícula
-        ctx.beginPath()
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(139, 92, 246, ${particle.opacity})`
-        ctx.fill()
+        if (particle.isIcon && particle.icon) {
+          ctx.save()
+          ctx.translate(particle.x, particle.y)
+          ctx.rotate(particle.rotation)
+          ctx.globalAlpha = particle.opacity
+          ctx.font = `${particle.size}px Arial`
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(particle.icon, 0, 0)
+          ctx.restore()
+        } else {
+          ctx.beginPath()
+          ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
+          ctx.fillStyle = `rgba(139, 92, 246, ${particle.opacity})`
+          ctx.fill()
+        }
 
-        // Conectar partículas próximas
-        particles.slice(i + 1).forEach(p2 => {
-          const dx = particle.x - p2.x
-          const dy = particle.y - p2.y
-          const distance = Math.sqrt(dx * dx + dy * dy)
+        // Conectar partículas próximas (apenas círculos)
+        if (!particle.isIcon) {
+          particles.slice(i + 1).forEach(p2 => {
+            if (!p2.isIcon) {
+              const dx = particle.x - p2.x
+              const dy = particle.y - p2.y
+              const distance = Math.sqrt(dx * dx + dy * dy)
 
-          if (distance < 120) {
-            ctx.beginPath()
-            ctx.strokeStyle = `rgba(139, 92, 246, ${0.15 * (1 - distance / 120)})`
-            ctx.lineWidth = 0.5
-            ctx.moveTo(particle.x, particle.y)
-            ctx.lineTo(p2.x, p2.y)
-            ctx.stroke()
-          }
-        })
+              if (distance < 120) {
+                ctx.beginPath()
+                ctx.strokeStyle = `rgba(139, 92, 246, ${0.15 * (1 - distance / 120)})`
+                ctx.lineWidth = 0.5
+                ctx.moveTo(particle.x, particle.y)
+                ctx.lineTo(p2.x, p2.y)
+                ctx.stroke()
+              }
+            }
+          })
+        }
       })
 
       requestAnimationFrame(animate)
@@ -142,6 +173,100 @@ const AnimatedStat = ({ value, label, suffix = '' }: { value: number, label: str
         {count}{suffix}
       </div>
       <div className="text-sm text-muted-foreground mt-2">{label}</div>
+    </div>
+  )
+}
+
+// Componente de Carousel de Depoimentos
+const TestimonialsCarousel = ({ testimonials }: { testimonials: any[] }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })])
+  const [selectedIndex, setSelectedIndex] = useState(0)
+
+  useEffect(() => {
+    if (!emblaApi) return
+
+    const onSelect = () => {
+      setSelectedIndex(emblaApi.selectedScrollSnap())
+    }
+
+    emblaApi.on('select', onSelect)
+    onSelect()
+
+    return () => {
+      emblaApi.off('select', onSelect)
+    }
+  }, [emblaApi])
+
+  const scrollPrev = () => emblaApi?.scrollPrev()
+  const scrollNext = () => emblaApi?.scrollNext()
+
+  return (
+    <div className="relative max-w-6xl mx-auto">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
+          {testimonials.map((testimonial, index) => (
+            <div key={index} className="flex-[0_0_100%] min-w-0 md:flex-[0_0_50%] lg:flex-[0_0_33.333%] px-4">
+              <Card className="relative overflow-hidden group hover:shadow-xl transition-all duration-300 h-full">
+                <Quote className="absolute top-4 right-4 size-8 text-violet-500/20 group-hover:scale-125 transition-transform" />
+                
+                <CardHeader>
+                  <div className="flex items-center gap-4">
+                    <div className="text-4xl">{testimonial.avatar}</div>
+                    <div>
+                      <CardTitle className="text-lg">{testimonial.name}</CardTitle>
+                      <CardDescription className="text-sm">
+                        {testimonial.role}
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+
+                <CardContent>
+                  <div className="flex gap-1 mb-4">
+                    {Array.from({ length: testimonial.rating }).map((_, i) => (
+                      <Star key={i} className="size-4 fill-yellow-500 text-yellow-500" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground italic">
+                    "{testimonial.content}"
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Navigation Buttons */}
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full shadow-lg z-10"
+        onClick={scrollPrev}
+      >
+        <ChevronLeft className="size-4" />
+      </Button>
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 rounded-full shadow-lg z-10"
+        onClick={scrollNext}
+      >
+        <ChevronRight className="size-4" />
+      </Button>
+
+      {/* Dots */}
+      <div className="flex justify-center gap-2 mt-8">
+        {testimonials.map((_, index) => (
+          <button
+            key={index}
+            className={`h-2 rounded-full transition-all ${
+              index === selectedIndex ? 'w-8 bg-violet-600' : 'w-2 bg-muted-foreground/30'
+            }`}
+            onClick={() => emblaApi?.scrollTo(index)}
+          />
+        ))}
+      </div>
     </div>
   )
 }
@@ -419,7 +544,7 @@ export default function HomePage() {
                   <div className="mt-4">
                     <div className="flex items-baseline gap-2">
                       <span className="text-4xl font-bold">
-                        ${plan.price[billingCycle]}
+                        {plan.price[billingCycle]}kz
                       </span>
                       <span className="text-muted-foreground">/mês</span>
                     </div>
@@ -454,7 +579,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Testimonials Section - Carousel */}
       <section className="py-20 md:py-32">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -465,40 +590,11 @@ export default function HomePage() {
               O que nossos clientes dizem
             </h2>
             <p className="text-xl text-muted-foreground">
-              Escritórios de todo o Brasil confiam no Kamaia
+              Escritórios de toda Angola e Mundo confiam no Kamaia
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="relative overflow-hidden group hover:shadow-xl transition-all duration-300">
-                <Quote className="absolute top-4 right-4 size-8 text-violet-500/20 group-hover:scale-125 transition-transform" />
-                
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className="text-4xl">{testimonial.avatar}</div>
-                    <div>
-                      <CardTitle className="text-lg">{testimonial.name}</CardTitle>
-                      <CardDescription className="text-sm">
-                        {testimonial.role}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent>
-                  <div className="flex gap-1 mb-4">
-                    {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Star key={i} className="size-4 fill-yellow-500 text-yellow-500" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground italic">
-                    "{testimonial.content}"
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <TestimonialsCarousel testimonials={testimonials} />
         </div>
       </section>
 
