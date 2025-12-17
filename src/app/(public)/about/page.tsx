@@ -55,10 +55,10 @@ export default function AboutPage() {
               Sobre Nós
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Transformando a gestão jurídica no Brasil
+              Transformando a gestão jurídica no Mundo
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Fundada em 2020, a Kamaia nasceu da necessidade de modernizar e simplificar 
+              Fundada em 20xx, a Kamaia nasceu da necessidade de modernizar e simplificar 
               a gestão de escritórios de advocacia através da tecnologia.
             </p>
           </div>
@@ -105,7 +105,7 @@ export default function AboutPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Ser a plataforma líder em gestão jurídica na América Latina, reconhecida pela 
+                  Ser a plataforma líder em gestão jurídica no Mundo, reconhecida pela 
                   inovação, qualidade e impacto positivo na vida dos profissionais do direito.
                 </p>
               </CardContent>

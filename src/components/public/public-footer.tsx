@@ -24,8 +24,8 @@ export function PublicFooter() {
     resources: [
       { name: "Documentação", href: "/docs" },
       // { name: "API", href: "/docs/api" },
-      { name: "Tutoriais", href: "/docs/tutorials" },
-      { name: "FAQ", href: "/docs/faq" },
+      { name: "Tutoriais", href: "/tutorials" },
+      { name: "FAQ", href: "/faq" },
     ],
     legal: [
       { name: "Termos de Uso", href: "/terms" },

@@ -8,7 +8,7 @@ import { Newspaper, Download, Mail } from "lucide-react"
 export default function PressPage() {
   const pressReleases = [
     {
-      title: "Kamaia Levanta R$ 10 Milhões em Série A",
+      title: "Kamaia Levanta AOA 10 Milhões em Série A",
       date: "15 Jan 2025",
       description: "Investimento será usado para expandir operações e desenvolver novas funcionalidades de IA."
     },

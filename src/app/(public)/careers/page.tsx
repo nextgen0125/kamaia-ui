@@ -10,7 +10,7 @@ export default function CareersPage() {
     {
       title: "Desenvolvedor Full Stack Sênior",
       department: "Engenharia",
-      location: "São Paulo, SP (Híbrido)",
+      location: "Luanda, Cazenga (Híbrido)",
       type: "Tempo Integral",
       description: "Buscamos um desenvolvedor experiente em React, Node.js e cloud para liderar projetos desafiadores."
     },
@@ -24,7 +24,7 @@ export default function CareersPage() {
     {
       title: "Customer Success Manager",
       department: "Atendimento",
-      location: "São Paulo, SP",
+      location: "Luanda, Cazenga",
       type: "Tempo Integral",
       description: "Ajude nossos clientes a terem sucesso e construa relacionamentos duradouros."
     },

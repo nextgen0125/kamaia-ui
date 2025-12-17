@@ -1,4 +1,5 @@
 import { Logo } from "@/components/logo";
+import { Card } from "@/components/ui/card";
 
 
 export default function LoginPage({
@@ -7,26 +8,28 @@ export default function LoginPage({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="grid min-h-svh lg:grid-cols-2">
-      <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex justify-center gap-2 md:justify-start">
-          <a href="/" className="flex items-center gap-2 font-medium">
-            <Logo />
-          </a>
-        </div>
+    <div className="grid min-h-svh lg:grid-cols-1">
+      <div className="flex flex-col gap-4 p-6 md:p-10 "> 
+        
         <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-xs">
+          <Card className="w-full max-w-lg p-10">
+            <div className="flex justify-center gap-2">
+              <a href="/" className="flex items-center gap-2 font-medium">
+                <Logo />
+              </a>
+            </div>
+
             {children}
-          </div>
+          </Card>
         </div>
       </div>
-      <div className="bg-muted relative hidden lg:block">
+      {/* <div className="bg-muted relative hidden lg:block">
         <img
           src="/kamaia-banner.png"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.5] dark:grayscale"
         />
-      </div>
+      </div> */}
     </div>
   )
 }

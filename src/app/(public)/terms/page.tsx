@@ -106,8 +106,8 @@ export default function TermsPage() {
 
               <h2>11. Lei Aplicável</h2>
               <p>
-                Estes termos são regidos pelas leis da República Federativa do Brasil. Qualquer disputa será resolvida 
-                nos tribunais competentes de São Paulo, SP.
+                Estes termos são regidos pelas leis da República Federativa de Angola. Qualquer disputa será resolvida 
+                nos tribunais competentes de Angola, Luanda.
               </p>
 
               <h2>12. Contato</h2>
@@ -116,7 +116,7 @@ export default function TermsPage() {
               </p>
               <ul>
                 <li>Email: legal@kamaia.com</li>
-                <li>Endereço: São Paulo, SP - Brasil</li>
+                <li>Endereço: Angola, Luanda - Angola</li>
               </ul>
             </CardContent>
           </Card>

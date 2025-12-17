@@ -118,7 +118,7 @@ export default function PrivacyPage() {
 
               <h2>9. Transferência Internacional de Dados</h2>
               <p>
-                Seus dados são armazenados em servidores localizados no Brasil. Caso seja necessária transferência 
+                Seus dados são armazenados em servidores localizados em Angola. Caso seja necessária transferência 
                 internacional, garantiremos proteção adequada conforme exigido pela LGPD.
               </p>
 
@@ -141,7 +141,7 @@ export default function PrivacyPage() {
               </p>
               <ul>
                 <li>Email: dpo@kamaia.com</li>
-                <li>Endereço: São Paulo, SP - Brasil</li>
+                <li>Endereço: Luanda - Angola</li>
               </ul>
             </CardContent>
           </Card>

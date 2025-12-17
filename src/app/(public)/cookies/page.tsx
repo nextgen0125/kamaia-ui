@@ -157,7 +157,7 @@ export default function CookiesPage() {
               </p>
               <ul>
                 <li>Email: privacy@kamaia.com</li>
-                <li>Endereço: São Paulo, SP - Brasil</li>
+                <li>Endereço: Luanda, Angola - Angola</li>
               </ul>
             </CardContent>
           </Card>
