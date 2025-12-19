@@ -20,17 +20,19 @@ export default function DashboardHeader() {
     <header className="px-4 md:px-6 h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 bg-sidebar">
       <div className="flex h-16 items-center justify-between gap-4">
         {/* Left side */}
-        <div className="flex flex-1 items-center gap-2">
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-foreground hover:text-primary/90">
-              <SidebarTrigger className="-ml-1" />
-            </a>
+        <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-6">
+              <a href="#" className="text-foreground hover:text-primary/90">
+                <SidebarTrigger className="-ml-1" />
+              </a>
+            </div>
           </div>
-        </div>
-        
-        {/* Center - Global Search */}
-        <div className="relative flex-1 max-w-md">
-          <GlobalSearch />
+          
+          {/* Center - Global Search */}
+          <div className="relative max-w-md">
+            <GlobalSearch />
+          </div>
         </div>
         
         {/* Right side */}
