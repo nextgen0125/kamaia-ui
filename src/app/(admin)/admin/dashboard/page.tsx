@@ -85,7 +85,7 @@ export default function AdminDashboardPage() {
   ]
 
   const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "AOA" }).format(value)
 
   const getStatusBadge = (status: string) => {
     const config = {
