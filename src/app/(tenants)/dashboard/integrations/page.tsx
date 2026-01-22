@@ -152,7 +152,7 @@ export default function IntegrationsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Integrações</h1>
           <p className="text-muted-foreground">
-            Conecte o Kamaia com suas ferramentas favoritas
+            Conecte a Kamaia com suas ferramentas favoritas
           </p>
         </div>
       </div>

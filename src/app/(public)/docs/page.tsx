@@ -37,7 +37,7 @@ export default function DocsPage() {
     {
       icon: <Rocket className="size-6" />,
       title: "Primeiros Passos",
-      description: "Comece a usar o Kamaia rapidamente",
+      description: "Comece a usar a Kamaia rapidamente",
       color: "from-blue-500 to-cyan-500",
       articles: [
         { title: "Como criar sua conta", href: "#create-account", time: "3 min" },
@@ -113,7 +113,7 @@ export default function DocsPage() {
       category: "Conta e Assinatura",
       questions: [
         {
-          question: "Como criar minha conta no Kamaia?",
+          question: "Como criar minha conta na Kamaia?",
           answer: "Para criar sua conta, clique em 'Começar Grátis' no topo da página, preencha seus dados e confirme o email. Você terá 14 dias de teste gratuito em todas as funcionalidades."
         },
         {
@@ -176,7 +176,7 @@ export default function DocsPage() {
 
   const videos = [
     {
-      title: "Introdução ao Kamaia",
+      title: "Introdução à Kamaia",
       duration: "5:30",
       thumbnail: "🎬",
       category: "Iniciante",
@@ -215,7 +215,7 @@ export default function DocsPage() {
       duration: "15:30",
       thumbnail: "⚙️",
       category: "Avançado",
-      description: "Integre o Kamaia com outras ferramentas"
+      description: "Integre a Kamaia com outras ferramentas"
     }
   ]
 

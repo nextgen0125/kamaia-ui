@@ -107,7 +107,7 @@ export function AddClientDialog({ onSuccess }: AddClientDialogProps) {
           Adicionar Cliente
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
         <DialogHeader>
           <DialogTitle>Adicionar Cliente</DialogTitle>
           <DialogDescription>

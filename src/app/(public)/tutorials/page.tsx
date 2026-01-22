@@ -9,7 +9,7 @@ import Link from "next/link"
 export default function TutorialsPage() {
   const tutorials = [
     {
-      title: "Primeiros Passos com o Kamaia",
+      title: "Primeiros Passos com a Kamaia",
       type: "video",
       duration: "15 min",
       level: "Iniciante",
@@ -61,7 +61,7 @@ export default function TutorialsPage() {
       type: "article",
       duration: "25 min",
       level: "Avançado",
-      description: "Guia completo para integrar o Kamaia com outros sistemas.",
+      description: "Guia completo para integrar a Kamaia com outros sistemas.",
       icon: "🔌"
     },
     {
@@ -92,7 +92,7 @@ export default function TutorialsPage() {
               Tutoriais
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Aprenda a usar o Kamaia
+              Aprenda a usar a Kamaia
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
               Tutoriais em vídeo e artigos para ajudar você a dominar a plataforma

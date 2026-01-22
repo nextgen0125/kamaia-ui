@@ -17,24 +17,27 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
-
-const registerSchema = z.object({
-    name: z.string().min(2, "O nome deve ter no mínimo 2 caracteres."),
-    email: z.string().email("Por favor, insira um email válido."),
-    password: z.string()
-      .min(6, "A senha deve ter no mínimo 6 caracteres.")
-      .max(50, "A senha deve ter no máximo 50 caracteres.")
-      .regex(/[A-Z]/, "A senha deve conter pelo menos uma letra maiúscula.")
-      .regex(/[a-z]/, "A senha deve conter pelo menos uma letra minúscula.")
-      .regex(/[0-9]/, "A senha deve conter pelo menos um número."),
-})
-
-type RegisterFormValues = z.infer<typeof registerSchema>
+import { useLanguage } from "@/contexts/language-context"
 
 export function RegisterForm({
     className,
     ...props
 }: React.ComponentProps<"form">) {
+    const { t } = useLanguage()
+    
+    const registerSchema = z.object({
+        name: z.string().min(2, t("validation.name.min")),
+        email: z.string().email(t("validation.email.invalid")),
+        password: z.string()
+          .min(6, t("validation.password.min"))
+          .max(50, t("validation.password.max"))
+          .regex(/[A-Z]/, t("validation.password.uppercase"))
+          .regex(/[a-z]/, t("validation.password.lowercase"))
+          .regex(/[0-9]/, t("validation.password.number")),
+    })
+
+    type RegisterFormValues = z.infer<typeof registerSchema>
+
     const form = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
         defaultValues: {
@@ -62,9 +65,9 @@ export function RegisterForm({
                 {...props}
             >
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-2xl font-bold">Criar uma conta</h1>
+                    <h1 className="text-2xl font-bold">{t("auth.register.title")}</h1>
                     <p className="text-muted-foreground text-sm">
-                        Preencha seus dados para se cadastrar
+                        {t("auth.register.subtitle")}
                     </p>
                 </div>
 
@@ -74,9 +77,9 @@ export function RegisterForm({
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Nome completo</FormLabel>
+                                <FormLabel>{t("auth.register.name")}</FormLabel>
                                 <FormControl>
-                                    <Input variant="kamaia" placeholder="João Silva" {...field} />
+                                    <Input variant="kamaia" placeholder={t("auth.register.name.placeholder")} {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -88,9 +91,9 @@ export function RegisterForm({
                         name="email"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Email</FormLabel>
+                                <FormLabel>{t("auth.register.email")}</FormLabel>
                                 <FormControl>
-                                    <Input type="email" variant="kamaia" placeholder="seu@email.com" {...field} />
+                                    <Input type="email" variant="kamaia" placeholder={t("auth.register.email.placeholder")} {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -102,9 +105,9 @@ export function RegisterForm({
                         name="password"
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Senha</FormLabel>
+                                <FormLabel>{t("auth.register.password")}</FormLabel>
                                 <FormControl>
-                                    <InputPassword variant="kamaia" placeholder="********" {...field} />
+                                    <InputPassword variant="kamaia" placeholder={t("auth.register.password.placeholder")} {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -112,14 +115,14 @@ export function RegisterForm({
                     />
 
                     <Button type="submit" className="w-full">
-                        Criar conta
+                        {t("auth.register.submit")}
                     </Button>
                 </div>
 
                 <div className="text-center text-sm">
-                    Já tem uma conta?{" "}
+                    {t("auth.register.has_account")}{" "}
                     <Link href="/login" className="underline underline-offset-4">
-                        Fazer login
+                        {t("auth.register.login")}
                     </Link>
                 </div>
             </form>

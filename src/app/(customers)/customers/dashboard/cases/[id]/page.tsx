@@ -40,7 +40,7 @@ const getCaseDetails = (id: string) => ({
     name: "Dr. João Silva",
     oab: "OAB/SP 123456",
     email: "joao.silva@escritorio.com",
-    phone: "(11) 91234-5678",
+    phone: "+244912345678",
   },
   timeline: [
     {
@@ -117,7 +117,7 @@ export default function CustomerCaseDetailPage() {
   const caseData = getCaseDetails(params.id as string)
 
   const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+    new Intl.NumberFormat("pt-AO", { style: "currency", currency: "AOA" }).format(value)
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })

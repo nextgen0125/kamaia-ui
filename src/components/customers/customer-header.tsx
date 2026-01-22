@@ -20,7 +20,7 @@ export function CustomerHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background">
-      <div className="flex h-16 items-center gap-4 px-6">
+      <div className="flex h-16 items-center justify-between gap-4 px-6">
         {/* Search */}
         <div className="flex-1 max-w-md">
           <div className="relative">

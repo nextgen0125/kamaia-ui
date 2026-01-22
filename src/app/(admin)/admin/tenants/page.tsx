@@ -131,7 +131,7 @@ export default function TenantsPage() {
   })
 
   const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "AOA" }).format(value)
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "short", year: "numeric" })

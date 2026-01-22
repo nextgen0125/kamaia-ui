@@ -17,20 +17,23 @@ import Link from "next/link"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
-
-const loginSchema = z.object({
-  email: z.string().email("Por favor, insira um email válido."),
-  password: z.string()
-    .min(6, "A senha deve ter no mínimo 6 caracteres.")
-    .max(50, "A senha deve ter no máximo 50 caracteres."),
-})
-
-type LoginFormValues = z.infer<typeof loginSchema>
+import { useLanguage } from "@/contexts/language-context"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const { t } = useLanguage()
+  
+  const loginSchema = z.object({
+    email: z.string().email(t("validation.email.invalid")),
+    password: z.string()
+      .min(6, t("validation.password.min"))
+      .max(50, t("validation.password.max")),
+  })
+
+  type LoginFormValues = z.infer<typeof loginSchema>
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -54,9 +57,9 @@ export function LoginForm({
     <Form {...form}>
       <form className={cn("flex flex-col gap-6", className)} {...props}>
         <div className="flex flex-col items-center gap-2 text-center">
-          <h1 className="text-2xl font-bold">Acesse sua conta</h1>
+          <h1 className="text-2xl font-bold">{t("auth.login.title")}</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Entre com suas credenciais para acessar o sistema
+            {t("auth.login.subtitle")}
           </p>
         </div>
         <div className="grid gap-6">
@@ -66,9 +69,9 @@ export function LoginForm({
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("auth.login.email")}</FormLabel>
                   <FormControl>
-                    <Input variant={'kamaia'} placeholder="seu@email.com" type="email" {...field} />
+                    <Input variant={'kamaia'} placeholder={t("auth.login.email.placeholder")} type="email" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -82,16 +85,16 @@ export function LoginForm({
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center">
-                    <FormLabel>Senha</FormLabel>
+                    <FormLabel>{t("auth.login.password")}</FormLabel>
                     <Link
                       href="/forgot-password"
                       className="ml-auto text-sm underline-offset-4 hover:underline"
                     >
-                      Esqueceu a senha?
+                      {t("auth.login.forgot")}
                     </Link>
                   </div>
                   <FormControl>
-                    <InputPassword variant="kamaia" placeholder="********" {...field} />
+                    <InputPassword variant="kamaia" placeholder={t("auth.login.password.placeholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -99,13 +102,13 @@ export function LoginForm({
             />
           </div>
           <Button type="button" onClick={form.handleSubmit(onSubmit)} className="w-full">
-            Entrar
+            {t("auth.login.submit")}
           </Button>
         </div>
         <div className="text-center text-sm">
-          Não tem uma conta?{" "}
+          {t("auth.login.no_account")}{" "}
           <Link href="/contact" className="underline underline-offset-4">
-            Entre em contacto
+            {t("auth.login.contact")}
           </Link>
         </div>
       </form>

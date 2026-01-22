@@ -54,10 +54,10 @@ const getClientDetails = (id: string) => ({
   id,
   name: "Carlos Eduardo Mendes",
   type: "pf",
-  cpf: "123.456.789-00",
+  cpf: "12323123123123123",
   rg: "12.345.678-9",
   email: "carlos.mendes@email.com",
-  phone: "(11) 98765-4321",
+  phone: "+244 945 923 923",
   birthDate: "1985-05-15",
   profession: "Engenheiro Civil",
   address: {
@@ -197,7 +197,7 @@ export default function ClientDetailsPage() {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
-      currency: "BRL",
+      currency: "AOA",
     }).format(value)
   }
 
@@ -359,7 +359,7 @@ export default function ClientDetailsPage() {
                 <CardContent className="space-y-4">
                   <div className="grid gap-4 md:grid-cols-2">
                     <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">CPF</h4>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">NIF</h4>
                       <p className="text-sm font-medium">{client.cpf}</p>
                     </div>
                     <div>

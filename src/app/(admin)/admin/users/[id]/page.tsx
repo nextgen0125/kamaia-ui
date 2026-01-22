@@ -24,7 +24,7 @@ export default function UserDetailsPage() {
     id: "USR-2025-001",
     name: "João Silva",
     email: "joao@silvaadvogados.com",
-    phone: "(11) 98765-4321",
+    phone: "+244 987654321",
     role: "Admin",
     tenant: "Silva & Advogados",
     tenantId: "TNT-2025-001",

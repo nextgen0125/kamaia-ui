@@ -131,7 +131,7 @@ export function AddCaseDialog({ onSuccess }: AddCaseDialogProps) {
           Novo Processo
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
         <DialogHeader>
           <DialogTitle>Novo Processo</DialogTitle>
           <DialogDescription>
@@ -392,7 +392,7 @@ export function AddCaseDialog({ onSuccess }: AddCaseDialogProps) {
                           <FormControl>
                             <Input type="number" placeholder="0,00" {...field} />
                           </FormControl>
-                          <FormDescription>Em reais (R$)</FormDescription>
+                          <FormDescription>Em kwanzas (AOA)</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

@@ -60,14 +60,14 @@ const getCaseDetails = (id: string) => ({
     type: "Pessoa Física",
     cpf: "123.456.789-00",
     email: "carlos.mendes@email.com",
-    phone: "(11) 98765-4321",
+    phone: "+244 945949302",
   },
   lawyer: {
     id: "1",
     name: "Dr. João Silva",
     oab: "OAB/SP 123456",
     email: "joao.silva@escritorio.com",
-    phone: "(11) 91234-5678",
+    phone: "+244 9659493092",
   },
   timeline: [
     {
@@ -256,7 +256,7 @@ export default function CaseDetailsPage() {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
-      currency: "BRL",
+      currency: "AOA",
     }).format(value)
   }
 

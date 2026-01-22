@@ -45,6 +45,7 @@ import {
   Star,
   Clock,
   Eye,
+  TrendingUp,
 } from "lucide-react"
 import { toast } from "sonner"
 

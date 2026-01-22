@@ -55,7 +55,7 @@ export default function CustomerNotificationsPage() {
       id: 5,
       type: "payment",
       title: "Fatura disponível",
-      message: "Nova fatura de R$ 500,00 disponível para pagamento",
+      message: "Nova fatura de 500.000 AOA disponível para pagamento",
       time: "2 dias atrás",
       read: true
     }

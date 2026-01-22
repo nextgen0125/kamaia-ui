@@ -110,6 +110,11 @@ const data = {
       icon: User2,
     },
     {
+      name: "Contactos",
+      url: "/dashboard/contacts",
+      icon: Users,
+    },
+    {
       name: "Advogados",
       url: "/dashboard/lawyers",
       icon: Users,

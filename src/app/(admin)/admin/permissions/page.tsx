@@ -97,7 +97,7 @@ export default function PermissionsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Configurar Permissões</CardTitle>
-          <CardDescription>Edite as permissões da função "Admin"</CardDescription>
+          <CardDescription>Edite as permissões da função &quot;Admin&quot;</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">

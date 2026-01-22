@@ -26,6 +26,8 @@ import { Search, Plus, MoreVertical, Edit, Trash2, Eye, TrendingUp, TrendingDown
 import Link from "next/link"
 import { AddTransactionDialog } from "@/components/finance/add-transaction-dialog"
 import { Progress } from "@/components/ui/progress"
+import { FinancialCard, StatCard } from "@/components/ui/mobile-card-extended"
+import { MobileCardList } from "@/components/ui/mobile-card-list"
 
 // Mock data
 const transactions = [
@@ -149,7 +151,7 @@ export default function FinancePage() {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
-      currency: "BRL",
+      currency: "AOA",
     }).format(value)
   }
 
@@ -273,7 +275,7 @@ export default function FinancePage() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="all" className="space-y-4" onValueChange={(v) => setFilterType(v as any)}>
-              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <TabsList>
                   <TabsTrigger value="all">Todos</TabsTrigger>
                   <TabsTrigger value="income">Receitas</TabsTrigger>
@@ -292,7 +294,8 @@ export default function FinancePage() {
               </div>
 
               <TabsContent value={filterType} className="space-y-4">
-                <div className="rounded-md border">
+                {/* Desktop Table */}
+                <div className="hidden md:block rounded-md border">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -384,6 +387,56 @@ export default function FinancePage() {
                     </TableBody>
                   </Table>
                 </div>
+
+                {/* Mobile View */}
+                <MobileCardList>
+                  {filteredTransactions.length === 0 ? (
+                    <div className="text-center py-12">
+                      <DollarSign className="size-12 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">Nenhum lançamento encontrado</p>
+                    </div>
+                  ) : (
+                    filteredTransactions.map((transaction) => (
+                      <FinancialCard
+                        key={transaction.id}
+                        id={transaction.id}
+                        type={transaction.type as "income" | "expense"}
+                        category={transaction.category}
+                        description={transaction.description}
+                        amount={transaction.amount}
+                        date={formatDate(transaction.date)}
+                        status={transaction.status as "completed" | "pending"}
+                        client={transaction.client || undefined}
+                        actions={
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="size-8">
+                                <MoreVertical className="size-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem>
+                                <Eye className="mr-2 size-4" />
+                                Ver detalhes
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Edit className="mr-2 size-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem className="text-destructive">
+                                <Trash2 className="mr-2 size-4" />
+                                Remover
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        }
+                      />
+                    ))
+                  )}
+                </MobileCardList>
               </TabsContent>
             </Tabs>
           </CardContent>
@@ -426,7 +479,8 @@ export default function FinancePage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
+          {/* Desktop Table */}
+          <div className="hidden md:block rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -496,6 +550,53 @@ export default function FinancePage() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Mobile View */}
+          <MobileCardList>
+            {invoices.map((invoice) => (
+              <FinancialCard
+                key={invoice.id}
+                id={invoice.id}
+                type="income"
+                category={invoice.number}
+                description={`Fatura para ${invoice.client}`}
+                amount={invoice.amount}
+                date={formatDate(invoice.dueDate)}
+                status={invoice.status === "paid" ? "completed" : "pending"}
+                client={invoice.client}
+                actions={
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="size-8">
+                        <MoreVertical className="size-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>
+                        <Eye className="mr-2 size-4" />
+                        Visualizar
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <FileText className="mr-2 size-4" />
+                        Baixar PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Edit className="mr-2 size-4" />
+                        Editar
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem className="text-destructive">
+                        <Trash2 className="mr-2 size-4" />
+                        Cancelar
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                }
+              />
+            ))}
+          </MobileCardList>
         </CardContent>
       </Card>
     </div>

@@ -57,17 +57,17 @@ const getLawyerDetails = (id: string) => ({
   name: "Dr. João Silva",
   oab: "OAB/SP 123456",
   email: "joao.silva@escritorio.com",
-  phone: "(11) 91234-5678",
+  phone: "+244 987654324",
   cpf: "123.456.789-00",
   birthDate: "1980-03-20",
   specialties: ["Direito Trabalhista", "Direito Civil", "Direito Empresarial"],
   status: "active",
   registrationDate: "2020-01-15",
   address: {
-    street: "Av. Paulista, 1000 - Sala 1501",
+    street: "Av. Gabriel Pereira, 1000 - Sala 1501",
     neighborhood: "Bela Vista",
-    city: "São Paulo",
-    state: "SP",
+    city: "Luanda",
+    state: "LD",
     zip: "01310-100",
   },
   stats: {
@@ -205,7 +205,7 @@ export default function LawyerDetailsPage() {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
-      currency: "BRL",
+      currency: "AOA",
     }).format(value)
   }
 
@@ -393,7 +393,7 @@ export default function LawyerDetailsPage() {
                       <p className="text-sm font-medium">{lawyer.oab}</p>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-1">CPF</h4>
+                      <h4 className="text-sm font-medium text-muted-foreground mb-1">NIF</h4>
                       <p className="text-sm font-medium">{lawyer.cpf}</p>
                     </div>
                     <div>

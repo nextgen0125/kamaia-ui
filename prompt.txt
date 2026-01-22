@@ -1,4 +1,0 @@
-Preciso que finalizes a funcionalidade de switch de idiomas nas diversas telas e componentes da área pública
-e de autenticação da aplicação/projeto.
-
-E por outra preciso que faças uma varredura no projeto completo e mudes todas as menções da palvra "do Kamaia" para "da Kamaia".

@@ -6,23 +6,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { 
   DollarSign, 
-  TrendingUp, 
-  Users, 
-  Calendar,
   Search,
   Filter,
-  CheckCircle2,
-  XCircle,
-  Clock,
   Download
 } from "lucide-react"
 
 export default function SubscriptionsPage() {
   const stats = [
-    { label: "Receita Mensal Recorrente", value: "R$ 89.450", change: "+12.5%", trend: "up" },
+    { label: "Receita Mensal Recorrente", value: "AOA  89.450", change: "+12.5%", trend: "up" },
     { label: "Assinaturas Ativas", value: "487", change: "+23", trend: "up" },
     { label: "Taxa de Cancelamento", value: "2.3%", change: "-0.5%", trend: "down" },
-    { label: "Ticket Médio", value: "R$ 183", change: "+5.2%", trend: "up" }
+    { label: "Ticket Médio", value: "AOA  183", change: "+5.2%", trend: "up" }
   ]
 
   const subscriptions = [
@@ -31,7 +25,7 @@ export default function SubscriptionsPage() {
       tenant: "Silva & Advogados",
       plan: "Professional",
       status: "active",
-      mrr: "R$ 199,00",
+      mrr: "AOA  199,00",
       startDate: "01/01/2025",
       nextBilling: "01/02/2025",
       users: 12
@@ -41,7 +35,7 @@ export default function SubscriptionsPage() {
       tenant: "Costa Lima Advogados",
       plan: "Enterprise",
       status: "active",
-      mrr: "R$ 399,00",
+      mrr: "AOA  399,00",
       startDate: "15/12/2024",
       nextBilling: "15/02/2025",
       users: 25
@@ -51,7 +45,7 @@ export default function SubscriptionsPage() {
       tenant: "Ferreira Jurídico",
       plan: "Starter",
       status: "trial",
-      mrr: "R$ 0,00",
+      mrr: "AOA  0,00",
       startDate: "20/01/2025",
       nextBilling: "03/02/2025",
       users: 3
@@ -61,7 +55,7 @@ export default function SubscriptionsPage() {
       tenant: "Mendes Associados",
       plan: "Professional",
       status: "past_due",
-      mrr: "R$ 199,00",
+      mrr: "AOA  199,00",
       startDate: "10/11/2024",
       nextBilling: "Vencido",
       users: 8
