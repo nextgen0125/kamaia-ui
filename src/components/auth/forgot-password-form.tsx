@@ -17,17 +17,20 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { Mail, ArrowLeft } from "lucide-react"
-
-const forgotPasswordSchema = z.object({
-  email: z.string().email("Por favor, insira um email válido."),
-})
-
-type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+import { useLanguage } from "@/contexts/language-context"
 
 export function ForgotPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const { t } = useLanguage()
+  
+  const forgotPasswordSchema = z.object({
+    email: z.string().email(t("validation.email.invalid")),
+  })
+
+  type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>
+
   const form = useForm<ForgotPasswordFormValues>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
@@ -36,8 +39,8 @@ export function ForgotPasswordForm({
   })
 
   function onSubmit(values: ForgotPasswordFormValues) {
-    toast.success("Email enviado!", {
-      description: "Verifique sua caixa de entrada para redefinir sua senha.",
+    toast.success(t("auth.forgot.success"), {
+      description: t("auth.forgot.success.description"),
     })
     console.log(values)
   }
@@ -53,9 +56,9 @@ export function ForgotPasswordForm({
           <div className="size-12 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white mb-2">
             <Mail className="size-6" />
           </div>
-          <h1 className="text-2xl font-bold">Esqueceu sua senha?</h1>
+          <h1 className="text-2xl font-bold">{t("auth.forgot.title")}</h1>
           <p className="text-muted-foreground text-sm">
-            Insira seu email e enviaremos um link para redefinir sua senha
+            {t("auth.forgot.subtitle")}
           </p>
         </div>
 
@@ -65,12 +68,12 @@ export function ForgotPasswordForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("auth.forgot.email")}</FormLabel>
                 <FormControl>
                   <Input
                     variant="kamaia"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder={t("auth.forgot.email.placeholder")}
                     {...field}
                   />
                 </FormControl>
@@ -80,14 +83,14 @@ export function ForgotPasswordForm({
           />
 
           <Button type="submit" className="w-full">
-            Enviar link de recuperação
+            {t("auth.forgot.submit")}
           </Button>
         </div>
 
         <div className="text-center text-sm">
           <Link href="/login" className="inline-flex items-center gap-2 underline underline-offset-4">
             <ArrowLeft className="size-3.5" />
-            Voltar para o login
+            {t("auth.forgot.back")}
           </Link>
         </div>
       </form>

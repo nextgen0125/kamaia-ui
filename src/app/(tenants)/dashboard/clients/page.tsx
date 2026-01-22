@@ -26,6 +26,8 @@ import { Search, Plus, MoreVertical, Edit, Trash2, Eye, Mail, Phone, Building2, 
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AddClientDialog } from "@/components/clients/add-client-dialog"
+import { ProfileCard } from "@/components/ui/mobile-card-variants"
+import { MobileCardList } from "@/components/ui/mobile-card-list"
 
 // Mock data
 const clients = [
@@ -208,7 +210,8 @@ export default function ClientsPage() {
             </div>
 
             <TabsContent value={filterType} className="space-y-4">
-              <div className="rounded-md border">
+              {/* Desktop Table */}
+              <div className="hidden md:block rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -314,6 +317,71 @@ export default function ClientsPage() {
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Mobile View */}
+              <MobileCardList>
+                {filteredClients.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Users className="size-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Nenhum cliente encontrado</p>
+                  </div>
+                ) : (
+                  filteredClients.map((client) => (
+                    <ProfileCard
+                      key={client.id}
+                      id={client.id}
+                      name={client.name}
+                      subtitle={client.cpfCnpj}
+                      avatar={client.avatar}
+                      badges={[
+                        { 
+                          label: client.type === "legal" ? "Pessoa Jurídica" : "Pessoa Física",
+                          variant: "secondary" as const
+                        },
+                        { 
+                          label: client.status === "active" ? "Ativo" : "Inativo",
+                          variant: client.status === "active" ? "default" as const : "outline" as const
+                        }
+                      ]}
+                      stats={[
+                        { label: "Casos", value: client.cases },
+                        { label: "Email", value: "📧" },
+                        { label: "Tel", value: "📞" }
+                      ]}
+                      actions={
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="size-8">
+                              <MoreVertical className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/clients/${client.id}`}>
+                                <Eye className="mr-2 size-4" />
+                                Ver detalhes
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/clients/${client.id}/edit`}>
+                                <Edit className="mr-2 size-4" />
+                                Editar
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="mr-2 size-4" />
+                              Remover
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      }
+                    />
+                  ))
+                )}
+              </MobileCardList>
             </TabsContent>
           </Tabs>
         </CardContent>

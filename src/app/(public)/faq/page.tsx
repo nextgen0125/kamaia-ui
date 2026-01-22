@@ -13,8 +13,8 @@ export default function FAQPage() {
       category: "Geral",
       questions: [
         {
-          q: "O que é o Kamaia?",
-          a: "O Kamaia é uma plataforma completa de gestão para escritórios de advocacia e departamentos jurídicos, que integra gestão de processos, clientes, documentos, finanças e muito mais em um único sistema."
+          q: "O que é a Kamaia?",
+          a: "A Kamaia é uma plataforma completa de gestão para escritórios de advocacia e departamentos jurídicos, que integra gestão de processos, clientes, documentos, finanças e muito mais em um único sistema."
         },
         {
           q: "Como funciona o período de teste gratuito?",
@@ -52,7 +52,7 @@ export default function FAQPage() {
         },
         {
           q: "O sistema é compatível com a LGPD?",
-          a: "Sim, o Kamaia está 100% em conformidade com a Lei Geral de Proteção de Dados (LGPD) e outras regulamentações de privacidade."
+          a: "Sim, a Kamaia está 100% em conformidade com a Lei Geral de Proteção de Dados (LGPD) e outras regulamentações de privacidade."
         },
         {
           q: "Como funciona o backup dos dados?",
@@ -65,7 +65,7 @@ export default function FAQPage() {
       questions: [
         {
           q: "Posso acessar o sistema de qualquer lugar?",
-          a: "Sim, o Kamaia é 100% baseado na nuvem e pode ser acessado de qualquer dispositivo com internet, incluindo computadores, tablets e smartphones."
+          a: "Sim, a Kamaia é 100% baseada na nuvem e pode ser acessada de qualquer dispositivo com internet, incluindo computadores, tablets e smartphones."
         },
         {
           q: "Existe aplicativo mobile?",
@@ -110,7 +110,7 @@ export default function FAQPage() {
               Perguntas Frequentes
             </h1>
             <p className="text-xl text-muted-foreground">
-              Encontre respostas para as dúvidas mais comuns sobre o Kamaia
+              Encontre respostas para as dúvidas mais comuns sobre a Kamaia
             </p>
           </div>
         </div>

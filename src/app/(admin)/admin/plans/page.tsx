@@ -100,7 +100,7 @@ const plans = [
 
 export default function PlansPage() {
   const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "AOA" }).format(value)
 
   const totalSubscriptions = plans.reduce((sum, p) => sum + p.stats.subscriptions, 0)
   const totalRevenue = plans.reduce((sum, p) => sum + p.stats.revenue, 0)

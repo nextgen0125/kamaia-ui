@@ -213,7 +213,7 @@ export function ComparisonCards() {
     if (unit === "currency") {
       return new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "BRL",
+        currency: "AOA",
         minimumFractionDigits: 0,
       }).format(value)
     }
@@ -292,7 +292,7 @@ export function ScatterPlot() {
             Tempo (meses)
           </div>
           <div className="absolute top-0 left-0 text-xs text-muted-foreground -rotate-90 origin-left">
-            Valor (R$)
+            Valor (AOA)
           </div>
 
           {/* Data points */}

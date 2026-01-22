@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Check, Sparkles, Shield, Zap, Users, HardDrive, HeadphonesIcon, BarChart3, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { useLanguage } from "@/contexts/language-context"
 
 export default function PricingPage() {
+  const { t } = useLanguage()
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'semester' | 'annual'>('monthly')
 
   const plans = [
@@ -85,60 +87,60 @@ export default function PricingPage() {
   const features = [
     {
       icon: <Users className="size-5" />,
-      title: 'Multi-usuário',
-      description: 'Gestão de equipes com controle de permissões'
+      title: t('pricing.features.multiuser.title'),
+      description: t('pricing.features.multiuser.description')
     },
     {
       icon: <Shield className="size-5" />,
-      title: 'Segurança',
-      description: 'Criptografia e conformidade com LGPD'
+      title: t('pricing.features.security.title'),
+      description: t('pricing.features.security.description')
     },
     {
       icon: <Zap className="size-5" />,
-      title: 'Performance',
-      description: 'Sistema rápido e responsivo'
+      title: t('pricing.features.performance.title'),
+      description: t('pricing.features.performance.description')
     },
     {
       icon: <HardDrive className="size-5" />,
-      title: 'Armazenamento',
-      description: 'Cloud seguro e escalável'
+      title: t('pricing.features.storage.title'),
+      description: t('pricing.features.storage.description')
     },
     {
       icon: <HeadphonesIcon className="size-5" />,
-      title: 'Suporte',
-      description: 'Equipe especializada sempre disponível'
+      title: t('pricing.features.support.title'),
+      description: t('pricing.features.support.description')
     },
     {
       icon: <BarChart3 className="size-5" />,
-      title: 'Analytics',
-      description: 'Relatórios e insights avançados'
+      title: t('pricing.features.analytics.title'),
+      description: t('pricing.features.analytics.description')
     }
   ]
 
   const faqs = [
     {
-      question: 'Posso mudar de plano a qualquer momento?',
-      answer: 'Sim! Você pode fazer upgrade ou downgrade do seu plano a qualquer momento. As alterações entram em vigor no próximo ciclo de faturamento.'
+      question: t('pricing.faq.change_plan'),
+      answer: t('pricing.faq.change_plan.answer')
     },
     {
-      question: 'Existe período de teste gratuito?',
-      answer: 'Sim, oferecemos 14 dias de teste gratuito em todos os planos, sem necessidade de cartão de crédito.'
+      question: t('pricing.faq.trial'),
+      answer: t('pricing.faq.trial.answer')
     },
     {
-      question: 'Como funciona o cancelamento?',
-      answer: 'Você pode cancelar sua assinatura a qualquer momento sem multas ou taxas adicionais. Seus dados ficam disponíveis por 30 dias após o cancelamento.'
+      question: t('pricing.faq.cancel'),
+      answer: t('pricing.faq.cancel.answer')
     },
     {
-      question: 'Vocês oferecem desconto para ONGs?',
-      answer: 'Sim! Oferecemos descontos especiais para organizações sem fins lucrativos. Entre em contato com nossa equipe comercial.'
+      question: t('pricing.faq.ngo'),
+      answer: t('pricing.faq.ngo.answer')
     },
     {
-      question: 'Os preços incluem suporte técnico?',
-      answer: 'Sim, todos os planos incluem suporte técnico. O nível de suporte varia conforme o plano escolhido.'
+      question: t('pricing.faq.support_included'),
+      answer: t('pricing.faq.support_included.answer')
     },
     {
-      question: 'Há taxa de setup ou instalação?',
-      answer: 'Não, não cobramos nenhuma taxa de setup. Você paga apenas a mensalidade do plano escolhido.'
+      question: t('pricing.faq.setup_fee'),
+      answer: t('pricing.faq.setup_fee.answer')
     }
   ]
 
@@ -157,15 +159,15 @@ export default function PricingPage() {
           <div className="max-w-3xl mx-auto text-center">
             <Badge variant="outline" className="mb-6">
               <Sparkles className="size-3.5 mr-1.5" />
-              Planos e Preços
+              {t('pricing.badge')}
             </Badge>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-violet-600 via-blue-600 to-violet-600 bg-clip-text text-transparent">
-              Escolha o plano ideal para seu escritório
+              {t('pricing.title')}
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8">
-              Transparência total. Sem taxas ocultas. Cancele quando quiser.
+              {t('pricing.subtitle')}
             </p>
           </div>
         </div>
@@ -178,13 +180,13 @@ export default function PricingPage() {
           <div className="flex justify-center mb-12">
             <Tabs value={billingCycle} onValueChange={(v) => setBillingCycle(v as any)}>
               <TabsList className="grid w-full grid-cols-3 max-w-md">
-                <TabsTrigger value="monthly">Mensal</TabsTrigger>
+                <TabsTrigger value="monthly">{t('pricing.monthly')}</TabsTrigger>
                 <TabsTrigger value="semester">
-                  Semestral
+                  {t('pricing.semester')}
                   <Badge variant="secondary" className="ml-2 text-xs">-10%</Badge>
                 </TabsTrigger>
                 <TabsTrigger value="annual">
-                  Anual
+                  {t('pricing.annual')}
                   <Badge variant="secondary" className="ml-2 text-xs">-20%</Badge>
                 </TabsTrigger>
               </TabsList>
@@ -201,7 +203,7 @@ export default function PricingPage() {
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
                     <Badge className={`bg-gradient-to-r ${plan.color} text-white shadow-lg`}>
-                      Mais Popular
+                      {t('pricing.popular')}
                     </Badge>
                   </div>
                 )}
@@ -219,16 +221,16 @@ export default function PricingPage() {
                       <span className="text-5xl font-bold">
                         {plan.price[billingCycle]} AOA
                       </span>
-                      <span className="text-muted-foreground">/mês</span>
+                      <span className="text-muted-foreground">{t('pricing.per_month')}</span>
                     </div>
                     <div className="text-sm text-muted-foreground mt-2">
-                      {billingCycle === 'semester' && 'Faturado R$ ' + (plan.price.semester * 6) + ' semestralmente'}
-                      {billingCycle === 'annual' && 'Faturado R$ ' + (plan.price.annual * 12) + ' anualmente'}
-                      {billingCycle === 'monthly' && 'Faturado mensalmente'}
+                      {billingCycle === 'semester' && t('pricing.billed.semester')}
+                      {billingCycle === 'annual' && t('pricing.billed.annual')}
+                      {billingCycle === 'monthly' && t('pricing.billed.monthly')}
                     </div>
                     {billingCycle === 'annual' && (
                       <div className="text-sm text-green-600 dark:text-green-400 font-medium mt-1">
-                        Economize R$ {calculateSavings(plan)} por ano
+                        {t('pricing.save')} {calculateSavings(plan)} AOA {t('pricing.per_year')}
                       </div>
                     )}
                   </div>
@@ -236,7 +238,7 @@ export default function PricingPage() {
                   <div className="flex items-center justify-center gap-4 mt-4 text-sm">
                     <div className="flex items-center gap-1">
                       <Users className="size-4 text-muted-foreground" />
-                      <span>{plan.users} usuários</span>
+                      <span>{plan.users} {t('pricing.users')}</span>
                     </div>
                     <div className="flex items-center gap-1">
                       <HardDrive className="size-4 text-muted-foreground" />
@@ -252,14 +254,14 @@ export default function PricingPage() {
                     asChild
                   >
                     <Link href="/register">
-                      Começar agora
+                      {t('pricing.cta')}
                       <ArrowRight className="ml-2 size-4" />
                     </Link>
                   </Button>
 
                   <div className="space-y-3 pt-4">
                     <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      Recursos incluídos:
+                      {t('pricing.included')}
                     </p>
                     {plan.features.map((feature, i) => (
                       <div key={i} className="flex items-start gap-3">
@@ -276,17 +278,17 @@ export default function PricingPage() {
           {/* Enterprise CTA */}
           <Card className="max-w-4xl mx-auto bg-gradient-to-br from-violet-50 to-blue-50 dark:from-violet-950/20 dark:to-blue-950/20 border-violet-200 dark:border-violet-800">
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Precisa de uma solução personalizada?</CardTitle>
+              <CardTitle className="text-2xl">{t('pricing.custom.title')}</CardTitle>
               <CardDescription className="text-base">
-                Para escritórios com necessidades específicas, oferecemos planos customizados com recursos exclusivos
+                {t('pricing.custom.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex justify-center gap-4">
               <Button size="lg" asChild>
-                <Link href="/contact">Falar com especialista</Link>
+                <Link href="/contact">{t('pricing.custom.cta')}</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="/docs">Ver documentação</Link>
+                <Link href="/docs">{t('pricing.custom.docs')}</Link>
               </Button>
             </CardContent>
           </Card>
@@ -298,10 +300,10 @@ export default function PricingPage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Recursos disponíveis em todos os planos
+              {t('pricing.features.title')}
             </h2>
             <p className="text-lg text-muted-foreground">
-              Funcionalidades essenciais para sua gestão jurídica
+              {t('pricing.features.subtitle')}
             </p>
           </div>
 
@@ -327,10 +329,10 @@ export default function PricingPage() {
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Perguntas Frequentes
+                {t('pricing.faq.title')}
               </h2>
               <p className="text-lg text-muted-foreground">
-                Tudo o que você precisa saber sobre nossos planos
+                {t('pricing.faq.subtitle')}
               </p>
             </div>
 
@@ -349,10 +351,10 @@ export default function PricingPage() {
 
             <div className="text-center mt-12">
               <p className="text-muted-foreground mb-4">
-                Ainda tem dúvidas?
+                {t('pricing.faq.more')}
               </p>
               <Button asChild>
-                <Link href="/contact">Entre em contato</Link>
+                <Link href="/contact">{t('pricing.faq.contact')}</Link>
               </Button>
             </div>
           </div>

@@ -6,8 +6,10 @@ import { Facebook, Twitter, Linkedin, Instagram, Mail, Phone, MapPin } from "luc
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import { useLanguage } from "@/contexts/language-context"
 
 export function PublicFooter() {
+  const { t } = useLanguage()
   const footerLinks = {
     product: [
       { name: "Recursos", href: "/#features" },
@@ -56,26 +58,26 @@ export function PublicFooter() {
               <Logo size={100} />
             </Link>
             <p className="text-sm text-muted-foreground mb-6 max-w-sm">
-              A plataforma mais completa para gestão de escritórios de advocacia e departamentos jurídicos.
+              {t('footer.description')}
             </p>
             
             {/* Newsletter */}
             <div className="space-y-2">
-              <p className="text-sm font-medium">Receba novidades</p>
+              <p className="text-sm font-medium">{t('footer.newsletter.title')}</p>
               <div className="flex gap-2">
                 <Input 
                   type="email" 
-                  placeholder="seu@email.com" 
+                  placeholder={t('footer.newsletter.placeholder')}
                   className="h-9"
                 />
-                <Button size="sm">Assinar</Button>
+                <Button size="sm">{t('footer.newsletter.button')}</Button>
               </div>
             </div>
           </div>
 
           {/* Product Links */}
           <div>
-            <h3 className="font-semibold mb-4">Produto</h3>
+            <h3 className="font-semibold mb-4">{t('footer.product.title')}</h3>
             <ul className="space-y-3">
               {footerLinks.product.map((link) => (
                 <li key={link.name}>
@@ -92,7 +94,7 @@ export function PublicFooter() {
 
           {/* Company Links */}
           <div>
-            <h3 className="font-semibold mb-4">Empresa</h3>
+            <h3 className="font-semibold mb-4">{t('footer.company.title')}</h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
@@ -109,7 +111,7 @@ export function PublicFooter() {
 
           {/* Resources Links */}
           <div>
-            <h3 className="font-semibold mb-4">Recursos</h3>
+            <h3 className="font-semibold mb-4">{t('footer.resources.title')}</h3>
             <ul className="space-y-3">
               {footerLinks.resources.map((link) => (
                 <li key={link.name}>
@@ -126,7 +128,7 @@ export function PublicFooter() {
 
           {/* Legal Links */}
           <div>
-            <h3 className="font-semibold mb-4">Legal</h3>
+            <h3 className="font-semibold mb-4">{t('footer.legal.title')}</h3>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
@@ -149,7 +151,7 @@ export function PublicFooter() {
           <div className="flex items-start gap-3">
             <Mail className="size-5 text-muted-foreground mt-0.5" />
             <div>
-              <p className="text-sm font-medium">Email</p>
+              <p className="text-sm font-medium">{t('footer.contact.email')}</p>
               <a 
                 href="mailto:contato@kamaia.com" 
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -162,7 +164,7 @@ export function PublicFooter() {
           <div className="flex items-start gap-3">
             <Phone className="size-5 text-muted-foreground mt-0.5" />
             <div>
-              <p className="text-sm font-medium">Telefone</p>
+              <p className="text-sm font-medium">{t('footer.contact.phone')}</p>
               <a 
                 href="tel:+5511999999999" 
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -175,7 +177,7 @@ export function PublicFooter() {
           <div className="flex items-start gap-3">
             <MapPin className="size-5 text-muted-foreground mt-0.5" />
             <div>
-              <p className="text-sm font-medium">Endereço</p>
+              <p className="text-sm font-medium">{t('footer.contact.address')}</p>
               <p className="text-sm text-muted-foreground">
                 Luanda, Angola
               </p>
@@ -188,7 +190,7 @@ export function PublicFooter() {
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground text-center md:text-left">
-            © {new Date().getFullYear()} Kamaia. Todos os direitos reservados.
+            © {new Date().getFullYear()} Kamaia. {t('footer.copyright')}
           </p>
 
           {/* Social Links */}

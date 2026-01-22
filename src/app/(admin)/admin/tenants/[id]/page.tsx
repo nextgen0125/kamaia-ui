@@ -24,7 +24,7 @@ export default function TenantDetailsPage() {
     id: "TNT-2025-001",
     name: "Silva & Advogados",
     email: "contato@silvaadvogados.com",
-    phone: "(11) 98765-4321",
+    phone: "+244 987654321",
     plan: "Professional",
     status: "active",
     createdAt: "01/01/2024",
@@ -41,9 +41,9 @@ export default function TenantDetailsPage() {
   ]
 
   const billing = [
-    { date: "01/01/2025", amount: "R$ 199,00", status: "paid", invoice: "INV-2025-001" },
-    { date: "01/12/2024", amount: "R$ 199,00", status: "paid", invoice: "INV-2024-012" },
-    { date: "01/11/2024", amount: "R$ 199,00", status: "paid", invoice: "INV-2024-011" }
+    { date: "01/01/2025", amount: "AOA 199,00", status: "paid", invoice: "INV-2025-001" },
+    { date: "01/12/2024", amount: "AOA 199,00", status: "paid", invoice: "INV-2024-012" },
+    { date: "01/11/2024", amount: "AOA 199,00", status: "paid", invoice: "INV-2024-011" }
   ]
 
   return (
@@ -111,7 +111,7 @@ export default function TenantDetailsPage() {
             <CreditCard className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 199</div>
+            <div className="text-2xl font-bold">AOA 199</div>
             <p className="text-xs text-muted-foreground">Mensal</p>
           </CardContent>
         </Card>

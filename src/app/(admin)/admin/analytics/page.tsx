@@ -56,7 +56,7 @@ export default function AnalyticsPage() {
   ]
 
   const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 0 }).format(value)
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "AOA", minimumFractionDigits: 0 }).format(value)
 
   const getGrowthIndicator = (growth: number) => {
     const isPositive = growth > 0

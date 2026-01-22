@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import useEmblaCarousel from 'embla-carousel-react'
 import Autoplay from 'embla-carousel-autoplay'
+import { useLanguage } from '@/contexts/language-context'
 
 // Partículas animadas no Canvas com ícones jurídicos
 const ParticleCanvas = () => {
@@ -272,6 +273,7 @@ const TestimonialsCarousel = ({ testimonials }: { testimonials: any[] }) => {
 }
 
 export default function HomePage() {
+  const { t } = useLanguage()
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'semester' | 'annual'>('monthly')
   const [isVisible, setIsVisible] = useState(false)
 
@@ -348,7 +350,7 @@ export default function HomePage() {
     {
       name: 'Dr. Paulo Ferreira',
       role: 'Diretor Jurídico, TechCorp',
-      content: 'Migramos 500 processos sem problemas. A equipe do Kamaia nos deu todo o suporte necessário.',
+      content: 'Migramos 500 processos sem problemas. A equipe da Kamaia nos deu todo o suporte necessário.',
       avatar: '👨‍💻',
       rating: 5
     }
@@ -400,40 +402,39 @@ export default function HomePage() {
           <div className={`max-w-4xl mx-auto text-center transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
             <Badge variant="outline" className="mb-6 text-sm px-4 py-1.5">
               <Sparkles className="size-3.5 mr-1.5" />
-              Plataforma líder em gestão jurídica
+              {t('home.hero.badge')}
             </Badge>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-violet-600 via-blue-600 to-violet-600 bg-clip-text text-transparent leading-tight">
-              O futuro da gestão jurídica está aqui
+              {t('home.hero.title')}
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              Transforme seu escritório com a plataforma mais completa e intuitiva do mercado. 
-              Gestão de processos, clientes e finanças em um só lugar.
+              {t('home.hero.subtitle')}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button size="lg" className="text-base px-8 group">
-                Começar agora gratuitamente
+                {t('home.hero.cta.primary')}
                 <ArrowRight className="ml-2 size-4 group-hover:translate-x-1 transition-transform" />
               </Button>
               <Button size="lg" variant="outline" className="text-base px-8">
-                Agendar demonstração
+                {t('home.hero.cta.secondary')}
               </Button>
             </div>
             
             <div className="mt-12 flex items-center justify-center gap-8 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Check className="size-4 text-green-500" />
-                <span>Sem cartão de crédito</span>
+                <span>{t('home.hero.trust.badge')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="size-4 text-green-500" />
-                <span>14 dias grátis</span>
+                <span>{t('home.hero.trust.trial')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="size-4 text-green-500" />
-                <span>Cancele quando quiser</span>
+                <span>{t('home.hero.trust.cancel')}</span>
               </div>
             </div>
           </div>
@@ -451,10 +452,10 @@ export default function HomePage() {
       <section className="py-16 border-b">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <AnimatedStat value={500} label="Escritórios ativos" suffix="+" />
-            <AnimatedStat value={15000} label="Processos gerenciados" suffix="+" />
-            <AnimatedStat value={98} label="Satisfação dos clientes" suffix="%" />
-            <AnimatedStat value={40} label="Aumento de produtividade" suffix="%" />
+            <AnimatedStat value={500} label={t('home.stats.offices')} suffix="+" />
+            <AnimatedStat value={15000} label={t('home.stats.cases')} suffix="+" />
+            <AnimatedStat value={98} label={t('home.stats.satisfaction')} suffix="%" />
+            <AnimatedStat value={40} label={t('home.stats.productivity')} suffix="%" />
           </div>
         </div>
       </section>
@@ -464,13 +465,13 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge variant="outline" className="mb-4">
-              Recursos
+              {t('home.features.badge')}
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Tudo que você precisa em um só lugar
+              {t('home.features.title')}
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Recursos poderosos para otimizar cada aspecto da sua prática jurídica
+              {t('home.features.subtitle')}
             </p>
           </div>
 
@@ -500,25 +501,25 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <Badge variant="outline" className="mb-4">
-              Preços
+              {t('home.pricing.badge')}
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Planos para cada escritório
+              {t('home.pricing.title')}
             </h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Escolha o plano ideal para o seu negócio
+              {t('home.pricing.subtitle')}
             </p>
 
             <Tabs value={billingCycle} onValueChange={(v) => setBillingCycle(v as any)} className="inline-flex">
               <TabsList>
-                <TabsTrigger value="monthly">Mensal</TabsTrigger>
+                <TabsTrigger value="monthly">{t('home.pricing.monthly')}</TabsTrigger>
                 <TabsTrigger value="semester">
-                  Semestral
-                  <Badge variant="secondary" className="ml-2">-10%</Badge>
+                  {t('home.pricing.semester')}
+                  <Badge variant="secondary" className="ml-2">{t('home.pricing.save.semester')}</Badge>
                 </TabsTrigger>
                 <TabsTrigger value="annual">
-                  Anual
-                  <Badge variant="secondary" className="ml-2">-20%</Badge>
+                  {t('home.pricing.annual')}
+                  <Badge variant="secondary" className="ml-2">{t('home.pricing.save.annual')}</Badge>
                 </TabsTrigger>
               </TabsList>
             </Tabs>
@@ -533,7 +534,7 @@ export default function HomePage() {
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                     <Badge className="bg-gradient-to-r from-violet-600 to-blue-600">
-                      Mais popular
+                      {t('home.pricing.popular')}
                     </Badge>
                   </div>
                 )}
@@ -549,9 +550,9 @@ export default function HomePage() {
                       <span className="text-muted-foreground">/mês</span>
                     </div>
                     <div className="text-sm text-muted-foreground mt-1">
-                      {billingCycle === 'semester' && 'Faturado semestralmente'}
-                      {billingCycle === 'annual' && 'Faturado anualmente'}
-                      {billingCycle === 'monthly' && 'Faturado mensalmente'}
+                      {billingCycle === 'semester' && t('home.pricing.billed.semester')}
+                      {billingCycle === 'annual' && t('home.pricing.billed.annual')}
+                      {billingCycle === 'monthly' && t('home.pricing.billed.monthly')}
                     </div>
                   </div>
                 </CardHeader>
@@ -561,7 +562,7 @@ export default function HomePage() {
                     className="w-full" 
                     variant={plan.popular ? 'default' : 'outline'}
                   >
-                    Começar agora
+                    {t('home.pricing.cta')}
                   </Button>
 
                   <div className="space-y-3">
@@ -584,13 +585,13 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <Badge variant="outline" className="mb-4">
-              Depoimentos
+              {t('home.testimonials.badge')}
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              O que nossos clientes dizem
+              {t('home.testimonials.title')}
             </h2>
             <p className="text-xl text-muted-foreground">
-              Escritórios de toda Angola e Mundo confiam no Kamaia
+              {t('home.testimonials.subtitle')}
             </p>
           </div>
 
@@ -610,18 +611,18 @@ export default function HomePage() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Pronto para transformar seu escritório?
+              {t('home.cta.title')}
             </h2>
             <p className="text-xl mb-8 text-white/90">
-              Junte-se a centenas de escritórios que já modernizaram sua gestão jurídica
+              {t('home.cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary" className="text-base px-8">
-                Começar teste gratuito
+                {t('home.cta.primary')}
                 <ArrowRight className="ml-2 size-4" />
               </Button>
               <Button size="lg" variant="outline" className="text-base px-8 bg-white/10 border-white/20 hover:bg-white/20 text-white">
-                Falar com vendas
+                {t('home.cta.secondary')}
               </Button>
             </div>
           </div>

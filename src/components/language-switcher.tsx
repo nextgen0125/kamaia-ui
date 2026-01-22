@@ -13,7 +13,8 @@ import { useLanguage } from "@/contexts/language-context"
 const languages = [
   { code: "pt" as const, name: "Português", flag: "🇦🇴" }, // Angola flag
   { code: "en" as const, name: "English", flag: "🇬🇧" },
-  { code: "fr" as const, name: "Français", flag: "🇫🇷" }
+  { code: "fr" as const, name: "Français", flag: "🇫🇷" },
+  { code: "es" as const, name: "Español", flag: "🇪🇸" }
 ]
 
 export function LanguageSwitcher() {

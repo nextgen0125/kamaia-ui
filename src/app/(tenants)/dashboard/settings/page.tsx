@@ -30,6 +30,7 @@ import {
   Save,
 } from "lucide-react"
 import { toast } from "sonner"
+import { Badge } from "@/components/ui/badge"
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(false)
@@ -471,7 +472,7 @@ export default function SettingsPage() {
                   <p className="text-sm font-medium">Plano Atual</p>
                   <Badge>Professional</Badge>
                 </div>
-                <p className="text-2xl font-bold">R$ 199,00/mês</p>
+                <p className="text-2xl font-bold">199.000 AOA/mês</p>
                 <p className="text-sm text-muted-foreground mt-1">
                   Próxima cobrança em 15 de abril de 2024
                 </p>

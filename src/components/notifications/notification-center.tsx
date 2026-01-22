@@ -81,7 +81,7 @@ const mockNotifications: Notification[] = [
     id: "5",
     type: "payment",
     title: "Pagamento recebido",
-    message: "Cliente Carlos Mendes - Honorários: R$ 5.000,00",
+    message: "Cliente Carlos Mendes - Honorários: 5.000.000 AOA",
     time: "3h atrás",
     read: true,
     priority: "low",

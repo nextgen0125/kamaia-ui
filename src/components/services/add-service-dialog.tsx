@@ -166,7 +166,7 @@ export function AddServiceDialog({ onSuccess }: AddServiceDialogProps) {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Preço (R$) *</FormLabel>
+                    <FormLabel>Preço (AOA) *</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="0,00" {...field} />
                     </FormControl>

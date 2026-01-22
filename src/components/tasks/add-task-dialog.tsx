@@ -88,7 +88,7 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
           Nova Tarefa
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
         <DialogHeader>
           <DialogTitle>Nova Tarefa</DialogTitle>
           <DialogDescription>

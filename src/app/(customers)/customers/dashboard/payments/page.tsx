@@ -20,7 +20,7 @@ export default function CustomerPaymentsPage() {
     {
       id: "INV-2025-001",
       date: "15 Jan 2025",
-      amount: "R$ 450,00",
+      amount: "450.000 AOA",
       status: "paid",
       description: "Honorários Advocatícios - Caso Civil",
       method: "Cartão de Crédito"
@@ -28,7 +28,7 @@ export default function CustomerPaymentsPage() {
     {
       id: "INV-2024-012",
       date: "20 Dez 2024",
-      amount: "R$ 350,00",
+      amount: "350.000 AOA",
       status: "paid",
       description: "Consulta Jurídica",
       method: "PIX"
@@ -36,7 +36,7 @@ export default function CustomerPaymentsPage() {
     {
       id: "INV-2024-011",
       date: "10 Dez 2024",
-      amount: "R$ 500,00",
+      amount: "500.000 AOA",
       status: "pending",
       description: "Honorários Advocatícios - Caso Trabalhista",
       method: "Boleto"
@@ -44,7 +44,7 @@ export default function CustomerPaymentsPage() {
     {
       id: "INV-2024-010",
       date: "25 Nov 2024",
-      amount: "R$ 400,00",
+      amount: "400.000 AOA",
       status: "paid",
       description: "Análise de Contrato",
       method: "Transferência"
@@ -63,7 +63,7 @@ export default function CustomerPaymentsPage() {
   const upcomingPayments = [
     {
       description: "Honorários Mensais",
-      amount: "R$ 450,00",
+      amount: "450.000 AOA",
       dueDate: "20 Fev 2025"
     }
   ]
@@ -92,7 +92,7 @@ export default function CustomerPaymentsPage() {
             <CheckCircle2 className="size-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 1.700,00</div>
+            <div className="text-2xl font-bold">1.700.000 AOA</div>
             <p className="text-xs text-muted-foreground mt-1">
               Últimos 12 meses
             </p>
@@ -105,7 +105,7 @@ export default function CustomerPaymentsPage() {
             <Clock className="size-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 500,00</div>
+            <div className="text-2xl font-bold">500.000 AOA</div>
             <p className="text-xs text-muted-foreground mt-1">
               1 fatura aguardando pagamento
             </p>
@@ -120,7 +120,7 @@ export default function CustomerPaymentsPage() {
           <CardContent>
             <div className="text-2xl font-bold">20 Fev</div>
             <p className="text-xs text-muted-foreground mt-1">
-              R$ 450,00
+              450.000 AOA
             </p>
           </CardContent>
         </Card>

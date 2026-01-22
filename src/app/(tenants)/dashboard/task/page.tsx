@@ -19,6 +19,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, Plus, MoreVertical, Edit, Trash2, CheckCircle2, Clock, AlertCircle, ListTodo } from "lucide-react"
 import { AddTaskDialog } from "@/components/tasks/add-task-dialog"
 import { Progress } from "@/components/ui/progress"
+import { TaskCard } from "@/components/ui/mobile-card-variants"
+import { MobileCardList } from "@/components/ui/mobile-card-list"
 
 // Mock data
 const tasks = [
@@ -269,13 +271,15 @@ export default function TaskPage() {
             </div>
 
             <TabsContent value={filterStatus} className="space-y-3">
-              {filteredTasks.length === 0 ? (
-                <div className="text-center py-12">
-                  <ListTodo className="size-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">Nenhuma tarefa encontrada</p>
-                </div>
-              ) : (
-                filteredTasks.map((task) => (
+              {/* Desktop View */}
+              <div className="hidden md:block space-y-3">
+                {filteredTasks.length === 0 ? (
+                  <div className="text-center py-12">
+                    <ListTodo className="size-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Nenhuma tarefa encontrada</p>
+                  </div>
+                ) : (
+                  filteredTasks.map((task) => (
                   <div
                     key={task.id}
                     className={`flex items-start gap-4 p-4 border rounded-lg hover:bg-muted/50 transition-colors ${
@@ -364,6 +368,62 @@ export default function TaskPage() {
                   </div>
                 ))
               )}
+              </div>
+
+              {/* Mobile View */}
+              <MobileCardList>
+                {filteredTasks.length === 0 ? (
+                  <div className="text-center py-12">
+                    <ListTodo className="size-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Nenhuma tarefa encontrada</p>
+                  </div>
+                ) : (
+                  filteredTasks.map((task) => (
+                    <TaskCard
+                      key={task.id}
+                      id={task.id}
+                      title={task.title}
+                      description={task.description}
+                      priority={task.priority as "high" | "medium" | "low"}
+                      status={getStatusLabel(task.status)}
+                      dueDate={formatDate(task.dueDate)}
+                      assignee={{
+                        name: task.assignee,
+                        avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${task.assignee}`
+                      }}
+                      tags={task.case ? [task.case] : undefined}
+                      completed={task.completed}
+                      onToggle={() => console.log("Toggle task", task.id)}
+                      actions={
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="size-8">
+                              <MoreVertical className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                              <Edit className="mr-2 size-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <CheckCircle2 className="mr-2 size-4" />
+                              Marcar como concluída
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="mr-2 size-4" />
+                              Remover
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      }
+                    />
+                  ))
+                )}
+              </MobileCardList>
             </TabsContent>
           </Tabs>
         </CardContent>

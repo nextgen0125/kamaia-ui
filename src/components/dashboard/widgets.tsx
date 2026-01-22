@@ -37,7 +37,7 @@ export function QuickStatsWidget() {
     },
     {
       title: "Receita Mensal",
-      value: "R$ 125.000",
+      value: "125.000.000 AOA",
       change: "+12% vs mês anterior",
       trend: "up",
       icon: DollarSign,
@@ -354,7 +354,7 @@ export function PerformanceChartWidget() {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
-      currency: "BRL",
+      currency: "AOA",
       minimumFractionDigits: 0,
     }).format(value)
   }

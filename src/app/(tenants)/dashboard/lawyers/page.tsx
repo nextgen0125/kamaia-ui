@@ -22,9 +22,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Search, Plus, MoreVertical, Edit, Trash2, Eye, Mail, Phone, Building2 } from "lucide-react"
+import { Search, Plus, MoreVertical, Edit, Trash2, Eye, Mail, Phone, Building2, Users } from "lucide-react"
 import Link from "next/link"
 import { AddLawyerDialog } from "@/components/lawyers/add-lawyer-dialog"
+import { ProfileCard } from "@/components/ui/mobile-card-variants"
+import { MobileCardList } from "@/components/ui/mobile-card-list"
 
 // Mock data - substituir por dados reais da API
 const lawyers = [
@@ -33,7 +35,7 @@ const lawyers = [
     name: "Dr. João Silva",
     oab: "SP 123456",
     email: "joao.silva@example.com",
-    phone: "(11) 98765-4321",
+    phone: "+244 945 965 459",
     specialties: ["Civil", "Trabalhista"],
     cases: 45,
     status: "active",
@@ -44,7 +46,7 @@ const lawyers = [
     name: "Dra. Maria Santos",
     oab: "SP 789012",
     email: "maria.santos@example.com",
-    phone: "(11) 91234-5678",
+    phone: "+244 945 965 459",
     specialties: ["Penal", "Criminal"],
     cases: 32,
     status: "active",
@@ -164,8 +166,8 @@ export default function LawyersPage() {
             </div>
           </div>
 
-          {/* Table */}
-          <div className="rounded-md border">
+          {/* Desktop Table */}
+          <div className="hidden md:block rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -271,6 +273,68 @@ export default function LawyersPage() {
               </TableBody>
             </Table>
           </div>
+
+          {/* Mobile View */}
+          <MobileCardList>
+            {filteredLawyers.length === 0 ? (
+              <div className="text-center py-12">
+                <Users className="size-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">Nenhum advogado encontrado</p>
+              </div>
+            ) : (
+              filteredLawyers.map((lawyer) => (
+                <ProfileCard
+                  key={lawyer.id}
+                  id={lawyer.id}
+                  name={lawyer.name}
+                  subtitle={lawyer.oab}
+                  avatar={lawyer.avatar}
+                  badges={[
+                    ...lawyer.specialties.map((s) => ({ label: s, variant: "secondary" as const })),
+                    { 
+                      label: lawyer.status === "active" ? "Ativo" : "Inativo",
+                      variant: lawyer.status === "active" ? "default" as const : "outline" as const
+                    }
+                  ]}
+                  stats={[
+                    { label: "Casos", value: lawyer.cases },
+                    { label: "Email", value: "📧" },
+                    { label: "Tel", value: "📞" }
+                  ]}
+                  actions={
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="size-8">
+                          <MoreVertical className="size-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/lawyers/${lawyer.id}`}>
+                            <Eye className="mr-2 size-4" />
+                            Ver detalhes
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/dashboard/lawyers/${lawyer.id}/edit`}>
+                            <Edit className="mr-2 size-4" />
+                            Editar
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem className="text-destructive">
+                          <Trash2 className="mr-2 size-4" />
+                          Remover
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  }
+                />
+              ))
+            )}
+          </MobileCardList>
         </CardContent>
       </Card>
     </div>

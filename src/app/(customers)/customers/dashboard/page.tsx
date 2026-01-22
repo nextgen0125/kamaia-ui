@@ -27,11 +27,11 @@ import Link from "next/link"
 const clientData = {
   name: "Carlos Eduardo Mendes",
   email: "carlos.mendes@email.com",
-  phone: "(11) 98765-4321",
+  phone: "+244987654321",
   lawyer: {
     name: "Dr. João Silva",
     oab: "OAB/SP 123456",
-    phone: "(11) 91234-5678",
+    phone: "+244912345678",
     email: "joao.silva@escritorio.com",
   },
 }
@@ -108,7 +108,7 @@ export default function CustomerDashboardPage() {
   const completedCases = cases.filter((c) => c.status === "completed")
 
   const formatCurrency = (value: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+    new Intl.NumberFormat("pt-AO", { style: "currency", currency: "AOA" }).format(value)
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })

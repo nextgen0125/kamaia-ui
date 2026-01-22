@@ -47,7 +47,7 @@ export default function CustomerProfilePage() {
     {
       type: "payment",
       title: "Pagamento realizado",
-      description: "Fatura INV-2025-001 - R$ 450,00",
+      description: "Fatura INV-2025-001 - 450.000 AOA",
       date: "2 dias atrás"
     }
   ]

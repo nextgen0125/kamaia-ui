@@ -26,6 +26,8 @@ import { Search, Plus, MoreVertical, Edit, Trash2, Eye, FileText, Clock, AlertCi
 import Link from "next/link"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AddCaseDialog } from "@/components/cases/add-case-dialog"
+import { CaseCard } from "@/components/ui/mobile-card-variants"
+import { MobileCardList } from "@/components/ui/mobile-card-list"
 
 // Mock data
 const cases = [
@@ -152,7 +154,7 @@ export default function CasesPage() {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
-      currency: "BRL",
+      currency: "AOA",
     }).format(value)
   }
 
@@ -261,7 +263,8 @@ export default function CasesPage() {
             </div>
 
             <TabsContent value={filterStatus} className="space-y-4">
-              <div className="rounded-md border">
+              {/* Desktop Table */}
+              <div className="hidden md:block rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -362,6 +365,68 @@ export default function CasesPage() {
                   </TableBody>
                 </Table>
               </div>
+
+              {/* Mobile View */}
+              <MobileCardList>
+                {filteredCases.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Scale className="size-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Nenhum processo encontrado</p>
+                  </div>
+                ) : (
+                  filteredCases.map((case_) => (
+                    <CaseCard
+                      key={case_.id}
+                      id={case_.id}
+                      number={case_.number}
+                      title={case_.title}
+                      client={case_.client}
+                      status={case_.status}
+                      priority={case_.priority}
+                      phase={case_.phase}
+                      value={case_.value}
+                      lastUpdate={formatDate(case_.lastUpdate)}
+                      actions={
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="size-8">
+                              <MoreVertical className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/cases/${case_.id}`}>
+                                <Eye className="mr-2 size-4" />
+                                Ver detalhes
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/cases/${case_.id}/edit`}>
+                                <Edit className="mr-2 size-4" />
+                                Editar
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                              <Link href={`/dashboard/cases/${case_.id}/timeline`}>
+                                <Clock className="mr-2 size-4" />
+                                Timeline
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-destructive">
+                              <Trash2 className="mr-2 size-4" />
+                              Arquivar
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      }
+                      onClick={() => window.location.href = `/dashboard/cases/${case_.id}`}
+                    />
+                  ))
+                )}
+              </MobileCardList>
             </TabsContent>
           </Tabs>
         </CardContent>

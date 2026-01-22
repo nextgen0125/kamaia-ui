@@ -65,7 +65,7 @@ export default function RoadmapPage() {
               Roadmap
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              O futuro do Kamaia
+              O futuro da Kamaia
             </h1>
             <p className="text-xl text-muted-foreground">
               Acompanhe as novidades e recursos que estamos desenvolvendo para revolucionar 

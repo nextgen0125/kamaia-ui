@@ -1,5 +1,8 @@
+"use client"
+
 import { Logo } from "@/components/logo";
 import { Card } from "@/components/ui/card";
+import { LanguageProvider } from "@/contexts/language-context";
 
 
 export default function LoginPage({
@@ -8,6 +11,7 @@ export default function LoginPage({
   children: React.ReactNode;
 }>) {
   return (
+  <LanguageProvider>
     <div className="grid min-h-svh lg:grid-cols-1">
       <div className="flex flex-col gap-4 p-6 md:p-10 "> 
         
@@ -22,14 +26,18 @@ export default function LoginPage({
             {children}
           </Card>
         </div>
+        {/* <div className="bg-muted relative hidden lg:block">
+          <Image
+            src="/kamaia-banner.png"
+            alt="Kamaia Banner"
+            fill
+            className="object-cover dark:brightness-[0.5] dark:grayscale"
+            priority
+          />
+        </div> */}
       </div>
-      {/* <div className="bg-muted relative hidden lg:block">
-        <img
-          src="/kamaia-banner.png"
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.5] dark:grayscale"
-        />
-      </div> */}
-    </div>
+      </div>
+
+    </LanguageProvider>
   )
 }
