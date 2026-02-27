@@ -18,12 +18,25 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { useLanguage } from "@/contexts/language-context"
+import { useAuthOperations, useLogin } from "@/hooks/queries/use-auth"
+import { useEffect } from "react"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const { t } = useLanguage()
+   const { 
+    isLoading, 
+    error, 
+    isError, 
+    profile, 
+    isAuthenticated,
+    clearError,
+    user
+  } = useAuthOperations();
+
+  const loginMutation = useLogin();
   
   const loginSchema = z.object({
     email: z.string().email(t("validation.email.invalid")),
@@ -42,16 +55,100 @@ export function LoginForm({
     },
   })
 
-  function onSubmit(values: LoginFormValues) {
-    // Mostra os dados no Sonner
-    toast("Form submitted!", {
-      description: (
-        <pre className="mt-2 rounded-md bg-slate-950 p-4 text-white">
-          {JSON.stringify(values, null, 2)}
-        </pre>
-      ),
-    })
+  const onSubmit = async (credentials: LoginFormValues) => {
+      try {
+        // Limpar erros anteriores do contexto
+        if (clearError) {
+          clearError();
+        }
+
+        // Executar a mutação de login
+        await loginMutation.mutateAsync(credentials);
+
+      } catch (error: any) {
+        // Log do erro para debug
+        console.error('Erro no processo de login na LoginPage:', error);
+
+        
+        
+        // Tratamento adicional de erros específicos apenas para casos especiais
+        if (error?.status === 403) {
+          toast("Acesso negado!", {
+            description: (
+              <pre className="mt-2 rounded-md bg-slate-950 p-4 text-white">
+                Sua conta não tem permissão para acessar este sistema.
+              </pre>
+            ),
+          })
+        } else if (error?.status >= 500) {
+          toast("Erro do servidor!", {
+            description: (
+              <pre className="mt-2 rounded-md bg-slate-950 p-4 text-white">
+                Nossos servidores estão temporariamente indisponíveis. Tente novamente em alguns minutos.
+              </pre>
+            ),
+          })
+        }
+        
+        // NÃO re-throw o erro - deixar o LoginForm tratar
+        // O LoginForm já trata todos os erros adequadamente
+        return;
+      }
+
+    // // Mostra os dados no Sonner
+   
   }
+
+  // Efeito para monitorar erros do contexto de autenticação
+  useEffect(() => {
+    if (error && typeof error === 'string') {
+      console.log('Erro do AuthContext detectado:', error);
+      // O erro já está sendo tratado pelo LoginForm através do estado do contexto
+      // Não precisamos fazer nada aqui para evitar duplicação
+    }
+  }, [error]);
+
+  // Efeito para redirecionamento após login bem-sucedido
+  useEffect(() => {
+    if (isAuthenticated && profile?.data) {
+      const timer = setTimeout(() => {
+        if (isEnterprising()) {
+          router.push('/dashboard');
+        } else if (isSuperAdmin()) {
+          router.push('/admin/dashboard');
+        } else if (isEmployee()) {
+          const businessSlug = user?.businessAccess?.[0]?.business?.slug;
+          
+          if (businessSlug) {
+            // Força o slug como string e remove caracteres especiais
+            const cleanSlug = String(businessSlug).replace(/[^a-zA-Z0-9-]/g, '');
+            const targetUrl = `/business/${cleanSlug}/dashboard`;
+
+            // Múltiplas tentativas de redirecionamento
+            try {
+              // Método 1: Router push com shallow
+              router.push(targetUrl, undefined);
+            } catch (error) {
+              try {
+                // Método 2: Window location
+                window.location.href = targetUrl;
+              } catch (windowError) {
+                // Método 3: Router replace
+                router.replace(targetUrl);
+              }
+            }
+          } else {
+            console.error('Business slug not found, redirecting to home');
+            router.push('/');
+          }
+        } else {
+          console.log('No role matched, staying on current page');
+        }
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isAuthenticated, profile?.data, user]);
 
   return (
     <Form {...form}>
