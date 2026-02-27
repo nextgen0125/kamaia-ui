@@ -6,6 +6,7 @@ import {
   AuthTokens,
   ApiError
 } from '../interfaces/IAuth';
+import { IUser } from '@/interfaces/IUser';
 
 // Configuração base da API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:55555/v1';
@@ -126,6 +127,73 @@ class AuthService {
       console.error('Erro ao fazer logout:', error);
     } finally {
       this.clearStoredTokens();
+    }
+  }
+
+    /**
+   * Valida token JWT
+   */
+    async validateToken(): Promise<{ valid: boolean; user?: IUser }> {
+      try {
+        const response: AxiosResponse<{ valid: boolean; user: IUser }> = 
+          await this.api.get('/auth/validate-token');
+        
+        const data = response.data;
+        if (data) {
+          return data;
+        }
+
+        return { valid: false };
+      } catch (error) {
+        return { valid: false };
+      }
+    }
+
+      /**
+   * Obtém perfil do usuário autenticado
+   */
+  async getProfile(): Promise<IUser> {
+    try {
+      const response: AxiosResponse<IUser> = await this.api.get('/auth/profile');
+      
+      const data = response.data;
+      if (data) {
+        return data;
+      }
+
+      throw new Error('Erro ao obter perfil do usuário');
+    } catch (error) {
+      throw this.handleApiError(error);
+    }
+  }
+
+    /**
+   * Obtém informações da sessão
+   */
+  async getSession(): Promise<{
+    user: IUser;
+    isAuthenticated: boolean;
+    loginTime?: string;
+    permissions: string[];
+    roles: string[];
+  }> {
+    try {
+      const response: AxiosResponse<{
+        user: IUser;
+        isAuthenticated: boolean;
+        loginTime?: string;
+        permissions: string[];
+        roles: string[];
+      }> = await this.api.get('/auth/session');
+      
+      const data = response.data;
+      if (data) {
+        return data;
+      }
+
+      throw new Error('Erro ao obter sessão');
+    } catch (error) {
+      throw this.handleApiError(error);
     }
   }
 

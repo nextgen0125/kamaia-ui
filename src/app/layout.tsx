@@ -6,6 +6,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import NextTopLoader from 'nextjs-toploader';
 import "./globals.css";
 import { QueryClientContextProvider } from "@/contexts/query-client-context";
+import { AuthProvider } from "@/contexts/auth-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,24 +40,26 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryClientContextProvider>
-          <NextTopLoader
-            color="#6366f1"
-            height={3}
-            showSpinner={false}
-            speed={200}
-            shadow="0 0 10px #6366f1,0 0 5px #6366f1"
-          />
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NuqsAdapter>{children}</NuqsAdapter>
-            <Toaster />
-          </ThemeProvider>
-        </QueryClientContextProvider>
+        <AuthProvider>
+          <QueryClientContextProvider>
+            <NextTopLoader
+              color="#6366f1"
+              height={3}
+              showSpinner={false}
+              speed={200}
+              shadow="0 0 10px #6366f1,0 0 5px #6366f1"
+            />
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <NuqsAdapter>{children}</NuqsAdapter>
+              <Toaster />
+            </ThemeProvider>
+          </QueryClientContextProvider>
+        </AuthProvider>
       </body>
     </html>
   );
