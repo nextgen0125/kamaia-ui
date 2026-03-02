@@ -19,13 +19,18 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { useLanguage } from "@/contexts/language-context"
 import { useAuthOperations, useLogin } from "@/hooks/queries/use-auth"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
   const { t } = useLanguage()
+  const [submitError, setSubmitError] = useState<string>('');
+  const router = useRouter();
+
    const { 
     isLoading, 
     error, 
@@ -33,15 +38,19 @@ export function LoginForm({
     profile, 
     isAuthenticated,
     clearError,
-    user
+    user,
+    isSuperAdmin,
+    isCostumer
   } = useAuthOperations();
+
+  const { error: contextError } = useAuth();
 
   const loginMutation = useLogin();
   
   const loginSchema = z.object({
     email: z.string().email(t("validation.email.invalid")),
     password: z.string()
-      .min(6, t("validation.password.min"))
+      .min(1, t("validation.password.mandatory"))
       .max(50, t("validation.password.max")),
   })
 
@@ -90,9 +99,43 @@ export function LoginForm({
           })
         }
         
-        // NÃO re-throw o erro - deixar o LoginForm tratar
-        // O LoginForm já trata todos os erros adequadamente
-        return;
+        
+        
+        // Tratamento de erros específicos
+        if (error?.status === 401) {
+          form.setError('email', {
+            type: 'manual',
+            message: 'Email ou senha incorretos',
+          });
+          form.setError('password', {
+            type: 'manual',
+            message: 'Email ou senha incorretos',
+          });
+          setSubmitError('Credenciais inválidas. Verifique seu email e senha.');
+          toast.error('Credenciais inválidas. Verifique seu email e senha.');
+        } else if (error?.status === 429) {
+          setSubmitError('Muitas tentativas de login. Tente novamente em alguns minutos.');
+          toast.error('Muitas tentativas de login. Tente novamente em alguns minutos.');
+        } else if (error?.status === 0 || !error?.status) {
+          setSubmitError('Erro de conexão. Verifique sua internet e tente novamente.');
+          toast.error('Erro de conexão. Verifique sua internet e tente novamente.');
+        } else if (error?.errors && typeof error.errors === 'object') {
+          // Tratar erros de validação do backend
+          Object.entries(error.errors).forEach(([field, messages]) => {
+            if (Array.isArray(messages) && messages.length > 0) {
+              form.setError(field as keyof LoginFormValues, {
+                type: 'manual',
+                message: messages[0],
+              });
+            }
+          });
+          setSubmitError('Dados inválidos. Verifique os campos destacados.');
+          toast.error('Dados inválidos. Verifique os campos destacados.');
+        } else {
+          const errorMessage = error?.message || 'Erro interno do servidor. Tente novamente.';
+          setSubmitError(errorMessage);
+          toast.error(errorMessage);
+        }
       }
 
     // // Mostra os dados no Sonner
@@ -108,21 +151,40 @@ export function LoginForm({
     }
   }, [error]);
 
+   // Efeito para monitorar erros do contexto
+  useEffect(() => {
+    if (contextError) {
+      console.log('Erro do contexto detectado no LoginForm:', contextError);
+      setSubmitError(contextError);
+      
+      // Definir erros nos campos também
+      form.setError('email', {
+        type: 'manual',
+        message: 'Verifique suas credenciais',
+      });
+      form.setError('password', {
+        type: 'manual',
+        message: 'Verifique suas credenciais',
+      });
+      
+      // Mostrar mensagem toast
+      toast.error(contextError);
+    }
+  }, [contextError, form.setError]);
+
   // Efeito para redirecionamento após login bem-sucedido
   useEffect(() => {
     if (isAuthenticated && profile?.data) {
       const timer = setTimeout(() => {
-        if (isEnterprising()) {
-          router.push('/dashboard');
-        } else if (isSuperAdmin()) {
-          router.push('/admin/dashboard');
-        } else if (isEmployee()) {
-          const businessSlug = user?.businessAccess?.[0]?.business?.slug;
+        if (isSuperAdmin()) {
+          router.push('/k_admin/dashboard');
+        } else if (isCostumer()) {
+          const companyId = user?.company_acls?.[0]?.company_id
           
-          if (businessSlug) {
+          if (companyId) {
             // Força o slug como string e remove caracteres especiais
-            const cleanSlug = String(businessSlug).replace(/[^a-zA-Z0-9-]/g, '');
-            const targetUrl = `/business/${cleanSlug}/dashboard`;
+            const cleanSlug = String(companyId);
+            const targetUrl = `/customers/${cleanSlug}/dashboard`;
 
             // Múltiplas tentativas de redirecionamento
             try {
@@ -138,17 +200,44 @@ export function LoginForm({
               }
             }
           } else {
-            console.error('Business slug not found, redirecting to home');
+            
+            console.error('Company ID not found, redirecting to home');
             router.push('/');
           }
         } else {
-          console.log('No role matched, staying on current page');
+          const companyId = user?.costumer_infos?.[0]?.company_id
+          
+          if (companyId) {
+            // Força o slug como string e remove caracteres especiais
+            const cleanSlug = String(companyId);
+            const targetUrl = `/${cleanSlug}/dashboard`;
+
+            // Múltiplas tentativas de redirecionamento
+            try {
+              // Método 1: Router push com shallow
+              router.push(targetUrl, undefined);
+            } catch (error) {
+              try {
+                // Método 2: Window location
+                window.location.href = targetUrl;
+              } catch (windowError) {
+                // Método 3: Router replace
+                router.replace(targetUrl);
+              }
+            }
+          } else {
+            console.log('No role matched, staying on current page');
+          }
         }
       }, 1000);
       
       return () => clearTimeout(timer);
     }
   }, [isAuthenticated, profile?.data, user]);
+
+  const isFormLoading = isLoading || form.formState.isSubmitting;
+    // Determinar qual erro mostrar (priorizar erro local sobre contexto)
+  const displayError = submitError || contextError;
 
   return (
     <Form {...form}>
@@ -160,10 +249,27 @@ export function LoginForm({
           </p>
         </div>
         <div className="grid gap-6">
+          {/* Erro geral do formulário */}
+          {displayError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-800">{displayError}</p>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="grid gap-3">
             <FormField
               control={form.control}
               name="email"
+              disabled={isFormLoading}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("auth.login.email")}</FormLabel>
@@ -179,6 +285,7 @@ export function LoginForm({
             <FormField
               control={form.control}
               name="password"
+              disabled={isFormLoading}
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center">
@@ -198,8 +305,13 @@ export function LoginForm({
               )}
             />
           </div>
-          <Button type="button" onClick={form.handleSubmit(onSubmit)} className="w-full">
-            {t("auth.login.submit")}
+          <Button type="button" disabled={isFormLoading} onClick={form.handleSubmit(onSubmit)} className="w-full">
+            {isFormLoading ? (
+                <div className="loading-spinner"></div>
+            ) : (
+              t("auth.login.submit")
+            )}
+            
           </Button>
         </div>
         <div className="text-center text-sm">

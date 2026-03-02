@@ -149,6 +149,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Validation
     "validation.email.invalid": "Por favor, insira um email válido.",
+    "validation.password.mandatory": "A senha é obrigatória.",
     "validation.password.min": "A senha deve ter no mínimo 6 caracteres.",
     "validation.password.max": "A senha deve ter no máximo 50 caracteres.",
     "validation.password.uppercase": "A senha deve conter pelo menos uma letra maiúscula.",
@@ -474,6 +475,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Validation
     "validation.email.invalid": "Please enter a valid email.",
+    "validation.password.mandatory": "A password is required.",
     "validation.password.min": "Password must be at least 6 characters.",
     "validation.password.max": "Password must be at most 50 characters.",
     "validation.password.uppercase": "Password must contain at least one uppercase letter.",
@@ -799,6 +801,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Validation
     "validation.email.invalid": "Veuillez entrer un email valide.",
+    "validation.password.mandatory": "Un mot de passe est requis.",
     "validation.password.min": "Le mot de passe doit contenir au moins 6 caractères.",
     "validation.password.max": "Le mot de passe doit contenir au maximum 50 caractères.",
     "validation.password.uppercase": "Le mot de passe doit contenir au moins une lettre majuscule.",
@@ -1124,6 +1127,7 @@ const translations: Record<Language, Record<string, string>> = {
     
     // Validation
     "validation.email.invalid": "Por favor, ingresa un email válido.",
+    "validation.password.mandatory": "La contraseña es obligatoria",
     "validation.password.min": "La contraseña debe tener al menos 6 caracteres.",
     "validation.password.max": "La contraseña debe tener como máximo 50 caracteres.",
     "validation.password.uppercase": "La contraseña debe contener al menos una letra mayúscula.",

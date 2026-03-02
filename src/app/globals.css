@@ -120,3 +120,7 @@
     @apply bg-background text-foreground;
   }
 }
+
+.loading-spinner {
+  @apply inline-block w-4 h-4 border-2 border-gray-300 border-t-teal-600 rounded-full animate-spin;
+}

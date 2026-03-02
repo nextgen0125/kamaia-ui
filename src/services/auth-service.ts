@@ -9,7 +9,7 @@ import {
 import { IUser } from '@/interfaces/IUser';
 
 // Configuração base da API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:55555/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:55555/';
 
 /**
  * Service de autenticação refatorado

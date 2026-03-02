@@ -7,6 +7,7 @@ import {
 } from '../interfaces/IAuth';
 import { IUser } from '@/interfaces/IUser';
 import authService from '@/services/auth-service';
+import { IRole } from '@/interfaces/IRole';
 
 /**
  * Estados do contexto de autenticação
@@ -228,9 +229,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const hasRole = (roleSlug: string): boolean => {
     return state.user?.roles?.some(
-      role => typeof role === "string" 
+      (role: IRole) => typeof role === "string" 
         ? (role as string)?.toLowerCase() === roleSlug.toLowerCase()
-        : role?.slug?.toLowerCase() === roleSlug.toLowerCase()
+        : role?.type?.toLowerCase() === roleSlug.toLowerCase()
     ) || false;
   };
 
@@ -253,6 +254,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 //     return hasDirectPermission || hasRolePermission || false;
 //   };
 
+  /**
+   * Verifica se é super admin
+   */
+  const isSuperAdmin = (): boolean => {
+    return hasRole('SUPER_ADMIN');
+  };
+
+  /**
+   * Verifica se é funcionário
+   */
+  const isCostumer = (): boolean => {
+    return !!state.user?.costumer_infos?.length;
+  };
+
+
   
 
   //@ts-ignore
@@ -273,6 +289,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     clearError,
     hasRole,
     // hasPermission,
+    isSuperAdmin,
+    isCostumer
   };
 
   return (
@@ -298,6 +316,8 @@ export function useAuth() {
     clearError: () => void;
     hasRole: (roleSlug: string) => boolean;
     hasPermission: (permissionSlug: string) => boolean;
+    isSuperAdmin: () => boolean;
+    isCostumer: () => boolean;
   };
 }
 
