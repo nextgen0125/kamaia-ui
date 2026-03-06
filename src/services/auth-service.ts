@@ -9,7 +9,7 @@ import {
 import { IUser } from '@/interfaces/IUser';
 
 // Configuração base da API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:55555/';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5555/';
 
 /**
  * Service de autenticação refatorado
@@ -28,7 +28,8 @@ class AuthService {
       timeout: 15000,
       headers: {
         'Content-Type': 'application/json',
-      },
+        'Accept': 'application/json'
+      }
     });
 
     this.setupInterceptors();
@@ -76,6 +77,7 @@ class AuthService {
           }
         }
 
+
         return Promise.reject(this.handleApiError(error));
       }
     );
@@ -88,11 +90,13 @@ class AuthService {
    */
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
+      console.log("credentials", credentials)
       const response: AxiosResponse<LoginResponse> = await this.api.post(
         '/auth/login',
-        credentials
+        {...credentials}
       );
 
+      
       const data = response.data;
       if (data) {
         const tokens = {

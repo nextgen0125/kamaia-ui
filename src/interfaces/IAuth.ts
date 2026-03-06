@@ -5,7 +5,6 @@ import { IUser } from "./IUser";
 export interface LoginCredentials {
   email: string;
   password: string;
-  rememberMe?: boolean;
 }
 
 export interface AuthTokens {
