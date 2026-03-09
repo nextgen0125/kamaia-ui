@@ -10,6 +10,8 @@ export default function LoginPage({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+
   return (
   <LanguageProvider>
     <div className="grid min-h-svh lg:grid-cols-1">

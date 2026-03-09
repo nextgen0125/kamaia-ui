@@ -43,7 +43,7 @@ export function LoginForm({
 
   const {
     isLoading,
-    error,
+    isError,
     profile,
     isAuthenticated,
     clearError,
@@ -162,6 +162,19 @@ export function LoginForm({
 
     return () => clearTimeout(timer);
   }, [isAuthenticated, profile?.data, user]);
+
+    // Se já estiver autenticado, mostrar loading
+  if (isAuthenticated && !isError) {
+      return (
+        <div className="flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8">
+            <div className="text-center">
+            <div className="loading-spinner w-8 h-8 mx-auto mb-4"></div>
+            <p className="text-text-secondary">Redirecionando Usuário...</p>
+            </div>
+        </div>
+      );
+  }
+
 
   const isFormLoading = isLoading || form.formState.isSubmitting;
   const displayError = submitError || contextError;

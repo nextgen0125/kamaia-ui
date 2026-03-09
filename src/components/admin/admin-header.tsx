@@ -20,8 +20,23 @@ import {
   User,
   Shield,
 } from "lucide-react"
+import { useLogout } from "@/hooks/queries/use-auth"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export function AdminHeader() {
+  const router = useRouter();
+  const logOutMutation = useLogout();
+
+  const handleLogOut = async () => {
+    try {
+      await logOutMutation.mutateAsync();
+      router.push("/login")
+    } catch (error) {
+      toast.error(error as string);
+    }
+  }
+
   return (
     <header className="border-b bg-background">
       <div className="flex h-16 items-center gap-4 px-6">
@@ -74,7 +89,7 @@ export function AdminHeader() {
                 Perfil
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem className="text-destructive" onClick={handleLogOut}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Sair
               </DropdownMenuItem>
