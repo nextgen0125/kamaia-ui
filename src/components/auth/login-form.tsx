@@ -34,6 +34,7 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 export function LoginForm({
   className,
+  onSubmit: _onSubmit,
   ...props
 }: React.ComponentProps<"form">) {
   const { t } = useLanguage()
@@ -65,8 +66,6 @@ export function LoginForm({
 
   const onSubmit = async (credentials: LoginFormValues) => {
     // Log para confirmar que os valores chegam corretamente
-    console.log("credentials form", credentials)
-
     clearError?.()
     setSubmitError('')
 
@@ -170,7 +169,11 @@ export function LoginForm({
 
   return (
     <Form {...form}>
-      <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        className={cn("flex flex-col gap-6", className)}
+        {...props}
+        onSubmit={form.handleSubmit(onSubmit)}
+        >
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">{t("auth.login.title")}</h1>
           <p className="text-muted-foreground text-sm text-balance">
