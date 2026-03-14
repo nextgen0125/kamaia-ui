@@ -8,6 +8,9 @@ import {
 import { IUser } from '@/interfaces/IUser';
 import authService from '@/services/auth-service';
 import { IRole } from '@/interfaces/IRole';
+import { ICompanyACL } from '@/interfaces/ICompanyACL';
+import { ICompanyPermission } from '@/interfaces/ICompanyPermission';
+import { ICompanyRole } from '@/interfaces/ICompanyRole';
 
 /**
  * Estados do contexto de autenticação
@@ -235,24 +238,61 @@ export function AuthProvider({ children }: AuthProviderProps) {
     ) || false;
   };
 
+    /**
+   * Verifica se o usuário tem uma role de superAdmin específica
+   * @param roleSlug Slug da role
+   * @returns True se o usuário tem a role
+   */
+  const hasSuperAdminRole = (roleSlug: string): boolean => {
+    return state.user?.roles?.some(
+      (role: IRole) => typeof role === "string" 
+        ? (role as string)?.toLowerCase() === roleSlug.toLowerCase()
+        : role?.type?.toLowerCase() === roleSlug.toLowerCase()
+    ) || false;
+  };
+  
+
   /**
    * Verifica se o usuário tem uma permissão específica
    * @param permissionSlug Slug da permissão
    * @returns True se o usuário tem a permissão
    */
-//   const hasPermission = (permissionSlug: string): boolean => {
-//     // Verificar permissões diretas
-//     const hasDirectPermission = state.user?.permissions?.some(
-//       permission => permission.slug === permissionSlug
-//     );
+  const hasCompanyPermission = (permissionSlug: string, companyId: string): boolean => {
+    const acl: ICompanyACL = state.user?.company_acls?.find(
+      (companyACL: ICompanyACL) => companyACL?.company_id === companyId
+    );
 
-//     // Verificar permissões através de roles
-//     const hasRolePermission = state.user?.roles?.some(role =>
-//       role.permissions?.some(permission => permission.slug.toLowerCase() === permissionSlug.toLowerCase())
-//     );
+    // Verificar permissões diretas
+    const hasDirectPermission = acl?.company_permissions?.some(
+      (permission: ICompanyPermission) => permission.type === permissionSlug
+    );
 
-//     return hasDirectPermission || hasRolePermission || false;
-//   };
+    // Verificar permissões através de roles
+    // const hasRolePermission = state.user?.roles?.some(role =>
+    //   role.permissions?.some(permission => permission.slug.toLowerCase() === permissionSlug.toLowerCase())
+    // );
+
+    return hasDirectPermission /*|| hasRolePermission*/ || false;
+  };
+
+  
+   /**
+   * Verifica se o usuário tem uma role específica
+   * @param roleSlug Slug da role
+   * @returns True se o usuário tem a role
+   */
+  const hasCompanyRole = (roleSlug: string, companyId: string): boolean => {
+    const acl: ICompanyACL = state.user?.company_acls?.find(
+      (companyACL: ICompanyACL) => companyACL?.company_id === companyId
+    );
+
+    // Verificar permissões diretas
+    const hasDirectRole = acl?.company_roles?.some(
+      (role: ICompanyRole) => role.type === roleSlug
+    );
+
+    return hasDirectRole || false;
+  };
 
   /**
    * Verifica se é super admin
@@ -288,7 +328,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     error: state.error,
     clearError,
     hasRole,
-    // hasPermission,
+    hasSuperAdminRole,
+    hasCompanyPermission,
+    hasCompanyRole,
     isSuperAdmin,
     isCostumer
   };
@@ -315,7 +357,9 @@ export function useAuth() {
     error: string | null;
     clearError: () => void;
     hasRole: (roleSlug: string) => boolean;
-    hasPermission: (permissionSlug: string) => boolean;
+    hasSuperAdminRole: (roleSlug: string) => boolean;
+    hasCompanyPermission: (permissionSlug: string, companyId: string) => boolean;
+    hasCompanyRole: (roleSlug: string, companyId: string) => boolean;
     isSuperAdmin: () => boolean;
     isCostumer: () => boolean;
   };

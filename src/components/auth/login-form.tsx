@@ -23,14 +23,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 
-const loginSchema = z.object({
-  email: z.string().email(/*"validation.email.invalid"*/"Por favor, insira um email válido."),
-  password: z.string()
-    .min(1, /*"validation.password.mandatory"*/"A senha é obrigatória.")
-    .max(50, /*"validation.password.max"*/"A senha deve ter no máximo 50 caracteres."),
-})
 
-type LoginFormValues = z.infer<typeof loginSchema>
 
 export function LoginForm({
   className,
@@ -40,6 +33,15 @@ export function LoginForm({
   const { t } = useLanguage()
   const [submitError, setSubmitError] = useState<string>('');
   const router = useRouter();
+
+  const loginSchema = z.object({
+  email: z.string().email(t("validation.email.invalid")),
+  password: z.string()
+    .min(1, t("validation.password.mandatory"))
+    .max(50, t("validation.password.max")),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
 
   const {
     isLoading,
