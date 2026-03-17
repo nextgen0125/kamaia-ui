@@ -1,7 +1,8 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { 
-  LoginCredentials, 
+  LoginCredentials,
+  ResetPasswordData, 
 } from '@/interfaces/IAuth';
 import { useAuth } from '@/contexts/auth-context';
 import React from 'react';
@@ -200,6 +201,74 @@ export function useTokenMonitoring() {
     isMonitoring: tokenInfo.isLoading,
     refreshToken: refreshTokenMutation,
   };
+}
+
+/**
+ * Hook para esqueci minha senha
+ * @returns Mutation para solicitar reset de senha
+ */
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: (email: string) => authService.forgotPassword(email),
+    onSuccess: () => {
+      console.log('Solicitação de recuperação de senha enviada');
+    },
+    onError: (error) => {
+      console.error('Erro ao solicitar reset de senha:', error);
+    },
+  });
+}
+
+/**
+ * Hook para reset de senha
+ * @returns Mutation para redefinir senha
+ */
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: (data: ResetPasswordData) => authService.resetPassword(data),
+    onSuccess: () => {
+      console.log('Senha redefinida com sucesso');
+    },
+    onError: (error) => {
+      console.error('Erro ao redefinir senha:', error);
+    },
+  });
+}
+
+/**
+ * Hook para verificação de email
+ * @returns Mutation para verificar email
+ */
+export function useVerifyEmail() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (token: string) => authService.verifyEmail(token),
+    onSuccess: (user) => {
+      // Atualizar cache do perfil com dados atualizados
+      queryClient.setQueryData(authQueryKeys.profile, user);
+      queryClient.invalidateQueries({ queryKey: authQueryKeys.session });
+    },
+    onError: (error) => {
+      console.error('Erro ao verificar email:', error);
+    },
+  });
+}
+
+/**
+ * Hook para reenvio de verificação de email
+ * @returns Mutation para reenviar verificação
+ */
+export function useResendVerification() {
+  return useMutation({
+    mutationFn: () => authService.resendVerification(),
+    onSuccess: () => {
+      console.log('Email de verificação reenviado');
+    },
+    onError: (error) => {
+      console.error('Erro ao reenviar verificação:', error);
+    },
+  });
 }
 
 /**

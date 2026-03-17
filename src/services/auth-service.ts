@@ -4,7 +4,8 @@ import {
   LoginCredentials, 
   LoginResponse, 
   AuthTokens,
-  ApiError
+  ApiError,
+  ResetPasswordData
 } from '../interfaces/IAuth';
 import { IUser } from '@/interfaces/IUser';
 
@@ -243,6 +244,93 @@ class AuthService {
 
     // Verificar se o token não expirou
     return Date.now() < expiration;
+  }
+
+    /**
+   * Solicita reset de senha
+   * @param email Email do usuário
+   */
+  async forgotPassword(email: string): Promise<void> {
+    try {
+      const response: AxiosResponse<any> = await this.api.post(
+        '/auth/forgot-password', 
+        { email }
+      );
+
+      // Sempre considerar sucesso para não revelar se o email existe
+      if (response.status === 200) {
+        return;
+      }
+
+      throw new Error('Erro ao solicitar recuperação de senha');
+    } catch (error) {
+      // Para forgot password, sempre retornar sucesso por segurança
+      // A menos que seja um erro de rede ou servidor
+      //@ts-ignore
+      if (error.code === 'NETWORK_ERROR' || error.response?.status >= 500) {
+        throw this.handleApiError(error);
+      }
+      
+      // Para outros erros, retornar sucesso silenciosamente
+      return;
+    }
+  }
+
+  /**
+   * Redefine senha usando token
+   * @param data Dados do reset de senha
+   */
+  async resetPassword(data: ResetPasswordData): Promise<void> {
+    try {
+      const response: AxiosResponse<any> = await this.api.post(
+        '/auth/reset-password',
+        data
+      );
+
+      if (response.status !== 200) {
+        throw new Error('Erro ao redefinir senha');
+      }
+    } catch (error) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Verifica email usando token
+   * @param token Token de verificação
+   */
+  async verifyEmail(token: string): Promise<IUser> {
+    try {
+      const response: AxiosResponse<{ user: IUser }> = await this.api.get(
+        `/auth/verify-email/${token}`
+      );
+
+      const data = response.data;
+      if (data?.user) {
+        return data.user;
+      }
+
+      throw new Error('Erro ao verificar email');
+    } catch (error) {
+      throw this.handleApiError(error);
+    }
+  }
+
+  /**
+   * Reenvia email de verificação
+   */
+  async resendVerification(): Promise<void> {
+    try {
+      const response: AxiosResponse<any> = await this.api.post(
+        '/auth/resend-verification'
+      );
+
+      if (response.status !== 200) {
+        throw new Error('Erro ao reenviar verificação');
+      }
+    } catch (error) {
+      throw this.handleApiError(error);
+    }
   }
 
   /**

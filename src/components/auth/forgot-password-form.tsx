@@ -18,6 +18,7 @@ import { toast } from "sonner"
 import { z } from "zod"
 import { Mail, ArrowLeft } from "lucide-react"
 import { useLanguage } from "@/contexts/language-context"
+import { useForgotPassword } from "@/hooks/queries/use-auth"
 
 export function ForgotPasswordForm({
   className,
@@ -38,12 +39,23 @@ export function ForgotPasswordForm({
     },
   })
 
-  function onSubmit(values: ForgotPasswordFormValues) {
-    toast.success(t("auth.forgot.success"), {
-      description: t("auth.forgot.success.description"),
-    })
-    console.log(values)
+  const forgotPasswordMutation = useForgotPassword();
+
+  const onSubmit = async (values: ForgotPasswordFormValues) => {
+    try {
+      await forgotPasswordMutation.mutateAsync(values.email)
+      form.reset();
+      toast.success(t("auth.forgot.success"), {
+        description: t("auth.forgot.success.description"),
+      })
+    } catch (error) {
+      toast.error("Houve um erro durante a solicitação", {
+        description: `Erro ao solicitar o link de recuperação: ${error}`,
+      })
+    }
   }
+
+  const isFormLoading = forgotPasswordMutation.isPending || form.formState.isSubmitting;
 
   return (
     <Form {...form}>
@@ -83,7 +95,11 @@ export function ForgotPasswordForm({
           />
 
           <Button type="submit" className="w-full">
-            {t("auth.forgot.submit")}
+            {isFormLoading ? (
+                <div className="loading-spinner"></div>
+            ) : (
+              t("auth.forgot.submit")
+            )}
           </Button>
         </div>
 

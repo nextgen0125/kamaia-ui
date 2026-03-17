@@ -41,6 +41,31 @@ export interface RegisterData {
 }
 
 /**
+ * Interface para dados de recuperação de senha
+ */
+export interface ForgotPasswordData {
+  email: string;
+}
+
+/**
+ * Interface para dados de reset de senha
+ */
+export interface ResetPasswordData {
+  token: string;
+  password: string;
+  confirmPassword: string;
+}
+
+/**
+ * Interface para dados de alteração de senha
+ */
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+/**
  * Interface para contexto de autenticação
  */
 export interface AuthContextType {
