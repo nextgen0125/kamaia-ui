@@ -50,7 +50,7 @@ export function ForgotPasswordForm({
       })
     } catch (error) {
       toast.error("Houve um erro durante a solicitação", {
-        description: `Erro ao solicitar o link de recuperação: ${error}`,
+        description: `Erro ao solicitar o link de recuperação: ${(error as any)?.message}`,
       })
     }
   }

@@ -17,6 +17,9 @@ import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 import { ShieldCheck, ArrowLeft } from "lucide-react"
+import { useParams } from "next/navigation"
+import { useQueryState } from "nuqs"
+import { useResetPassword } from "@/hooks/queries/use-auth"
 
 const resetPasswordSchema = z
   .object({
@@ -39,6 +42,11 @@ export function ResetPasswordForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+
+  const [resetToken] = useQueryState('reset_token');
+
+  const resetTokenMutation = useResetPassword();
+
   const form = useForm<ResetPasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -47,11 +55,35 @@ export function ResetPasswordForm({
     },
   })
 
-  function onSubmit(values: ResetPasswordFormValues) {
-    toast.success("Senha redefinida com sucesso!", {
-      description: "Você já pode fazer login com sua nova senha.",
-    })
-    console.log(values)
+  const onSubmit = async (values: ResetPasswordFormValues) => {
+    
+    try {
+        if (!resetToken) {
+          toast.error("Token de Recuperação inválido!", {
+            description: "O token de Recuperação não foi encontrado.",
+          })
+    
+          return;
+        }
+        
+        console.log(values)
+        await resetTokenMutation.mutateAsync({
+          token: resetToken as string,
+          ...values
+        });
+
+        form.reset();
+
+        toast.success("Senha redefinida com sucesso!", {
+          description: "Você já pode fazer login com sua nova senha.",
+        })
+
+    } catch (error) {
+      console.error(error)
+      toast.error("Houve um erro durante a requisição", {
+        description: `Erro ao redefinir a senha: ${(error as any)?.message}`,
+      })
+    }
   }
 
   return (
