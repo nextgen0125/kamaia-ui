@@ -5,6 +5,7 @@ import { useRouter, usePathname, useParams } from 'next/navigation';
 import { Loader2, Shield, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useLogout } from '@/hooks/queries/use-auth';
+import { Logo } from '../logo';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -223,16 +224,20 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
     }
 
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-teal-100 text-teal-600 rounded-full mb-4">
-            <Shield className="h-8 w-8" />
-          </div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Verificando acesso</h2>
-          <p className="text-gray-700 mb-4">Aguarde enquanto validamos suas permissões...</p>
+          <div className="inline-flex items-center justify-center mb-4">
+            <Logo />
+
+          </div> 
+          {/* <div className="grid flex-1 text-left text-sm leading-tight">
+            <Logo />
+            </div> */}
+          <h2 className="text-xl font-semibold text-muted-foreground  mb-2">Verificando acesso</h2>
+          <p className="text-muted-foreground mb-4">Aguarde enquanto validamos suas permissões...</p>
           <div className="flex items-center justify-center space-x-2">
             <Loader2 className="h-5 w-5 animate-spin text-teal-600" />
-            <span className="text-sm text-gray-700">Carregando...</span>
+            <span className="text-sm text-muted-foreground">Carregando...</span>
           </div>
         </div>
       </div>
@@ -242,13 +247,13 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
   // Mostrar página de acesso negado
   if (!hasAccess && showUnauthorized) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8">
         <div className="text-center max-w-md mx-auto">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 text-red-600 rounded-full mb-4">
             <AlertTriangle className="h-8 w-8" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Acesso Negado</h2>
-          <p className="text-gray-700 mb-4">
+          <h2 className="text-2xl font-bold text-muted-foreground  mb-2">Acesso Negado</h2>
+          <p className="text-muted-foreground mb-4">
             Você não tem permissão para acessar esta página.
           </p>
           {accessDeniedReason && (
@@ -259,19 +264,14 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
           <div className="space-y-3">
             <button
               onClick={() => router.back()}
-              className="w-full btn-secondary"
+              className="w-full bg-gray-500 border border-gray-200 rounded-lg p-2 cursor-pointer"
             >
               Voltar
             </button>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="w-full btn-primary"
-            >
-              Ir para Dashboard
-            </button>
+            
             <button
               onClick={() => logout.mutateAsync()}
-              className="w-full bg-red-500 border border-red-200 rounded-lg p-2"
+              className="w-full bg-red-500 border border-red-200 rounded-lg p-2 cursor-pointer"
             >
               Terminar sessão
             </button>

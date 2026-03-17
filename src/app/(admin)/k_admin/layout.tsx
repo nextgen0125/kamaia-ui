@@ -1,6 +1,7 @@
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AdminSidebar } from "@/components/admin/admin-sidebar"
 import { AdminHeader } from "@/components/admin/admin-header"
+import AuthGuard from "@/components/auth/auth-guard"
 
 export default function AdminLayout({
   children,
@@ -8,16 +9,24 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   return (
-    <SidebarProvider>
-      <div className="flex h-screen w-full">
-        <AdminSidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <AdminHeader />
-          <main className="flex-1 overflow-y-auto bg-background">
-            {children}
-          </main>
+    <AuthGuard
+      requiredSuperAdminRoles={
+        [
+          "SUPER_ADMIN"
+        ]
+      }
+    >
+      <SidebarProvider>
+        <div className="flex h-screen w-full">
+          <AdminSidebar />
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <AdminHeader />
+            <main className="flex-1 overflow-y-auto bg-background">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </AuthGuard>
   )
 }

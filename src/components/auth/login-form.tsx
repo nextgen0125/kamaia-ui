@@ -23,7 +23,7 @@ import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/contexts/auth-context"
 
-
+ 
 
 export function LoginForm({
   className,
@@ -33,15 +33,6 @@ export function LoginForm({
   const { t } = useLanguage()
   const [submitError, setSubmitError] = useState<string>('');
   const router = useRouter();
-
-  const loginSchema = z.object({
-  email: z.string().email(t("validation.email.invalid")),
-  password: z.string()
-    .min(1, t("validation.password.mandatory"))
-    .max(50, t("validation.password.max")),
-})
-
-type LoginFormValues = z.infer<typeof loginSchema>
 
   const {
     isLoading,
@@ -57,6 +48,15 @@ type LoginFormValues = z.infer<typeof loginSchema>
   const { error: contextError } = useAuth();
   const loginMutation = useLogin();
 
+   const loginSchema = z.object({
+  email: z.string().email(t("validation.email.invalid")),
+  password: z.string()
+    .min(1, t("validation.password.mandatory"))
+    .max(50, t("validation.password.max")),
+})
+
+type LoginFormValues = z.infer<typeof loginSchema>
+
   // Schema estável — criado fora do componente
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -66,8 +66,24 @@ type LoginFormValues = z.infer<typeof loginSchema>
     },
   })
 
-  const onSubmit = async (credentials: LoginFormValues) => {
-    // Log para confirmar que os valores chegam corretamente
+  // const onSubmit = async (credentials: LoginFormValues) => {
+  //   // Log para confirmar que os valores chegam corretamente
+  //   console.log(credentials)
+  //   clearError?.()
+  //   setSubmitError('')
+
+  //   try {
+  //     await loginMutation.mutateAsync(credentials);
+  //   } catch (error: any) {
+  //     console.error('Erro no processo de login:', error);
+  //     handleLoginError(error);
+  //   }
+  // }
+
+  const onSubmit = async (_: LoginFormValues) => {
+    const credentials = form.getValues()
+    // console.log("credentials form", credentials)
+
     clearError?.()
     setSubmitError('')
 
