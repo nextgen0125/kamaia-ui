@@ -5,6 +5,7 @@ import {
   SidebarInset,
   SidebarProvider
 } from "@/components/ui/sidebar";
+import { CompanyDashboardContextProvider } from "@/contexts/company-contexts/company-dashboard";
 
 export default function DashboardLayout({
   children,
@@ -22,15 +23,17 @@ export default function DashboardLayout({
         ]
       }
     >
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset>
-          <DashboardHeader />
-          <div className="mx-auto w-full pt-8 px-8">
-            {children}
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+      <CompanyDashboardContextProvider>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            <DashboardHeader />
+            <div className="mx-auto w-full pt-8 px-8">
+              {children}
+            </div>
+          </SidebarInset>
+        </SidebarProvider>
+      </CompanyDashboardContextProvider>
     </AuthGuard>
   )
 }
