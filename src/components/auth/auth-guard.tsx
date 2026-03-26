@@ -153,7 +153,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
 
       // Verificar roles de superAdmin se especificadas
       if (requiredSuperAdminRoles.length > 0) {
-        const hasRequiredRole = requiredSuperAdminRoles.some(role => hasSuperAdminRole(role));
+        const hasRequiredRole = requiredSuperAdminRoles?.some(role => hasSuperAdminRole(role));
         if (!hasRequiredRole) {
             handleAccessDenied(`Acesso negado. Cargos necessários: ${requiredSuperAdminRoles.join(', ')}`)
             return;
@@ -163,7 +163,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
 
         // Verificar permissões se especificadas
       if (requiredCompanyRoles.length > 0) {
-        const hasRequiredRole = requiredCompanyRoles.some(role => hasCompanyRole(role, company_id as string));
+        const hasRequiredRole = requiredCompanyRoles?.some(role => hasCompanyRole(role, company_id as string));
         if (!hasRequiredRole) {
           handleAccessDenied(`Acesso negado. Permissões necessárias: ${requiredCompanyRoles.join(', ')}`)
           return;
@@ -172,7 +172,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
 
       // Verificar permissões se especificadas
       if (requiredCompanyPermissions.length > 0) {
-        const hasRequiredPermission = requiredCompanyPermissions.some(permission => hasCompanyPermission(permission, company_id as string));
+        const hasRequiredPermission = requiredCompanyPermissions?.some(permission => hasCompanyPermission(permission, company_id as string));
         if (!hasRequiredPermission) {
             handleAccessDenied(`Acesso negado. Permissões necessárias: ${requiredCompanyPermissions.join(', ')}`)
           return;
