@@ -1,11 +1,15 @@
+import { IBaseEntity } from "./IBaseEntity";
 import { IUser } from "./IUser";
 
 
-export interface ICompany {
+export interface ICompany extends IBaseEntity{
     user_id: string;
     name: string;
     phone: string;
     email: string;
+    nif: string;
+    address: string;
+    time_zone: string;
     logo_url: string;
     logo_key: string;
     email_verified: boolean;

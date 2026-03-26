@@ -112,11 +112,26 @@ class CompanyService {
    * @param companyData Dados parciais para atualização
    * @returns Empresa atualizada
    */
-  async updateCompany(companyData: UpdateCompanyData): Promise<ICompany> {
+  async updateCompany(companyData: UpdateCompanyData, company_id: string): Promise<ICompany> {
     try {
+      const formData = new FormData()
+
+      formData.append("name", companyData.name)
+      formData.append("phone", companyData.phone)
+      if (companyData.email) formData.append("email", companyData.email)
+      if (companyData.nif) formData.append("nif", companyData.nif)
+      if (companyData.address) formData.append("address", companyData.address)
+      if (companyData.time_zone) formData.append("time_zone", companyData.time_zone)
+      if (companyData.file && companyData.file.length > 0) formData.append("file", companyData.file[0])
+
       const response: AxiosResponse<ICompany> = await this.api.put(
-        '/v1/companies',
-        companyData
+        `/v1/companies/${company_id}`,
+        formData, 
+        {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        }
       );
 
       const data = response.data;
@@ -130,6 +145,7 @@ class CompanyService {
     }
   }
 }
+
 
 // Exportar instância singleton — mesma convenção do auth-service
 export const companyService = new CompanyService();

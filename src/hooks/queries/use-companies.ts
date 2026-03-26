@@ -96,15 +96,16 @@ export function useCreateCompany() {
  * Requer role SUPER_ADMIN ou ADMINISTRATOR.
  * @returns Mutation para atualização de empresa
  */
-export function useUpdateCompany() {
+export function useUpdateCompany(company_id: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (companyData: UpdateCompanyData) =>
-      companyService.updateCompany(companyData),
+      companyService.updateCompany(companyData, company_id),
     onSuccess: () => {
       // Invalida listas para refletir as alterações
       queryClient.invalidateQueries({ queryKey: companyQueryKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: companyQueryKeys.list({ companyId: company_id }) });
     },
     onError: (error) => {
       console.error('Erro ao atualizar empresa:', error);
@@ -141,9 +142,9 @@ export function useInvalidateCompanies() {
  * Hook combinado para operações de empresas.
  * Centraliza mutations e estados derivados em uma única interface.
  */
-export function useCompanyOperations() {
+export function useCompanyOperations(company_id: string) {
   const createCompanyMutation = useCreateCompany();
-  const updateCompanyMutation = useUpdateCompany();
+  const updateCompanyMutation = useUpdateCompany(company_id);
 
   return {
     // Mutations
