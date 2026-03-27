@@ -42,7 +42,9 @@ import {
   Clock,
   Download,
   Filter,
+
 } from "lucide-react"
+import { DialogCreateUser } from "@/components/admin/DialogCreateUser"
 
 const mockUsers = [
   {
@@ -148,10 +150,13 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold tracking-tight">Gestão de Usuários</h1>
           <p className="text-muted-foreground">Gerencie todos os usuários da plataforma</p>
         </div>
-        <Button variant="outline">
-          <Download className="mr-2 h-4 w-4" />
-          Exportar
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="cursor-pointer">
+            <Download className="mr-2 h-4 w-4" />
+            Exportar
+          </Button>
+          <DialogCreateUser />
+          </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
