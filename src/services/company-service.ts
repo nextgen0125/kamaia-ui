@@ -114,19 +114,33 @@ class CompanyService {
    */
   async updateCompany(companyData: UpdateCompanyData, company_id: string): Promise<ICompany> {
     try {
-      const formData = new FormData()
+       const formData = new FormData();
 
-      formData.append("name", companyData.name)
-      formData.append("phone", companyData.phone)
-      if (companyData.email) formData.append("email", companyData.email)
-      if (companyData.nif) formData.append("nif", companyData.nif)
-      if (companyData.address) formData.append("address", companyData.address)
-      if (companyData.time_zone) formData.append("time_zone", companyData.time_zone)
-      if (companyData.file && companyData.file.length > 0) formData.append("file", companyData.file[0])
+        // formData.append("file", data.file);
+
+
+      // const formData = new FormData();
+
+      // formData.append("name", companyData.name);
+      // formData.append("phone", companyData.phone);
+      // formData.append("email", companyData.email);
+      // formData.append("nif", companyData.nif);
+      // formData.append("address", companyData.address);
+      // formData.append("time_zone", companyData.time_zone);
+      // formData.append("file", companyData.file[0]);
+
+      if (companyData.file?.length > 0) {
+        formData.append("file", companyData.file[0]);
+      }
+      
+      console.log("companyData", companyData)
+      console.log("formData", formData)
+      console.log("{ ...companyData, ...formData }", { ...companyData, ...formData })
+
 
       const response: AxiosResponse<ICompany> = await this.api.put(
         `/v1/companies/${company_id}`,
-        formData, 
+        { ...companyData, ...formData }, 
         {
             headers: {
                 "Content-Type": "multipart/form-data",
