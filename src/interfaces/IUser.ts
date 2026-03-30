@@ -25,3 +25,21 @@ export interface IUser {
     company_acls: any[]
     costumer_infos: IClient[]
 }
+
+// Interface de criação de usuário
+export interface ICreateUserData {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+};
+
+// Interface de atualizar usuário a partir da lista de controllo de acesso
+export interface IUpadateUserACLData {
+    user_id: string;
+    email: string;
+    password: string;                                                      
+    full_name: string;
+    phone: string;                          
+}
