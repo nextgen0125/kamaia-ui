@@ -176,7 +176,6 @@ export default function CompanyGeneralSettingTab() {
 
   const handleSave = async (data: GeneralSettingsFormValues) => {
     try {
-      console.log("Payload pronto para envio:", data)
       await updateCompany.mutateAsync(data as any)
 
       toast.success("Dados Gerais de Configurações Alterados com sucesso!")

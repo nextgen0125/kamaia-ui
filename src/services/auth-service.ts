@@ -21,68 +21,70 @@ class AuthService {
   private api: AxiosInstance;
   private baseURL: string;
 
-  constructor() {
-    this.baseURL = API_BASE_URL;
-    
-    this.api = axios.create({
-      baseURL: this.baseURL,
-      timeout: 15000,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
+ constructor() {
+  this.baseURL = API_BASE_URL;
+  
+  this.api = axios.create({
+    baseURL: this.baseURL,
+    timeout: 15000,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    }
+  });
+
+  this.setupInterceptors();
+}
+
+private setupInterceptors(): void {
+  this.api.interceptors.request.use(
+    (config) => {
+      const token = this.getStoredToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
-    });
 
-    this.setupInterceptors();
-  }
-
-  /**
-   * Configura interceptors para requisições e respostas
-   */
-  private setupInterceptors(): void {
-    // Interceptor de requisição - adiciona token de autorização
-    this.api.interceptors.request.use(
-      (config) => {
-        const token = this.getStoredToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
+      // Se o body for FormData, remove o Content-Type dos headers para que
+      // o browser defina automaticamente "multipart/form-data; boundary=..."
+      // com o boundary correcto. Forçar "application/json" aqui faz o Multer
+      // falhar com "Unexpected field" pois não consegue fazer parse do body.
+      if (config.data instanceof FormData) {
+        delete config.headers['Content-Type'];
       }
-    );
 
-    // Interceptor de resposta - trata erros e refresh token
-    this.api.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
 
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          originalRequest._retry = true;
+  // Interceptor de resposta — sem alterações
+  this.api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
 
-          try {
-            await this.refreshToken();
-            const token = this.getStoredToken();
-            if (token) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-              return this.api(originalRequest);
-            }
-          } catch (refreshError) {
-            this.logout();
-            if (typeof window !== 'undefined') {
-              window.location.href = '/login';
-            }
+      if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+
+        try {
+          await this.refreshToken();
+          const token = this.getStoredToken();
+          if (token) {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return this.api(originalRequest);
+          }
+        } catch (refreshError) {
+          this.logout();
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
           }
         }
-
-
-        return Promise.reject(this.handleApiError(error));
       }
-    );
-  }
+
+      return Promise.reject(this.handleApiError(error));
+    }
+  );
+}
 
   /**
    * Realiza login do usuário

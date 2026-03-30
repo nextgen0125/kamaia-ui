@@ -109,54 +109,55 @@ class CompanyService {
   /**
    * Atualiza dados de uma empresa/escritório de advocacia.
    * Requer role SUPER_ADMIN ou ADMINISTRATOR (via canOrIs).
+   *
+   * IMPORTANTE: O Multer só aceita multipart/form-data.
+   * Todo o payload (texto + ficheiro) deve ir dentro de um único FormData —
+   * nunca misturar FormData com spread de objeto JS no body do Axios.
+   *
    * @param companyData Dados parciais para atualização
+   * @param company_id  ID da empresa
    * @returns Empresa atualizada
    */
   async updateCompany(companyData: UpdateCompanyData, company_id: string): Promise<ICompany> {
-    try {
-       const formData = new FormData();
+    const formData = new FormData();
 
-        // formData.append("file", data.file);
+    // ── Campos de texto ────────────────────────────────────────────────────────
+    // Só appenda os campos que foram preenchidos para não sobrescrever
+    // valores existentes com strings vazias na API.
+    if (companyData.name)      formData.append("name",      companyData.name);
+    if (companyData.phone)     formData.append("phone",     companyData.phone);
+    if (companyData.email)     formData.append("email",     companyData.email);
+    if (companyData.nif)       formData.append("nif",       companyData.nif);
+    if (companyData.address)   formData.append("address",   companyData.address);
+    if (companyData.time_zone) formData.append("time_zone", companyData.time_zone);
 
-
-      // const formData = new FormData();
-
-      // formData.append("name", companyData.name);
-      // formData.append("phone", companyData.phone);
-      // formData.append("email", companyData.email);
-      // formData.append("nif", companyData.nif);
-      // formData.append("address", companyData.address);
-      // formData.append("time_zone", companyData.time_zone);
-      // formData.append("file", companyData.file[0]);
-
-      if (companyData.file?.length > 0) {
-        formData.append("file", companyData.file[0]);
-      }
-      
-      console.log("companyData", companyData)
-      console.log("formData", formData)
-      console.log("{ ...companyData, ...formData }", { ...companyData, ...formData })
-
-
-      const response: AxiosResponse<ICompany> = await this.api.put(
-        `/v1/companies/${company_id}`,
-        { ...companyData, ...formData }, 
-        {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        }
-      );
-
-      const data = response.data;
-      if (data) {
-        return data;
-      }
-
-      throw new Error('Erro ao atualizar empresa');
-    } catch (error) {
-      throw error;
+    // ── Ficheiro ───────────────────────────────────────────────────────────────
+    // O campo deve chamar-se exactamente "file" — igual ao multer().single("file").
+    // Passa o File em si (fileList[0]), não a FileList inteira.
+    if (companyData.file && companyData.file.length > 0) {
+      formData.append("file", companyData.file[0]);
     }
+
+    // ── Request ────────────────────────────────────────────────────────────────
+    // Passar o FormData directamente como body.
+    // NÃO usar { ...companyData, ...formData } — spread de FormData retorna {}
+    // e mistura JSON com multipart, corrompendo o request.
+    //
+    // O header Content-Type pode ser omitido: o Axios/browser define
+    // automaticamente "multipart/form-data; boundary=..." com o boundary correcto.
+    // Se forçar o header manualmente sem o boundary, o Multer não consegue
+    // fazer o parse e lança erros similares ao Unexpected field.
+    const response: AxiosResponse<ICompany> = await this.api.put(
+      `/v1/companies/${company_id}`,
+      formData,
+      // sem headers — o Axios gera o Content-Type correcto
+    );
+
+    if (response.data) {
+      return response.data;
+    }
+
+    throw new Error("Erro ao atualizar empresa");
   }
 }
 
