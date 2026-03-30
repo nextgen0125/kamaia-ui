@@ -6,6 +6,9 @@ export interface IUser {
     id: string;
     created_at: Date;
 
+    firstName: string;
+    lastName: string;
+
     full_name: string;
     username: string;
     password: string;
