@@ -10,14 +10,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
-import { IUser } from "@/interfaces/IUser";
+import { ICompanyACL } from "@/interfaces/ICompanyACL";
 import { useState } from "react";
 import { toast } from "sonner";
 
 // ─── Dialog: Confirmar remoção ────────────────────────────────────────────────
 
 interface AlertRemoveMemberProps {
-  member: IUser | null
+  member: ICompanyACL | null
   open: boolean
   onOpenChange: (v: boolean) => void
 }
@@ -41,7 +41,7 @@ export function AlertRemoveMember({ member, open, onOpenChange }: AlertRemoveMem
           <AlertDialogTitle>Remover membro</AlertDialogTitle>
           <AlertDialogDescription>
             Tem a certeza que pretende remover{" "}
-            <strong>{member?.full_name}</strong> da equipe? Esta acção não pode
+            <strong>{member?.user?.full_name}</strong> da equipe? Esta acção não pode
             ser desfeita.
           </AlertDialogDescription>
         </AlertDialogHeader>

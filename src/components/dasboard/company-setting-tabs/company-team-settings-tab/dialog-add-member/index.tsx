@@ -433,7 +433,7 @@ export function MemberFormFields({ form, isLoading, mode }: MemberFormFieldsProp
 interface DialogAddMemberProps {
   open: boolean
   onOpenChange: (v: boolean) => void
-  onSuccess: (member: IUser) => void
+  onSuccess: () => void
 }
 
 export function DialogAddMember({ open, onOpenChange, onSuccess }: DialogAddMemberProps) {
@@ -475,7 +475,7 @@ export function DialogAddMember({ open, onOpenChange, onSuccess }: DialogAddMemb
       created_at: new Date(),
     }
 
-    onSuccess(newMember)
+    onSuccess()
     toast.success("Membro adicionado com sucesso!")
     form.reset()
     onOpenChange(false)

@@ -10,14 +10,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Form } from "@/components/ui/form"
-import { IUser } from "@/interfaces/IUser"
+import { ICompanyACL } from "@/interfaces/ICompanyACL"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import z, { string } from "zod"
 import { AVAILABLE_PERMISSIONS, AVAILABLE_ROLES, MemberFormFields, memberFormSchema } from "../dialog-add-member"
 import { useEffect, useMemo } from "react"
-import { ICompanyACL } from "@/interfaces/ICompanyACL"
 import { useParams } from "next/navigation"
 import { ICompanyRole } from "@/interfaces/ICompanyRole"
 import { ICompanyPermission } from "@/interfaces/ICompanyPermission"
@@ -27,7 +26,7 @@ import { ICompanyPermission } from "@/interfaces/ICompanyPermission"
 // ─── Dialog: Editar membro ────────────────────────────────────────────────────
 
 interface DialogEditMemberProps {
-  member: IUser | null
+  member: ICompanyACL | null
   open: boolean
   onOpenChange: (v: boolean) => void
 }
@@ -47,37 +46,30 @@ type EditMemberFormValues = z.infer<typeof editMemberFormSchema>
 export function DialogEditMember({ member, open, onOpenChange }: DialogEditMemberProps) {
     const params = useParams();
 
-    const acl = useMemo(() => {
-        return member?.company_acls?.find(
-            (acl: ICompanyACL) => acl?.company_id === params?.company_id
-        );
-    }, [member]);
-
   const form = useForm<EditMemberFormValues>({
     resolver: zodResolver(editMemberFormSchema),
     defaultValues: {
-      firstName: member?.firstName,
-      lastName: member?.lastName,
-      email: member?.email ?? "",
-      phone: member?.phone ?? "",
+      firstName: member?.user?.firstName,
+      lastName: member?.user?.lastName,
+      email: member?.user?.email ?? "",
+      phone: member?.user?.phone ?? "",
       password: "",
-      company_roles: acl?.company_roles.map((r: ICompanyRole) => r.type) ?? [],
-      company_permissions: acl?.company_permissions.map((p: ICompanyPermission) => p.type) ?? [],
+      company_roles: member?.company_roles.map((r: ICompanyRole) => r.type) ?? [],
+      company_permissions: member?.company_permissions.map((p: ICompanyPermission) => p.type) ?? [],
     },
   })
 
   // Sincroniza quando o member muda
   useEffect(() => {
     if (member) {
-      const [fn, ...rest] = member.full_name.split(" ")
       form.reset({
-        firstName: fn,
-        lastName: rest.join(" "),
-        email: member.email,
-        phone: member.phone,
+        firstName: member?.user?.firstName,
+        lastName: member?.user?.lastName,
+        email: member?.user?.email,
+        phone: member?.user?.phone,
         password: "",
-        company_roles: acl?.company_roles.map((r: ICompanyRole) => r.type),
-        company_permissions: acl?.company_permissions.map((p: ICompanyPermission) => p.type),
+        company_roles: member?.company_roles.map((r: ICompanyRole) => r.type),
+        company_permissions: member?.company_permissions.map((p: ICompanyPermission) => p.type),
       })
     }
   }, [member, form])
@@ -115,7 +107,7 @@ export function DialogEditMember({ member, open, onOpenChange }: DialogEditMembe
         <DialogHeader>
           <DialogTitle>Editar Membro</DialogTitle>
           <DialogDescription>
-            Actualize os dados de <strong>{member?.full_name}</strong>.
+            Actualize os dados de <strong>{member?.user?.full_name}</strong>.
           </DialogDescription>
         </DialogHeader>
 
