@@ -29,9 +29,9 @@ export interface IUpdateCompanyACLData {
     user_id?: string
     updateUserRequest?: IUpadateUserACLData
 
-    company_id: string
-    company_roles: string[]
-    company_permissions?:string[]
+    company_roles: string[];
+    password?: string | undefined;
+    company_permissions?: string[] | null | undefined;
 }
 
 export interface ICompanyACLFilters {

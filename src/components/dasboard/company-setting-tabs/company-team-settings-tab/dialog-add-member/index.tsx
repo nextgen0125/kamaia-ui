@@ -374,7 +374,7 @@ export function MemberFormFields({ form, isLoading, mode }: MemberFormFieldsProp
         )}
       />
  
-      <FormField
+      {mode === "create" && <FormField
         control={form.control}
         name="password"
         disabled={isLoading}
@@ -382,11 +382,11 @@ export function MemberFormFields({ form, isLoading, mode }: MemberFormFieldsProp
           <FormItem>
             <FormLabel>
               Senha{" "}
-              {mode === "edit" && (
+              {/* {mode === "edit" && (
                 <span className="text-muted-foreground font-normal text-xs">
                   (deixe em branco para manter a actual)
                 </span>
-              )}
+              )} */}
             </FormLabel>
             <FormControl>
               <Input type="password" placeholder="••••••••" {...field} />
@@ -394,7 +394,7 @@ export function MemberFormFields({ form, isLoading, mode }: MemberFormFieldsProp
             <FormMessage />
           </FormItem>
         )}
-      />
+      />}
  
       {/* Cargos e Permissões lado a lado em grid — cada um com o MultiSelect */}
       <div className="grid grid-cols-1 gap-3">
@@ -460,7 +460,7 @@ interface DialogAddMemberProps {
 export function DialogAddMember({ open, onOpenChange, onSuccess }: DialogAddMemberProps) {
   const { company, isLoading: isLoadingCompany } = useCompanyDashboardContext();
   const createCompanyACL = useAddUserToCompanyACL();
-  
+
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
     defaultValues: {

@@ -20,6 +20,8 @@ import { useEffect, useMemo } from "react"
 import { useParams } from "next/navigation"
 import { ICompanyRole } from "@/interfaces/ICompanyRole"
 import { ICompanyPermission } from "@/interfaces/ICompanyPermission"
+import { useCompanyDashboardContext } from "@/contexts/company-contexts/company-dashboard"
+import { useAddUserToCompanyACL, useUpdateCompanyACLEntry } from "@/hooks/queries/use-company-acl"
 
 
 
@@ -44,7 +46,8 @@ const editMemberFormSchema = memberFormSchema.extend({
 type EditMemberFormValues = z.infer<typeof editMemberFormSchema>
 
 export function DialogEditMember({ member, open, onOpenChange }: DialogEditMemberProps) {
-    const params = useParams();
+  const { company, isLoading: isLoadingCompany } = useCompanyDashboardContext();
+  const updateCompanyACL = useUpdateCompanyACLEntry();
 
   const form = useForm<EditMemberFormValues>({
     resolver: zodResolver(editMemberFormSchema),
@@ -74,32 +77,31 @@ export function DialogEditMember({ member, open, onOpenChange }: DialogEditMembe
     }
   }, [member, form])
 
-  const isLoading = form.formState.isSubmitting
+  const isLoading = form.formState.isSubmitting || updateCompanyACL.isPending || isLoadingCompany;
+
 
   const handleSubmit = async (data: EditMemberFormValues) => {
     if (!member) return
-    await new Promise((r) => setTimeout(r, 900))
+    try {
+        await updateCompanyACL.mutateAsync({
+          companyId: company?.id as string,
+          aclData: {...data, id: member.id},
+          aclId: member.id
+        });
 
-    const updated: any = {
-      ...member,
-      full_name: `${data.firstName} ${data.lastName}`,
-      email: data.email,
-      phone: data.phone,
-      company_roles: data.company_roles.map((r) => ({
-        id: r,
-        name: AVAILABLE_ROLES.find((x) => x.value === r)?.label ?? r,
-        type: r,
-      })),
-      company_permissions: (data.company_permissions ?? []).map((p) => ({
-        id: p,
-        name: AVAILABLE_PERMISSIONS.find((x) => x.value === p)?.label ?? p,
-        type: p,
-      })),
-    }
-
-    toast.success("Membro actualizado com sucesso!")
-    onOpenChange(false)
+        toast.success("Membro actualizado com sucesso!")
+        onOpenChange(false)
+      } catch (error) {
+        console.log(error)
+        if ((error as any).status === 500) {
+          toast.error("Houve um erro ao tentar salvar os dados.");
+        } else {
+          toast.error((error as any).message);
+        }
+      }
   }
+
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

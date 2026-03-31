@@ -153,7 +153,7 @@ class CompanyACLService {
   ): Promise<ICompanyACL> {
     try {
       const response: AxiosResponse<ICompanyACL> = await this.api.put(
-        `/v1/companies/${aclId}/${companyId}`,
+        `/v1/companies/${companyId}/company-acl/${aclId}`,
         aclData
       );
 

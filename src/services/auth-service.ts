@@ -407,10 +407,12 @@ private setupInterceptors(): void {
     if (error.response) {
       // Erro de resposta da API
       const { data, status } = error.response;
+
+      const validationMessage = data?.find((error: any) => !!error.message && !!error.validation)
       
       return {
         success: false,
-        message: data?.message || this.getDefaultErrorMessage(status),
+        message: data?.message || validationMessage?.message || this.getDefaultErrorMessage(status),
         errors: data?.errors,
         status,
         timestamp: new Date().toISOString(),
