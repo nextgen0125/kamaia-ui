@@ -5,29 +5,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
-  TrendingUp,
   Scale,
   Users,
-  Briefcase,
   DollarSign,
   Calendar,
   Clock,
   FileText,
   ArrowRight,
-  TrendingDown,
-  AlertTriangle,
 } from "lucide-react"
 import Link from "next/link"
 import { Progress } from "@/components/ui/progress"
+import CompanyDashboardKPIs from "@/components/dasboard/company-dashboard-kpis"
 
 export default function DashboardPage() {
-  // Mock data
-  const stats = {
-    cases: { total: 45, change: 20, trend: "up" },
-    clients: { total: 32, change: 15, trend: "up" },
-    lawyers: { total: 8, change: 2, trend: "up" },
-    revenue: { total: 45231.89, change: 12, trend: "up" },
-  }
+
 
   const recentCases = [
     {
@@ -118,12 +109,7 @@ export default function DashboardPage() {
     { area: "Outros", count: 4, percentage: 9 },
   ]
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "AOA",
-    }).format(value)
-  }
+
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("pt-BR", {
@@ -156,62 +142,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Main Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Processos</CardTitle>
-            <Scale className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.cases.total}</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <TrendingUp className="size-3 text-green-500" />
-              +{stats.cases.change}% em relação ao mês passado
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Clientes Ativos</CardTitle>
-            <Users className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.clients.total}</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <TrendingUp className="size-3 text-green-500" />
-              +{stats.clients.change}% em relação ao mês passado
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Advogados</CardTitle>
-            <Briefcase className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.lawyers.total}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              +{stats.lawyers.change} novos este mês
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Receita Mensal</CardTitle>
-            <DollarSign className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(stats.revenue.total)}</div>
-            <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <TrendingUp className="size-3 text-green-500" />
-              +{stats.revenue.change}% em relação ao mês passado
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <CompanyDashboardKPIs />
 
       <div className="grid gap-4 lg:grid-cols-7">
         {/* Recent Cases */}

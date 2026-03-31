@@ -155,6 +155,8 @@ type LoginFormValues = z.infer<typeof loginSchema>
   useEffect(() => {
     if (!isAuthenticated || !profile?.data) return
 
+    console.log(user)
+
     const timer = setTimeout(() => {
       if (isSuperAdmin()) {
         router.push('/k_admin/dashboard');

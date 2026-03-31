@@ -102,6 +102,28 @@ class CompanyService {
     }
   }
 
+  /**
+   * Busca os KPIs de uma empresa/escritório de advocacia pelo ID.
+   * @returns Empresa
+   */
+  async getCompanyKPIs(companyId: string, page: string): Promise<ICompany> {
+    try {
+      const response: AxiosResponse<ICompany> = await this.api.get(
+        `/v1/companies/${companyId}/kpis?page=${page}`,
+      );
+
+      const data = response.data;
+      if (data) {
+        return data;
+      }
+
+      throw new Error('Erro ao buscar os kpis da empresa');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
   // ─────────────────────────────────────────────────────────────────────────────
   // PUT /v1/companies  — Atualizar empresa  [SUPER_ADMIN | ADMINISTRATOR]
   // ─────────────────────────────────────────────────────────────────────────────

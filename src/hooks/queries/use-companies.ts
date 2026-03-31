@@ -63,6 +63,31 @@ export function useCompany(companyId: string) {
   });
 }
 
+/**
+ * Busca uma empresa/escritório de advocacia pelo ID.
+ * Endpoint: GET /v1/companies/:id
+ * @param CompanyId ID da empresa/escritório
+ * @param Page Página para o filtro do KPIs da empresa/escritório
+ * @returns Query com o KPIS da empresa
+ */
+export function useCompanyKPIs (companyId: string, page: string) {
+  return useQuery({
+    queryKey: companyQueryKeys.list({ companyId }),
+    queryFn: () => companyService.getCompanyKPIs(companyId, page),
+    staleTime: 10 * 60 * 1000, // 10 minutos
+    enabled: !!companyId && !!page,
+    retry: (failureCount, error: any) => {
+      // Não tentar novamente em erros de autorização
+      if (error?.status === 401 || error?.status === 403) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mutations
@@ -176,5 +201,6 @@ export default {
   useUpdateCompany,
   useCompanyOperations,
   useInvalidateCompanies,
+  useCompanyKPIs,
   useCompany
 };

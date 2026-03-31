@@ -408,7 +408,9 @@ private setupInterceptors(): void {
       // Erro de resposta da API
       const { data, status } = error.response;
 
-      const validationMessage = data?.find((error: any) => !!error.message && !!error.validation)
+      const validationMessage = !data?.message 
+        ? data?.find((error: any) => !!error.message && !!error.validation)
+        : null;
       
       return {
         success: false,
