@@ -10,6 +10,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { useCompanyDashboardContext } from "@/contexts/company-contexts/company-dashboard";
+import { useDeleteACLEntry } from "@/hooks/queries/use-company-acl";
 import { ICompanyACL } from "@/interfaces/ICompanyACL";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -23,15 +25,24 @@ interface AlertRemoveMemberProps {
 }
 
 export function AlertRemoveMember({ member, open, onOpenChange }: AlertRemoveMemberProps) {
-  const [isLoading, setIsLoading] = useState(false)
+  const { company, isLoading: isLoadingCompany } = useCompanyDashboardContext();
+  const removeACL = useDeleteACLEntry();
 
   const handleConfirm = async () => {
-    if (!member) return
-    setIsLoading(true)
-    await new Promise((r) => setTimeout(r, 700))
-    toast.success("Membro removido com sucesso!")
-    setIsLoading(false)
-    onOpenChange(false)
+    if (!member && !company) return
+    
+    try {
+      await removeACL.mutateAsync({
+        aclId: member?.id as string,
+        companyId: company?.id as string
+      })
+      toast.success("Membro removido com sucesso!")
+      onOpenChange(false)
+    } catch (error) {
+      console.log(error)
+      toast.error((error as any).message);
+    }
+
   }
 
   return (
@@ -46,13 +57,13 @@ export function AlertRemoveMember({ member, open, onOpenChange }: AlertRemoveMem
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel disabled={removeACL.isPending}>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleConfirm}
-            disabled={isLoading}
+            disabled={removeACL.isPending}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {isLoading ? "A remover..." : "Remover"}
+            {removeACL.isPending ? "A remover..." : "Remover"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

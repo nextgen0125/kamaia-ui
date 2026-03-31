@@ -183,7 +183,7 @@ class CompanyACLService {
    */
   async deleteACLEntry(aclId: string, companyId: string): Promise<void> {
     try {
-      await this.api.delete(`/v1/companies/${aclId}/${companyId}`);
+      await this.api.delete(`/v1/companies/${companyId}/company-acl/${aclId}`);
     } catch (error) {
       throw error;
     }

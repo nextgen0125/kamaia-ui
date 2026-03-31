@@ -81,7 +81,7 @@ private setupInterceptors(): void {
         }
       }
 
-      return Promise.reject(this.handleApiError(error));
+      return Promise.reject(this.handleApiError(error)); 
     }
   );
 }
