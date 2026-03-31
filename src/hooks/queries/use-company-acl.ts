@@ -98,7 +98,7 @@ export function useAttorneyACL(companyId: string, filters?: ICompanyACLFilters) 
  *
  * @returns Mutation para adição de usuário à ACL
  */
-export function useAddUserToACL() {
+export function useAddUserToCompanyACL() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -132,7 +132,7 @@ export function useAddUserToACL() {
  *
  * @returns Mutation para atualização de entrada de ACL
  */
-export function useUpdateACLEntry() {
+export function useUpdateCompanyACLEntry() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -241,8 +241,8 @@ export function useInvalidateCompanyACL() {
  * Centraliza todas as mutations e seus estados derivados em uma única interface.
  */
 export function useCompanyACLOperations() {
-  const addUserMutation = useAddUserToACL();
-  const updateACLMutation = useUpdateACLEntry();
+  const addUserMutation = useAddUserToCompanyACL();
+  const updateACLMutation = useUpdateCompanyACLEntry();
   const deleteACLMutation = useDeleteACLEntry();
 
   return {
@@ -276,8 +276,8 @@ export function useCompanyACLOperations() {
 export default {
   useCompanyACL,
   useAttorneyACL,
-  useAddUserToACL,
-  useUpdateACLEntry,
+  useAddUserToCompanyACL,
+  useUpdateCompanyACLEntry,
   useDeleteACLEntry,
   useCompanyACLOperations,
   useInvalidateCompanyACL,

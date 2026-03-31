@@ -18,9 +18,10 @@ export interface ICompanyACL extends IBaseEntity {
 export interface ICreateCompanyACLData {
     createUserRequest?: ICreateUserData;
 
-    company_id: string;
     company_roles: string[];
-    company_permissions?: string[];
+    user_id?: string | undefined;
+    password?: string | undefined;
+    company_permissions?: string[] | null | undefined;
 }
 
 export interface IUpdateCompanyACLData {

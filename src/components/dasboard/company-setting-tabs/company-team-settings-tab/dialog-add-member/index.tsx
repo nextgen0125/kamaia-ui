@@ -35,8 +35,11 @@ import {
 } from "@/components/ui/popover"
 
 import { cn } from "@/lib/utils"
-import { KeyboardEvent, useRef, useState } from "react";
+import { KeyboardEvent, useMemo, useRef, useState } from "react";
 import { Check, ChevronsUpDown, X } from "lucide-react";
+import { useCompanyPermissions, useCompanyRoles } from "@/hooks/queries/use-company-roles-permissions";
+import { useAddUserToCompanyACL } from "@/hooks/queries/use-company-acl";
+import { useCompanyDashboardContext } from "@/contexts/company-contexts/company-dashboard";
 
 export const AVAILABLE_ROLES: { value: string; label: string }[] = [
   { value: "ADMINISTRATOR", label: "Administrador" },
@@ -289,6 +292,24 @@ interface MemberFormFieldsProps {
 }
  
 export function MemberFormFields({ form, isLoading, mode }: MemberFormFieldsProps) {
+
+  const { data: roles, isLoading: isLoadingRoles } = useCompanyRoles();
+  const { data: permisssions, isLoading: isLoadingPermissions } = useCompanyPermissions();
+
+  const available_roles = useMemo(() => {
+    return roles?.map(role => ({
+      value: role.type,
+      label: role.name 
+    }));
+  }, [roles, isLoadingRoles]);
+
+  const available_permissions = useMemo(() => {
+    return permisssions?.map(permission => ({
+      value: permission.type,
+      label: permission.name 
+    }));
+  }, [permisssions, isLoadingPermissions]);
+
   return (
     <div className="space-y-4 py-1">
       {/* Nome e Último nome lado a lado */}
@@ -380,13 +401,13 @@ export function MemberFormFields({ form, isLoading, mode }: MemberFormFieldsProp
         <FormField
           control={form.control}
           name="company_roles"
-          disabled={isLoading}
+          disabled={isLoading || isLoadingRoles}
           render={({ field }) => (
             <FormItem>
               <FormLabel>Cargos</FormLabel>
               <FormControl>
                 <MultiSelect
-                  options={AVAILABLE_ROLES}
+                  options={available_roles ?? []}
                   value={field.value ?? []}
                   onChange={field.onChange}
                   placeholder="Selecione cargos..."
@@ -411,7 +432,7 @@ export function MemberFormFields({ form, isLoading, mode }: MemberFormFieldsProp
               </FormLabel>
               <FormControl>
                 <MultiSelect
-                  options={AVAILABLE_PERMISSIONS}
+                  options={available_permissions ?? []}
                   value={(field.value as string[]) ?? []}
                   onChange={field.onChange}
                   placeholder="Selecione permissões..."
@@ -437,6 +458,9 @@ interface DialogAddMemberProps {
 }
 
 export function DialogAddMember({ open, onOpenChange, onSuccess }: DialogAddMemberProps) {
+  const { company, isLoading: isLoadingCompany } = useCompanyDashboardContext();
+  const createCompanyACL = useAddUserToCompanyACL();
+  
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
     defaultValues: {
@@ -450,35 +474,23 @@ export function DialogAddMember({ open, onOpenChange, onSuccess }: DialogAddMemb
     },
   })
 
-  const isLoading = form.formState.isSubmitting
+  const isLoading = form.formState.isSubmitting || createCompanyACL.isPending || isLoadingCompany;
 
   const handleSubmit = async (data: MemberFormValues) => {
-    // Simulação de request
-    await new Promise((r) => setTimeout(r, 900))
+    try {
+      await createCompanyACL.mutateAsync({
+        companyId: company?.id as string,
+        aclData: data,
+      });
 
-    const newMember: any = {
-      id: `acl-${Date.now()}`,
-      user_id: `usr-${Date.now()}`,
-      full_name: `${data.firstName} ${data.lastName}`,
-      email: data.email,
-      phone: data.phone,
-      company_roles: data.company_roles.map((r) => ({
-        id: r,
-        name: AVAILABLE_ROLES.find((x) => x.value === r)?.label ?? r,
-        type: r,
-      })),
-      company_permissions: (data.company_permissions ?? []).map((p) => ({
-        id: p,
-        name: AVAILABLE_PERMISSIONS.find((x) => x.value === p)?.label ?? p,
-        type: p,
-      })),
-      created_at: new Date(),
+      onSuccess()
+      toast.success("Membro adicionado com sucesso!")
+      form.reset()
+      onOpenChange(false)
+    } catch (error) {
+      console.log(error)
+      toast.error("Houve um erro ao tentar salvar os dados.");
     }
-
-    onSuccess()
-    toast.success("Membro adicionado com sucesso!")
-    form.reset()
-    onOpenChange(false)
   }
 
   return (
