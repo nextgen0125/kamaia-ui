@@ -16,39 +16,12 @@ import {
 import Link from "next/link"
 import { Progress } from "@/components/ui/progress"
 import CompanyDashboardKPIs from "@/components/dasboard/company-dashboard-kpis"
+import CardCompanyDashboardRecentCases from "@/components/dasboard/card-company-dashboard-recent-cases"
 
 export default function DashboardPage() {
 
 
-  const recentCases = [
-    {
-      id: 1,
-      number: "0001234-56.2024.8.26.0100",
-      title: "Ação Trabalhista - Horas Extras",
-      client: "Carlos Mendes",
-      status: "active",
-      priority: "high",
-      date: "2024-03-15",
-    },
-    {
-      id: 2,
-      number: "0002345-67.2024.8.26.0000",
-      title: "Divórcio Consensual",
-      client: "Ana Paula Oliveira",
-      status: "active",
-      priority: "medium",
-      date: "2024-03-14",
-    },
-    {
-      id: 3,
-      number: "0003456-78.2024.8.26.0100",
-      title: "Cobrança - Inadimplência",
-      client: "Empresa ABC Ltda",
-      status: "pending",
-      priority: "low",
-      date: "2024-03-13",
-    },
-  ]
+
 
   const upcomingDeadlines = [
     {
@@ -118,18 +91,6 @@ export default function DashboardPage() {
     })
   }
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "destructive"
-      case "medium":
-        return "default"
-      case "low":
-        return "secondary"
-      default:
-        return "secondary"
-    }
-  }
 
   return (
     <div className="space-y-6">
@@ -146,46 +107,7 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 lg:grid-cols-7">
         {/* Recent Cases */}
-        <Card className="lg:col-span-4">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Processos Recentes</CardTitle>
-                <CardDescription>Últimos processos cadastrados</CardDescription>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/dashboard/cases">
-                  Ver todos
-                  <ArrowRight className="ml-2 size-4" />
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentCases.map((case_) => (
-                <div
-                  key={case_.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className="space-y-1 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium text-sm">{case_.title}</p>
-                      <Badge variant={getPriorityColor(case_.priority)} className="text-xs">
-                        {case_.priority === "high" ? "Alta" : case_.priority === "medium" ? "Média" : "Baixa"}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">{case_.client}</p>
-                    <p className="text-xs text-muted-foreground font-mono">{case_.number}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-muted-foreground">{formatDate(case_.date)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <CardCompanyDashboardRecentCases />
 
         {/* Cases by Area */}
         <Card className="lg:col-span-3">
