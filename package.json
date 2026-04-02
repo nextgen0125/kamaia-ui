@@ -76,6 +76,7 @@
     "@eslint/eslintrc": "^3",
     "@faker-js/faker": "^10.0.0",
     "@tailwindcss/postcss": "^4",
+    "@tanstack/react-query-devtools": "^5.96.1",
     "@types/node": "latest",
     "@types/react": "^19",
     "@types/react-dom": "^19",

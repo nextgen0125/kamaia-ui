@@ -5,6 +5,7 @@ import {
   ICompanyACLFilters,
 } from '@/interfaces/ICompanyACL';
 import companyACLService from '@/services/company-acl-service';
+import { companyQueryKeys } from './use-companies';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Query Keys
@@ -117,6 +118,9 @@ export function useAddUserToCompanyACL() {
       queryClient.invalidateQueries({
         queryKey: companyACLQueryKeys.attorneyLists(companyId),
       });
+            queryClient.invalidateQueries({
+        queryKey: companyQueryKeys.kpis(companyId, "dashboard"),
+      });
     },
     onError: (error) => {
       console.error('Erro ao adicionar usuário à ACL:', error);
@@ -153,6 +157,10 @@ export function useUpdateCompanyACLEntry() {
       queryClient.invalidateQueries({
         queryKey: companyACLQueryKeys.attorneyLists(companyId),
       });
+      queryClient.invalidateQueries({
+        queryKey: companyQueryKeys.kpis(companyId, "dashboard"),
+      });
+      
     },
     onError: (error) => {
       console.error('Erro ao atualizar entrada de ACL:', error);
@@ -186,6 +194,9 @@ export function useDeleteACLEntry() {
       });
       queryClient.invalidateQueries({
         queryKey: companyACLQueryKeys.attorneyLists(companyId),
+      });
+            queryClient.invalidateQueries({
+        queryKey: companyQueryKeys.kpis(companyId, "dashboard"),
       });
     },
     onError: (error) => {

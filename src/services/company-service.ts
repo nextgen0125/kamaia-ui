@@ -1,6 +1,6 @@
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { authService } from './auth-service';
-import { ICompany, CreateCompanyData, UpdateCompanyData, CompanyFilters, PaginatedCompanies } from '@/interfaces/ICompany';
+import { ICompany, CreateCompanyData, UpdateCompanyData, CompanyFilters, PaginatedCompanies, ICompanyDashboardIKPIs } from '@/interfaces/ICompany';
 
 /**
  * Service de empresas/escritórios de advocacia.
@@ -106,9 +106,9 @@ class CompanyService {
    * Busca os KPIs de uma empresa/escritório de advocacia pelo ID.
    * @returns Empresa
    */
-  async getCompanyKPIs(companyId: string, page: string): Promise<ICompany> {
+  async getCompanyKPIs(companyId: string, page: string): Promise<ICompanyDashboardIKPIs> {
     try {
-      const response: AxiosResponse<ICompany> = await this.api.get(
+      const response: AxiosResponse<ICompanyDashboardIKPIs> = await this.api.get(
         `/v1/companies/${companyId}/kpis?page=${page}`,
       );
 

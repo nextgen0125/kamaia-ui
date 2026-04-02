@@ -19,22 +19,33 @@ import {
   AlertTriangle,
 } from "lucide-react"
 import { formatCurrency } from "@/utils/formatCurrency"
+import { useCompanyKPIs } from "@/hooks/queries/use-companies"
+import { useParams } from "next/navigation"
+
+const trendTypeIcon = {
+  "up": <TrendingUp className="size-3 text-green-500" />,
+  "down": <TrendingDown className="size-3 text-red-500" />,
+  "neutral": null
+}
+
+const trendTypeSymbol = {
+  "up": "+",
+  "down": "-",
+  "neutral": null
+}
 
 export default function CompanyDashboardKPIs() {
+  const params = useParams();
 
-  const { isLoading } = useCompanyDashboardContext();
+  const { isLoading, company } = useCompanyDashboardContext();
+  const { isLoading: isLoadingCompany, data: kpis } = useCompanyKPIs(params?.company_id as string, "dashboard");
 
-    // Mock data
-  const stats = {
-    cases: { total: 45, change: 20, trend: "up" },
-    clients: { total: 32, change: 15, trend: "up" },
-    lawyers: { total: 8, change: 2, trend: "up" },
-    revenue: { total: 45231.89, change: 12, trend: "up" },
-  }
-
-  return isLoading
+  return isLoading || isLoadingCompany
     ? <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatCardSkeleton />
+          {
+            [1, 2, 3,4].map(item => <StatCardSkeleton key={item} />)
+          }
+          
       </div>
     : (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -44,10 +55,10 @@ export default function CompanyDashboardKPIs() {
             <Scale className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.cases.total}</div>
+            <div className="text-2xl font-bold">{kpis?.totalProcesses?.value}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <TrendingUp className="size-3 text-green-500" />
-              +{stats.cases.change}% em relação ao mês passado
+              { trendTypeIcon[kpis?.totalProcesses?.trend || "neutral"] }
+              {trendTypeSymbol[kpis?.totalProcesses?.trend || "neutral"]}{kpis?.totalProcesses?.value}% em relação ao mês passado
             </p>
           </CardContent>
         </Card>
@@ -58,10 +69,10 @@ export default function CompanyDashboardKPIs() {
             <Users className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.clients.total}</div>
+            <div className="text-2xl font-bold">{kpis?.activeClients?.value}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <TrendingUp className="size-3 text-green-500" />
-              +{stats.clients.change}% em relação ao mês passado
+              { trendTypeIcon[kpis?.activeClients?.trend || "neutral"] }
+              {trendTypeSymbol[kpis?.activeClients?.trend || "neutral"]}{kpis?.activeClients?.percentChange}% em relação ao mês passado
             </p>
           </CardContent>
         </Card>
@@ -72,9 +83,9 @@ export default function CompanyDashboardKPIs() {
             <Briefcase className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.lawyers.total}</div>
+            <div className="text-2xl font-bold">{kpis?.lawyers?.value}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              +{stats.lawyers.change} novos este mês
+              {trendTypeSymbol[kpis?.lawyers?.trend || "neutral"]}{kpis?.lawyers?.numericChange} novos este mês
             </p>
           </CardContent>
         </Card>
@@ -85,10 +96,10 @@ export default function CompanyDashboardKPIs() {
             <DollarSign className="size-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(stats.revenue.total)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(kpis?.monthlyRevenue?.value ?? 0)}</div>
             <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-              <TrendingUp className="size-3 text-green-500" />
-              +{stats.revenue.change}% em relação ao mês passado
+              { trendTypeIcon[kpis?.monthlyRevenue?.trend || "neutral"] }
+              {trendTypeSymbol[kpis?.monthlyRevenue?.trend || "neutral"]}{kpis?.monthlyRevenue?.percentChange}% em relação ao mês passado
             </p>
           </CardContent>
         </Card>

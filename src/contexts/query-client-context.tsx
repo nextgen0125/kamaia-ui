@@ -4,6 +4,7 @@
 import { queryClientOptions } from '@/lib/query-client-options';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { createContext, ReactNode } from 'react';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 
 const QueryClientContext = createContext<undefined>(undefined);
@@ -15,6 +16,7 @@ export const QueryClientContextProvider: React.FC<{ children: ReactNode }> = ({ 
     <QueryClientContext.Provider value={undefined}>
       <QueryClientProvider client={queryClient.current}>
         {children}
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </QueryClientContext.Provider>
   );

@@ -14,6 +14,7 @@ export const companyQueryKeys = {
   all: ['companies'] as const,
   lists: () => [...companyQueryKeys.all, 'list'] as const,
   list: (filters?: CompanyFilters) => [...companyQueryKeys.lists(), filters] as const,
+  kpis: (comapnyId: string, page: string) => [...companyQueryKeys.lists(), 'kpis', comapnyId, page] as const,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -72,7 +73,7 @@ export function useCompany(companyId: string) {
  */
 export function useCompanyKPIs (companyId: string, page: string) {
   return useQuery({
-    queryKey: companyQueryKeys.list({ companyId }),
+    queryKey: companyQueryKeys.kpis(companyId, page),
     queryFn: () => companyService.getCompanyKPIs(companyId, page),
     staleTime: 10 * 60 * 1000, // 10 minutos
     enabled: !!companyId && !!page,
