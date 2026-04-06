@@ -20,7 +20,7 @@ export interface IClient {
     profission: string
     company_name: string 
 
-    registering_user: IUser
+    user: IUser
     company: ICompany
     involved: any[]
 }

@@ -1,6 +1,7 @@
 import { IBaseEntity } from "./IBaseEntity";
 import { ICompany } from "./ICompany";
 import { ICompanyACL } from "./ICompanyACL";
+import { IInvolved } from "./IInvolved";
 
 
 export interface IProcess extends IBaseEntity {
@@ -23,7 +24,7 @@ export interface IProcess extends IBaseEntity {
     company_acl: ICompanyACL
     access: AccessTypeProcecess
     service: any[]
-    involved: any
+    involveds: IInvolved[]
     finance: any
 }
 

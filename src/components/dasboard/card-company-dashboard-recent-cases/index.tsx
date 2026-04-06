@@ -6,54 +6,20 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 
 import { useCompanyDashboardContext } from "@/contexts/company-contexts/company-dashboard"
-import { CaseCardSkeleton, StatCardSkeleton } from "@/components/ui/skeleton-cards"
+import { CaseCardSkeleton } from "@/components/ui/skeleton-cards"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   ArrowRight,
   FolderOpen,
 } from "lucide-react"
-import { useCompanyKPIs } from "@/hooks/queries/use-companies"
-import { useParams } from "next/navigation"
 import { getPriorityColor } from "@/utils/getPriorityColor"
 import { formatDate } from "@/utils/formatDate"
 import { useProcesses } from "@/hooks/queries/use-process"
 
 export default function CardCompanyDashboardRecentCases () {
 
-    const recentCases = [
-    {
-      id: 1,
-      number: "0001234-56.2024.8.26.0100",
-      title: "Ação Trabalhista - Horas Extras",
-      client: "Carlos Mendes",
-      status: "active",
-      priority: "high",
-      date: "2024-03-15",
-    },
-    {
-      id: 2,
-      number: "0002345-67.2024.8.26.0000",
-      title: "Divórcio Consensual",
-      client: "Ana Paula Oliveira",
-      status: "active",
-      priority: "medium",
-      date: "2024-03-14",
-    },
-    {
-      id: 3,
-      number: "0003456-78.2024.8.26.0100",
-      title: "Cobrança - Inadimplência",
-      client: "Empresa ABC Ltda",
-      status: "pending",
-      priority: "low",
-      date: "2024-03-13",
-    },
-  ]
-
   const { isLoading, company } = useCompanyDashboardContext();
   const { isLoading: isLoadingProcesses, data } = useProcesses(company?.id as string, { page: 1, take: 5 });
-
-  console.log(data)
 
   return isLoading || isLoadingProcesses
     ? <CaseCardSkeleton className="lg:col-span-4" />
@@ -93,7 +59,7 @@ export default function CardCompanyDashboardRecentCases () {
             </div>
             ) : (
             <div className="space-y-4">
-                {recentCases.map((case_) => (
+                {data?.processes?.map((case_) => (
                 <div
                     key={case_.id}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
@@ -105,11 +71,17 @@ export default function CardCompanyDashboardRecentCases () {
                         {case_.priority === "high" ? "Alta" : case_.priority === "medium" ? "Média" : "Baixa"}
                         </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground">{case_.client}</p>
-                    <p className="text-xs text-muted-foreground font-mono">{case_.number}</p>
+                    <p className="text-xs text-muted-foreground">{
+                        case_.involveds?.length
+                            ? case_.involveds[0]?.client?.user?.full_name
+                                ? case_.involveds[0].client.user.full_name + (case_.involveds.length > 1 ? <Badge variant={"secondary"}>+{case_.involveds.length -1}</Badge> : "")
+                                : "Sem cliente"
+                            : "Sem envolvidos"
+                    } </p>
+                    <p className="text-xs text-muted-foreground font-mono">{case_.process_number}</p>
                     </div>
                     <div className="text-right">
-                    <p className="text-xs text-muted-foreground">{formatDate(case_.date, "short")}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(case_.created_at, "short")}</p>
                     </div>
                 </div>
                 ))}
