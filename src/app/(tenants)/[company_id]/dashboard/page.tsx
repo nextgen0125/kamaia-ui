@@ -14,9 +14,9 @@ import {
   ArrowRight,
 } from "lucide-react"
 import Link from "next/link"
-import { Progress } from "@/components/ui/progress"
 import CompanyDashboardKPIs from "@/components/dasboard/company-dashboard-kpis"
 import CardCompanyDashboardRecentCases from "@/components/dasboard/card-company-dashboard-recent-cases"
+import CardCompanyProcessesByArea from "@/components/dasboard/card-company-processes-by-area"
 
 export default function DashboardPage() {
 
@@ -74,13 +74,7 @@ export default function DashboardPage() {
     },
   ]
 
-  const casesByArea = [
-    { area: "Trabalhista", count: 15, percentage: 33 },
-    { area: "Civil", count: 12, percentage: 27 },
-    { area: "Penal", count: 8, percentage: 18 },
-    { area: "Família", count: 6, percentage: 13 },
-    { area: "Outros", count: 4, percentage: 9 },
-  ]
+
 
 
 
@@ -110,25 +104,7 @@ export default function DashboardPage() {
         <CardCompanyDashboardRecentCases />
 
         {/* Cases by Area */}
-        <Card className="lg:col-span-3">
-          <CardHeader>
-            <CardTitle>Processos por Área</CardTitle>
-            <CardDescription>Distribuição de casos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {casesByArea.map((item) => (
-                <div key={item.area} className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-medium">{item.area}</span>
-                    <span className="text-muted-foreground">{item.count} casos</span>
-                  </div>
-                  <Progress value={item.percentage} className="h-2" />
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <CardCompanyProcessesByArea />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

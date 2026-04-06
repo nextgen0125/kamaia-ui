@@ -100,11 +100,31 @@ export enum ILegalArea {
   CIVIL = "CIVIL",
   PENAL = "PENAL",
   TRABALHO = "TRABALHO",
-  FAMILIA = "FAMILIA",
+  FAMILIA = "FAMÍLIA",
   COMERCIAL = "COMERCIAL",
   ADMINISTRATIVO = "ADMINISTRATIVO",
   CONSTITUCIONAL = "CONSTITUCIONAL",
-  TRIBUTARIO = "TRIBUTARIO",
+  TRIBUTARIO = "TRIBUTÁRIO",
   INTERNACIONAL = "INTERNACIONAL",
   OUTRO = "OUTRO"
+}
+
+export interface ILegalAreaStat {
+    /** Área legal do agrupamento. */
+    legal_area: ILegalArea;
+    /** Total de processos nessa área. */
+    total: number;
+    /** Percentual em relação ao total geral de processos da empresa (2 casas decimais). */
+    percentage: number;
+    /** Média do valor da causa dos processos nessa área. */
+    avg_case_value: number;
+    /** Média do valor da sentença dos processos nessa área. */
+    avg_sentence_value: number;
+}
+
+export interface IProcessesByAreaStatistics {
+    /** Total geral de processos da empresa (todas as áreas). */
+    total_processes: number;
+    /** Estatísticas por área legal, ordenadas por total decrescente. */
+    by_area: ILegalAreaStat[];
 }

@@ -33,6 +33,8 @@ export const processQueryKeys = {
     [...processQueryKeys.byCompany(companyId), 'detail'] as const,
   detail: (companyId: string, processId: string) =>
     [...processQueryKeys.details(companyId), processId] as const,
+  statistics: (companyId: string, filters?: IProcessFilters) =>
+    [...processQueryKeys.byCompany(companyId), 'statistics', filters] as const,
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -53,6 +55,36 @@ export function useProcesses(companyId: string, filters?: IProcessFilters) {
   return useQuery({
     queryKey: processQueryKeys.list(companyId, filters),
     queryFn: () => processService.getProcesses(companyId, filters),
+    enabled: !!companyId,
+    staleTime: 2 * 60 * 1000, // 2 minutos
+    retry: (failureCount, error: any) => {
+      if (
+        error?.status === 401 ||
+        error?.status === 403 ||
+        error?.status === 404
+      ) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+
+/**
+ * Busca todas as estatísticas dos processos jurídicos de uma empresa.
+ * Endpoint: GET /v1/companies/:company_id/processes/statistics
+ * Acessível a SUPER_ADMIN, ADMINISTRATOR, ATTORNEY, ASSISTANT e VISUALIZER
+ * com permissão process:view ou process:manage.
+ *
+ * @param companyId UUID da empresa/escritório de advocacia
+ * @param filters   Filtros de paginação opcionais (page, take)
+ * @returns         Query com lista paginada de processos
+ */
+export function useProcessesStatistics(companyId: string, filters?: IProcessFilters) {
+  return useQuery({
+    queryKey: processQueryKeys.statistics(companyId, filters),
+    queryFn: () => processService.getProcessesStatistics(companyId, filters),
     enabled: !!companyId,
     staleTime: 2 * 60 * 1000, // 2 minutos
     retry: (failureCount, error: any) => {
@@ -208,6 +240,12 @@ export function useInvalidateProcesses() {
         queryKey: processQueryKeys.detail(companyId, processId),
       });
     },
+    /** Invalida o detalhe de um processo específico */
+    invalidateStatistics: (companyId: string) => {
+      queryClient.invalidateQueries({
+        queryKey: processQueryKeys.statistics(companyId, undefined),
+      });
+    },
   };
 }
 
@@ -259,4 +297,5 @@ export default {
   useDeleteProcess,
   useProcessOperations,
   useInvalidateProcesses,
+  useProcessesStatistics
 };

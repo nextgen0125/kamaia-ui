@@ -6,6 +6,7 @@ import {
   IUpdateProcessData,
   IProcessFilters,
   IPaginatedProcesses,
+  IProcessesByAreaStatistics,
 } from '@/interfaces/IProcess';
 
 /**
@@ -95,6 +96,43 @@ class ProcessService {
       throw error;
     }
   }
+
+    // ─────────────────────────────────────────────────────────────────────────────
+  // GET /v1/companies/:company_id/processes/statistics
+  // Listar processos  [SUPER_ADMIN | ADMINISTRATOR | ATTORNEY | ASSISTANT | VISUALIZER]
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Lista as estatiticas dos processos jurídicos de uma empresa.
+   * Acessível a múltiplos roles via canOrIs (process:view | process:manage).
+   *
+   * @param companyId UUID da empresa/escritório de advocacia
+   * @param filters   Filtros de paginação opcionais (page, take)
+   * @returns         Lista paginada de processos
+   */
+  async getProcessesStatistics(
+    companyId: string,
+    filters?: IProcessFilters
+  ): Promise<IProcessesByAreaStatistics> {
+    try {
+      const response: AxiosResponse<IProcessesByAreaStatistics> = await this.api.get(
+        `/v1/companies/${companyId}/processes/statistics`,
+        { params: filters }
+      );
+
+      const data = response.data;
+      if (data) {
+        return data;
+      }
+
+      throw new Error('Erro ao buscar estatísticas de processos');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  
+
 
   // ─────────────────────────────────────────────────────────────────────────────
   // PUT /v1/companies/:company_id/processes/:id
