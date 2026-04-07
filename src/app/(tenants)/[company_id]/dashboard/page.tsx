@@ -17,38 +17,10 @@ import Link from "next/link"
 import CompanyDashboardKPIs from "@/components/dasboard/company-dashboard-kpis"
 import CardCompanyDashboardRecentCases from "@/components/dasboard/card-company-dashboard-recent-cases"
 import CardCompanyProcessesByArea from "@/components/dasboard/card-company-processes-by-area"
+import CardCompanyUpcomingDeadlines from "@/components/dasboard/card-company-upcoming-deadlines"
 
 export default function DashboardPage() {
 
-
-
-
-  const upcomingDeadlines = [
-    {
-      id: 1,
-      case: "Ação Trabalhista - Horas Extras",
-      description: "Apresentar contestação",
-      date: "2024-03-20",
-      daysLeft: 5,
-      priority: "high",
-    },
-    {
-      id: 2,
-      case: "Divórcio Consensual",
-      description: "Audiência de conciliação",
-      date: "2024-03-22",
-      daysLeft: 7,
-      priority: "medium",
-    },
-    {
-      id: 3,
-      case: "Indenização por Danos Morais",
-      description: "Recurso de apelação",
-      date: "2024-03-25",
-      daysLeft: 10,
-      priority: "high",
-    },
-  ]
 
   const recentActivities = [
     {
@@ -78,13 +50,6 @@ export default function DashboardPage() {
 
 
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "short",
-    })
-  }
-
 
   return (
     <div className="space-y-6">
@@ -109,52 +74,7 @@ export default function DashboardPage() {
 
       <div className="grid gap-4 lg:grid-cols-2">
         {/* Upcoming Deadlines */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Próximos Prazos</CardTitle>
-                <CardDescription>Prazos que vencem em breve</CardDescription>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/dashboard/agenda">
-                  Ver todos
-                  <ArrowRight className="ml-2 size-4" />
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {upcomingDeadlines.map((deadline) => (
-                <div
-                  key={deadline.id}
-                  className="flex items-start gap-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                >
-                  <div className={`size-10 rounded-lg flex items-center justify-center shrink-0 ${
-                    deadline.daysLeft <= 5 ? "bg-red-100 dark:bg-red-950" : "bg-blue-100 dark:bg-blue-950"
-                  }`}>
-                    <Calendar className={`size-5 ${
-                      deadline.daysLeft <= 5 ? "text-red-600 dark:text-red-400" : "text-blue-600 dark:text-blue-400"
-                    }`} />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <p className="font-medium text-sm">{deadline.description}</p>
-                    <p className="text-xs text-muted-foreground">{deadline.case}</p>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="outline" className="text-xs">
-                        {formatDate(deadline.date)}
-                      </Badge>
-                      <Badge variant={deadline.daysLeft <= 5 ? "destructive" : "default"} className="text-xs">
-                        {deadline.daysLeft} dias
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <CardCompanyUpcomingDeadlines />
 
         {/* Recent Activities */}
         <Card>
