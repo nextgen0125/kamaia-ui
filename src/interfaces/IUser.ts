@@ -19,6 +19,8 @@ export interface IUser {
     avatar_key: string;
     email_verified: boolean;
     phone_verified: boolean;
+    is_online: boolean;
+    last_time_online: Date;
     
     roles: any[];
     refresh_token: IRefreshToken;

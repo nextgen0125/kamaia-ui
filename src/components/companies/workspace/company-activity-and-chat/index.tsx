@@ -25,10 +25,10 @@ export default function CompanyActivityAndChat () {
                     <Activity className="mr-2 h-4 w-4" />
                     Atividades
                   </TabsTrigger>
-                  <TabsTrigger value="chat" className="cursor-pointer">
+                  {/* <TabsTrigger value="chat" className="cursor-pointer">
                     <MessageSquare className="mr-2 h-4 w-4" />
                     Chat da Equipe
-                  </TabsTrigger>
+                  </TabsTrigger> */}
                 </TabsList>
 
                 {/* Activity Feed */}
