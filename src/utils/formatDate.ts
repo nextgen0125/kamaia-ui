@@ -1,3 +1,5 @@
+import { formatDistanceToNow } from "date-fns"
+import { ptBR } from "date-fns/locale"
 
 export function formatDate(iso: string | Date, type: "long" | "short" = "long"): string {
   return type === "long"
@@ -10,4 +12,11 @@ export function formatDate(iso: string | Date, type: "long" | "short" = "long"):
         day: "2-digit",
         month: "short",
       })
+}
+
+export function formatTimeAgo(iso: string): string {
+  return formatDistanceToNow(new Date(iso), {
+    addSuffix: true,
+    locale: ptBR,
+  })
 }

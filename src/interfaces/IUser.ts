@@ -1,4 +1,5 @@
 import { IClient } from "./IClient";
+import { ICompanyACL } from "./ICompanyACL";
 import { IRefreshToken } from "./IRefreshToken";
 
 
@@ -22,7 +23,7 @@ export interface IUser {
     roles: any[];
     refresh_token: IRefreshToken;
     registered_companies: any[];
-    company_acls: any[]
+    company_acls?: ICompanyACL[]
     costumer_infos: IClient[]
 }
 
