@@ -40,6 +40,7 @@ import {
   File,
   Search,
 } from "lucide-react"
+import CompanyWorkspaceKPIs from "@/components/companies/workspace/company-workspace-kpis"
 
 // Mock data
 const teamMembers = [
@@ -204,36 +205,6 @@ const notifications = [
   },
 ]
 
-const quickStats = [
-  {
-    title: "Tarefas Pendentes",
-    value: "12",
-    change: "+2 hoje",
-    icon: Clock,
-    color: "text-orange-500",
-  },
-  {
-    title: "Prazos Próximos",
-    value: "5",
-    change: "3 esta semana",
-    icon: AlertCircle,
-    color: "text-red-500",
-  },
-  {
-    title: "Reuniões Hoje",
-    value: "4",
-    change: "2 concluídas",
-    icon: Calendar,
-    color: "text-blue-500",
-  },
-  {
-    title: "Atividade da Equipe",
-    value: "85%",
-    change: "+5% vs ontem",
-    icon: TrendingUp,
-    color: "text-green-500",
-  },
-]
 
 export default function WorkspacePage() {
   const [message, setMessage] = useState("")
@@ -286,24 +257,7 @@ export default function WorkspacePage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {quickStats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {stat.title}
-              </CardTitle>
-              <stat.icon className={`h-4 w-4 ${stat.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
-                {stat.change}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <CompanyWorkspaceKPIs />
 
       {/* Main Content */}
       <div className="grid gap-4 md:grid-cols-3">

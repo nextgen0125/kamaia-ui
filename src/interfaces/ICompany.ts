@@ -50,37 +50,3 @@ export interface PaginatedCompanies {
     page: number;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// KPIs Types
-// ─────────────────────────────────────────────────────────────────────────────
-
-export type IKpiTrend = "up" | "down" | "neutral";
-
-export interface IKpiComparativePercent {
-    /** Valor absoluto do mês corrente. */
-    value: number;
-    /** Variação percentual em relação ao mês anterior (positivo = crescimento). */
-    percentChange: number;
-    /** Indicativo visual de direção. */
-    trend: IKpiTrend;
-}
-
-export interface IKpiComparativeNumeric {
-    /** Valor absoluto do mês corrente. */
-    value: number;
-    /** Diferença numérica em relação ao mês anterior (positivo = crescimento). */
-    numericChange: number;
-    /** Indicativo visual de direção. */
-    trend: IKpiTrend;
-}
-
-export interface ICompanyDashboardIKPIs {
-    /** Total de processos criados no mês corrente vs. mês anterior. */
-    totalProcesses: IKpiComparativePercent;
-    /** Clientes com ao menos um processo ativo (≠ Arquivado) no mês corrente vs. anterior. */
-    activeClients: IKpiComparativePercent;
-    /** Membros com role do tipo "lawyer" ingressados no mês corrente vs. anterior. */
-    lawyers: IKpiComparativeNumeric;
-    /** Soma das receitas (AccessTypeFinance.income) no mês corrente vs. anterior. */
-    monthlyRevenue: IKpiComparativePercent;
-}

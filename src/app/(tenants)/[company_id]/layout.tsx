@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import AuthGuard from "@/components/auth/auth-guard";
-import DashboardHeader from "@/components/dasboard/dashboard-header";
+import DashboardHeader from "@/components/companies/dashboard/dashboard-header";
 import {
   SidebarInset,
   SidebarProvider

@@ -5,12 +5,12 @@ import {
 } from "lucide-react"
 import { useQueryState } from "nuqs"
 
-import NotificationMenu from "@/components/dasboard/navbar-components/notification-menu"
-import UserMenu from "@/components/dasboard/navbar-components/user-menu"
-import { Button } from "@/components/ui/button"
-import { SidebarTrigger } from "../ui/sidebar"
+import NotificationMenu from "@/components/companies/dashboard/navbar-components/notification-menu"
+import UserMenu from "@/components/companies/dashboard/navbar-components/user-menu"
 import SettingsDialog from "./settings-dialog"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 import { GlobalSearch } from "@/components/search/global-search"
+import { Button } from "@/components/ui/button"
 import { NotificationCenter } from "@/components/notifications/notification-center"
 
 export default function DashboardHeader() {
