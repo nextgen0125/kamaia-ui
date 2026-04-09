@@ -1,46 +1,27 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  Send,
-  Paperclip,
-  Smile,
   Phone,
   Video,
   MoreVertical,
   Users,
   Bell,
-  FileText,
-  Folder,
-  Calendar,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
-  TrendingUp,
   MessageSquare,
-  Activity,
-  UserPlus,
-  File,
-  Search,
 } from "lucide-react"
 import CompanyWorkspaceKPIs from "@/components/companies/workspace/company-workspace-kpis"
+import CompanyActivityAndChat from "@/components/companies/workspace/company-activity-and-chat"
 
 // Mock data
 const teamMembers = [
@@ -75,94 +56,6 @@ const teamMembers = [
     avatar: "/avatars/ana.jpg",
     status: "offline",
     lastSeen: "2h atrás",
-  },
-]
-
-const activities = [
-  {
-    id: 1,
-    type: "case",
-    user: "Dr. João Silva",
-    action: "criou um novo processo",
-    target: "Ação Trabalhista - Horas Extras",
-    time: "5 min atrás",
-    icon: FileText,
-    color: "text-blue-500",
-  },
-  {
-    id: 2,
-    type: "document",
-    user: "Dra. Maria Santos",
-    action: "fez upload de um documento",
-    target: "Petição Inicial.pdf",
-    time: "15 min atrás",
-    icon: File,
-    color: "text-green-500",
-  },
-  {
-    id: 3,
-    type: "client",
-    user: "Dr. Pedro Costa",
-    action: "cadastrou um novo cliente",
-    target: "Tech Solutions S/A",
-    time: "1h atrás",
-    icon: UserPlus,
-    color: "text-purple-500",
-  },
-  {
-    id: 4,
-    type: "task",
-    user: "Ana Carolina",
-    action: "concluiu uma tarefa",
-    target: "Revisar contratos mensais",
-    time: "2h atrás",
-    icon: CheckCircle2,
-    color: "text-emerald-500",
-  },
-  {
-    id: 5,
-    type: "meeting",
-    user: "Dra. Maria Santos",
-    action: "agendou uma reunião",
-    target: "Audiência de Conciliação",
-    time: "3h atrás",
-    icon: Calendar,
-    color: "text-orange-500",
-  },
-]
-
-const messages = [
-  {
-    id: 1,
-    user: "Dr. João Silva",
-    avatar: "/avatars/joao.jpg",
-    message: "Pessoal, precisamos revisar o processo da Tech Solutions antes da audiência de amanhã.",
-    time: "10:30",
-    isOwn: false,
-  },
-  {
-    id: 2,
-    user: "Você",
-    avatar: "/avatars/you.jpg",
-    message: "Pode deixar, Dr. João. Já estou revisando os documentos.",
-    time: "10:32",
-    isOwn: true,
-  },
-  {
-    id: 3,
-    user: "Dra. Maria Santos",
-    avatar: "/avatars/maria.jpg",
-    message: "Eu posso ajudar também. Qual o horário da audiência?",
-    time: "10:35",
-    isOwn: false,
-  },
-  {
-    id: 4,
-    user: "Dr. João Silva",
-    avatar: "/avatars/joao.jpg",
-    message: "Às 14h no Fórum Central, sala 201. Obrigado pela ajuda!",
-    time: "10:36",
-    isOwn: false,
   },
 ]
 
@@ -205,18 +98,7 @@ const notifications = [
   },
 ]
 
-
 export default function WorkspacePage() {
-  const [message, setMessage] = useState("")
-  const [activeTab, setActiveTab] = useState("activity")
-
-  const handleSendMessage = () => {
-    if (message.trim()) {
-      // Aqui você adicionaria a lógica para enviar a mensagem
-      console.log("Enviando mensagem:", message)
-      setMessage("")
-    }
-  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -262,124 +144,7 @@ export default function WorkspacePage() {
       {/* Main Content */}
       <div className="grid gap-4 md:grid-cols-3">
         {/* Left Column - Activity & Chat */}
-        <div className="md:col-span-2 space-y-4">
-          <Card>
-            <CardHeader>
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="activity">
-                    <Activity className="mr-2 h-4 w-4" />
-                    Atividades
-                  </TabsTrigger>
-                  <TabsTrigger value="chat">
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    Chat da Equipe
-                  </TabsTrigger>
-                </TabsList>
-
-                {/* Activity Feed */}
-                <TabsContent value="activity" className="mt-4">
-                  <ScrollArea className="h-[500px] pr-4">
-                    <div className="space-y-4">
-                      {activities.map((activity) => (
-                        <div
-                          key={activity.id}
-                          className="flex items-start space-x-4 rounded-lg border p-4 transition-colors hover:bg-muted/50"
-                        >
-                          <div className={`rounded-full p-2 bg-muted ${activity.color}`}>
-                            <activity.icon className="h-4 w-4" />
-                          </div>
-                          <div className="flex-1 space-y-1">
-                            <p className="text-sm">
-                              <span className="font-medium">{activity.user}</span>{" "}
-                              {activity.action}{" "}
-                              <span className="font-medium">{activity.target}</span>
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {activity.time}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                </TabsContent>
-
-                {/* Chat */}
-                <TabsContent value="chat" className="mt-4">
-                  <ScrollArea className="h-[400px] pr-4">
-                    <div className="space-y-4">
-                      {messages.map((msg) => (
-                        <div
-                          key={msg.id}
-                          className={`flex items-start space-x-3 ${
-                            msg.isOwn ? "flex-row-reverse space-x-reverse" : ""
-                          }`}
-                        >
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={msg.avatar} />
-                            <AvatarFallback>{msg.user.charAt(0)}</AvatarFallback>
-                          </Avatar>
-                          <div
-                            className={`flex-1 space-y-1 ${
-                              msg.isOwn ? "items-end" : ""
-                            }`}
-                          >
-                            <div className="flex items-center space-x-2">
-                              <span className="text-xs font-medium">
-                                {msg.user}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                {msg.time}
-                              </span>
-                            </div>
-                            <div
-                              className={`rounded-lg px-4 py-2 ${
-                                msg.isOwn
-                                  ? "bg-primary text-primary-foreground"
-                                  : "bg-muted"
-                              }`}
-                            >
-                              <p className="text-sm">{msg.message}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-
-                  <Separator className="my-4" />
-
-                  {/* Message Input */}
-                  <div className="flex items-end space-x-2">
-                    <div className="flex-1">
-                      <Textarea
-                        placeholder="Digite sua mensagem..."
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && !e.shiftKey) {
-                            e.preventDefault()
-                            handleSendMessage()
-                          }
-                        }}
-                        className="min-h-[60px] resize-none"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-2">
-                      <Button size="icon" variant="outline">
-                        <Paperclip className="h-4 w-4" />
-                      </Button>
-                      <Button size="icon" onClick={handleSendMessage}>
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardHeader>
-          </Card>
-        </div>
+        <CompanyActivityAndChat />
 
         {/* Right Column - Team & Notifications */}
         <div className="space-y-4">
