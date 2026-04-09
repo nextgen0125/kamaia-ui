@@ -1,4 +1,4 @@
-import { formatDistanceToNow } from "date-fns"
+import { formatDistanceToNow, isValid } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
 export function formatDate(iso: string | Date, type: "long" | "short" = "long"): string {
@@ -14,9 +14,15 @@ export function formatDate(iso: string | Date, type: "long" | "short" = "long"):
       })
 }
 
+
 export function formatTimeAgo(iso: string): string {
-  return formatDistanceToNow(new Date(iso), {
+  const date = new Date(iso)
+
+  if (!isValid(date)) return ""
+
+  return formatDistanceToNow(date, {
     addSuffix: true,
+    includeSeconds: true,
     locale: ptBR,
   })
 }

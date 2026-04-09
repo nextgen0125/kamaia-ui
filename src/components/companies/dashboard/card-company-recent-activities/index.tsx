@@ -26,13 +26,13 @@ import { useAuth } from "@/contexts/auth-context"
 import { getUserAcl } from "@/utils/getUserAcl"
 
 
-function getFullName(log: IAuditLogEntry): string {
+export function getFullName(log: IAuditLogEntry): string {
   const user = log.company_acl?.user
   if (!user) return "Sistema"
   return `${user.firstName} ${user.lastName}`.trim()
 }
 
-function getInitials(name: string): string {
+export function getInitials(name: string): string {
   return name
     .split(" ")
     .slice(0, 2)
@@ -41,7 +41,7 @@ function getInitials(name: string): string {
     .toUpperCase()
 }
 
-function getAvatarSrc(log: IAuditLogEntry): string | undefined {
+export function getAvatarSrc(log: IAuditLogEntry): string | undefined {
   const user = log.company_acl?.user
   if (user?.avatar_url) return user.avatar_url
   const name = getFullName(log)
