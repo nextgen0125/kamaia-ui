@@ -1,9 +1,9 @@
-import CompanyDashboardKPIs from "@/components/dasboard/company-dashboard-kpis"
-import CardCompanyDashboardRecentCases from "@/components/dasboard/card-company-dashboard-recent-cases"
-import CardCompanyProcessesByArea from "@/components/dasboard/card-company-processes-by-area"
-import CardCompanyUpcomingDeadlines from "@/components/dasboard/card-company-upcoming-deadlines"
-import CardCompanyRecentActivities from "@/components/dasboard/card-company-recent-activities"
-import CardCompanyDashboardQuickActions from "@/components/dasboard/card-company-dashboard-quick-actions"
+import CompanyDashboardKPIs from "@/components/companies/dashboard/company-dashboard-kpis"
+import CardCompanyDashboardRecentCases from "@/components/companies/dashboard/card-company-dashboard-recent-cases"
+import CardCompanyProcessesByArea from "@/components/companies/dashboard/card-company-processes-by-area"
+import CardCompanyUpcomingDeadlines from "@/components/companies/dashboard/card-company-upcoming-deadlines"
+import CardCompanyRecentActivities from "@/components/companies/dashboard/card-company-recent-activities"
+import CardCompanyDashboardQuickActions from "@/components/companies/dashboard/card-company-dashboard-quick-actions"
 
 export default function DashboardPage() {
 
