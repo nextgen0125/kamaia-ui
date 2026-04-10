@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import {
   ICreateNotificationData,
   IUpdateNotificationData,
@@ -61,6 +61,44 @@ export function useNotifications(
     queryFn: () => notificationService.getNotifications(companyId, filters),
     enabled: !!companyId,
     staleTime: 30 * 1000, // 30 segundos — notificações mudam com alta frequência
+    retry: (failureCount, error: any) => {
+      if (error?.status === 401 || error?.status === 403) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+/**
+ * Lista as notificações do utilizador autenticado dentro de uma empresa usando Infinite Scroll.
+ * Endpoint: GET /v1/companies/:company_id/notifications
+ *
+ * @param companyId UUID da empresa/escritório de advocacia
+ * @param filters   Filtros opcionais (page será sobreposto, type, priority, is_read)
+ * @returns         Query infinita com lista paginada de notificações
+ */
+export function useInfiniteNotifications(
+  companyId: string,
+  filters?: Omit<INotificationFilters, 'page'>
+) {
+  return useInfiniteQuery({
+    queryKey: [...notificationQueryKeys.lists(companyId), 'infinite', filters],
+    queryFn: ({ pageParam }) =>
+      notificationService.getNotifications(companyId, { 
+        ...filters, 
+        page: pageParam as number, 
+        take: 10 
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    enabled: !!companyId,
+    staleTime: 30 * 1000, // 30 segundos
     retry: (failureCount, error: any) => {
       if (error?.status === 401 || error?.status === 403) {
         return false;
@@ -264,6 +302,7 @@ export function useNotificationOperations() {
 
 export default {
   useNotifications,
+  useInfiniteNotifications,
   useCreateNotification,
   useUpdateNotification,
   useDeleteNotification,
