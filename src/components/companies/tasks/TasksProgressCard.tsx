@@ -6,7 +6,7 @@ import { useParams } from "next/navigation"
 import { useTaskProgress } from "@/hooks/queries/tasks/use-task"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export function CardProgressoGeral() {
+export function TasksProgressCard() {
   const params = useParams()
   const companyId = params.company_id as string
   const { data: progress, isLoading } = useTaskProgress(companyId)

@@ -30,7 +30,7 @@ import { TaskCard } from "@/components/ui/mobile-card-variants"
 import { MobileCardList } from "@/components/ui/mobile-card-list"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export function CardListaTarefas() {
+export function TasksListCard() {
   const params = useParams()
   const companyId = params.company_id as string
   

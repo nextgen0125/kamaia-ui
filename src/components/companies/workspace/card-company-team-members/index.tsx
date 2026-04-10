@@ -38,12 +38,12 @@ const TAKE = 10
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function getInitials(acl: ICompanyACL): string {
+export function getInitials(acl: ICompanyACL): string {
   const { firstName, lastName } = acl.user
   return `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase()
 }
 
-function getFullName(acl: ICompanyACL): string {
+export function getFullName(acl: ICompanyACL): string {
   return acl.user.full_name || `${acl.user.firstName} ${acl.user.lastName}`.trim()
 }
 

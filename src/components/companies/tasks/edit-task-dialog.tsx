@@ -35,7 +35,7 @@ import { useParams } from "next/navigation"
 import { useUpdateTask } from "@/hooks/queries/tasks/use-task"
 import { useTaskLists } from "@/hooks/queries/tasks/use-task-list"
 import { useProcesses } from "@/hooks/queries/use-process"
-import { useAttorneyACL } from "@/hooks/queries/use-company-acl"
+import { useCompanyACL } from "@/hooks/queries/use-company-acl"
 import { ITask, ITaskStatus, ITaskPriority } from "@/interfaces/ITask"
 import { Loader2, Save } from "lucide-react"
 
@@ -64,9 +64,9 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
 
   const { mutate: updateTask, isPending } = useUpdateTask()
 
-  const { data: taskListsData, isLoading: isLoadingTaskLists } = useTaskLists(companyId)
+  const { data: taskListsData, isLoading: isLoadingTaskLists } = useTaskLists(companyId, { take: 100 })
   const { data: processesData, isLoading: isLoadingProcesses } = useProcesses(companyId)
-  const { data: attorneyACLData, isLoading: isLoadingACL } = useAttorneyACL(companyId)
+  const { data: companyACLData, isLoading: isLoadingACL } = useCompanyACL(companyId, { take: 100 })
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
@@ -234,7 +234,7 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {attorneyACLData?.company_acls.map((acl: any) => (
+                        {companyACLData?.company_acls?.map((acl: any) => (
                           <SelectItem key={acl.id} value={acl.id}>
                             {acl.user?.name || "Usuário sem nome"}
                           </SelectItem>

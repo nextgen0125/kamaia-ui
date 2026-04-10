@@ -412,6 +412,8 @@ private setupInterceptors(): void {
         ? data?.find((error: any) => !!error.message && !!error.validation)
         : null;
 
+        // console.log(data)
+
       return {
         success: false,
         message: data?.message || validationMessage?.message || this.getDefaultErrorMessage(status),

@@ -6,7 +6,7 @@ import { useParams } from "next/navigation"
 import { useTaskKPIs } from "@/hooks/queries/tasks/use-task"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export function CardsKPIs() {
+export function TasksKPICards() {
   const params = useParams()
   const companyId = params.company_id as string
   const { data: stats, isLoading } = useTaskKPIs(companyId)
