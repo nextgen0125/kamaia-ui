@@ -11,23 +11,37 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
+import { useParams } from "next/navigation"
+import { useDeleteTask } from "@/hooks/queries/tasks/use-task"
+import { Loader2 } from "lucide-react"
 
 interface DeleteTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   task: {
-    id: number
+    id: string
     title: string
   }
 }
 
 export function DeleteTaskDialog({ open, onOpenChange, task }: DeleteTaskDialogProps) {
+  const params = useParams()
+  const companyId = params.company_id as string
+  const { mutate: deleteTask, isPending } = useDeleteTask()
+
   const handleDelete = () => {
-    toast.success("Tarefa removida com sucesso!", {
-      description: `${task.title} foi removida.`,
-    })
-    console.log("Deleting task:", task.id)
-    onOpenChange(false)
+    deleteTask(
+      { companyId, taskId: task.id },
+      {
+        onSuccess: () => {
+          toast.success("Tarefa removida com sucesso!")
+          onOpenChange(false)
+        },
+        onError: (error: any) => {
+          toast.error(error?.response?.data?.message || "Erro ao remover tarefa")
+        },
+      }
+    )
   }
 
   return (
@@ -40,8 +54,16 @@ export function DeleteTaskDialog({ open, onOpenChange, task }: DeleteTaskDialogP
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+          <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={(e) => {
+              e.preventDefault()
+              handleDelete()
+            }} 
+            className="bg-destructive hover:bg-destructive/90"
+            disabled={isPending}
+          >
+            {isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
             Remover
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -49,3 +71,4 @@ export function DeleteTaskDialog({ open, onOpenChange, task }: DeleteTaskDialogP
     </AlertDialog>
   )
 }
+

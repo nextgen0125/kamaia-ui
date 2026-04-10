@@ -32,16 +32,23 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Plus, Save } from "lucide-react"
+import { Plus, Save, Loader2 } from "lucide-react"
+import { useParams } from "next/navigation"
+import { useCreateTask } from "@/hooks/queries/tasks/use-task"
+import { useTaskLists } from "@/hooks/queries/tasks/use-task-list"
+import { useProcesses } from "@/hooks/queries/use-process"
+import { useAttorneyACL } from "@/hooks/queries/use-company-acl"
+import { ITaskStatus, ITaskPriority } from "@/interfaces/ITask"
 
 const taskSchema = z.object({
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
   description: z.string().min(10, "Descrição deve ter no mínimo 10 caracteres"),
-  priority: z.enum(["low", "medium", "high"]),
-  status: z.enum(["todo", "in-progress", "done"]),
-  dueDate: z.string().min(1, "Selecione a data de vencimento"),
-  assigneeId: z.string().min(1, "Selecione o responsável"),
-  caseId: z.string().optional(),
+  priority: z.nativeEnum(ITaskPriority),
+  status: z.nativeEnum(ITaskStatus),
+  deadline: z.string().min(1, "Selecione a data de vencimento"),
+  company_acl_id: z.string().min(1, "Selecione o responsável"),
+  task_list_id: z.string().min(1, "Selecione a lista de tarefas"),
+  process_id: z.string().min(1, "Selecione o processo"),
 })
 
 type TaskFormValues = z.infer<typeof taskSchema>
@@ -52,33 +59,46 @@ interface AddTaskDialogProps {
 
 export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
   const [open, setOpen] = useState(false)
+  const params = useParams()
+  const companyId = params.company_id as string
+
+  const { mutate: createTask, isPending } = useCreateTask()
+  
+  // Queries para popular os selects
+  const { data: taskListsData, isLoading: isLoadingTaskLists } = useTaskLists(companyId)
+  const { data: processesData, isLoading: isLoadingProcesses } = useProcesses(companyId)
+  const { data: attorneyACLData, isLoading: isLoadingACL } = useAttorneyACL(companyId)
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       title: "",
       description: "",
-      priority: "medium",
-      status: "todo",
-      dueDate: "",
-      assigneeId: "",
-      caseId: "",
+      priority: ITaskPriority.MEDIUM,
+      status: ITaskStatus.TODO,
+      deadline: "",
+      company_acl_id: "",
+      task_list_id: "",
+      process_id: "",
     },
   })
 
   function onSubmit(values: TaskFormValues) {
-    console.log(values)
-    toast.success("Tarefa criada com sucesso!")
-    setOpen(false)
-    form.reset()
-    onSuccess?.()
+    createTask(
+      { companyId, data: values },
+      {
+        onSuccess: () => {
+          toast.success("Tarefa criada com sucesso!")
+          setOpen(false)
+          form.reset()
+          onSuccess?.()
+        },
+        onError: (error: any) => {
+          toast.error(error?.response?.data?.message || "Erro ao criar tarefa")
+        },
+      }
+    )
   }
-
-  const lawyers = [
-    { id: "1", name: "Dr. João Silva" },
-    { id: "2", name: "Dra. Maria Santos" },
-    { id: "3", name: "Dr. Pedro Costa" },
-  ]
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -92,7 +112,7 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
         <DialogHeader>
           <DialogTitle>Nova Tarefa</DialogTitle>
           <DialogDescription>
-            Crie uma nova tarefa e atribua a um responsável
+            Crie uma nova tarefa e atribua a um responsável e processo
           </DialogDescription>
         </DialogHeader>
 
@@ -144,9 +164,9 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="low">Baixa</SelectItem>
-                        <SelectItem value="medium">Média</SelectItem>
-                        <SelectItem value="high">Alta</SelectItem>
+                        <SelectItem value={ITaskPriority.LOW}>Baixa</SelectItem>
+                        <SelectItem value={ITaskPriority.MEDIUM}>Média</SelectItem>
+                        <SelectItem value={ITaskPriority.HIGH}>Alta</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -167,9 +187,9 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="todo">A Fazer</SelectItem>
-                        <SelectItem value="in-progress">Em Progresso</SelectItem>
-                        <SelectItem value="done">Concluída</SelectItem>
+                        <SelectItem value={ITaskStatus.TODO}>A Fazer</SelectItem>
+                        <SelectItem value={ITaskStatus.IN_PROGRESS}>Em Progresso</SelectItem>
+                        <SelectItem value={ITaskStatus.DONE}>Concluída</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -179,7 +199,7 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
 
               <FormField
                 control={form.control}
-                name="dueDate"
+                name="deadline"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Vencimento *</FormLabel>
@@ -192,22 +212,74 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
               />
             </div>
 
+            <div className="grid gap-4 md:grid-cols-1">
+              <FormField
+                control={form.control}
+                name="company_acl_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Responsável *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={isLoadingACL ? "Carregando..." : "Selecione o responsável"} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {attorneyACLData?.company_acls.map((acl: any) => (
+                          <SelectItem key={acl.id} value={acl.id}>
+                            {acl.user?.name || "Usuário sem nome"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="task_list_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Lista de Tarefas *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={isLoadingTaskLists ? "Carregando..." : "Selecione a lista"} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {taskListsData?.task_lists.map((list: any) => (
+                          <SelectItem key={list.id} value={list.id}>
+                            {list.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
-              name="assigneeId"
+              name="process_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Responsável *</FormLabel>
+                  <FormLabel>Vincular a Processo *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Selecione o responsável" />
+                        <SelectValue placeholder={isLoadingProcesses ? "Carregando..." : "Selecione um processo"} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {lawyers.map((lawyer) => (
-                        <SelectItem key={lawyer.id} value={lawyer.id}>
-                          {lawyer.name}
+                      {processesData?.processes.map((process: any) => (
+                        <SelectItem key={process.id} value={process.id}>
+                          {process.process_number} - {process.title}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -217,34 +289,16 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="caseId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Vincular a Processo (opcional)</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um processo" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="1">0001234-56.2024.8.26.0100</SelectItem>
-                      <SelectItem value="2">0002345-67.2024.8.26.0000</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} disabled={isPending}>
                 Cancelar
               </Button>
-              <Button type="submit">
-                <Save className="mr-2 size-4" />
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 size-4" />
+                )}
                 Criar Tarefa
               </Button>
             </DialogFooter>
@@ -254,3 +308,4 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
     </Dialog>
   )
 }
+

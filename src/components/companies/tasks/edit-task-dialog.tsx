@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -30,14 +31,23 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import { useParams } from "next/navigation"
+import { useUpdateTask } from "@/hooks/queries/tasks/use-task"
+import { useTaskLists } from "@/hooks/queries/tasks/use-task-list"
+import { useProcesses } from "@/hooks/queries/use-process"
+import { useAttorneyACL } from "@/hooks/queries/use-company-acl"
+import { ITask, ITaskStatus, ITaskPriority } from "@/interfaces/ITask"
+import { Loader2, Save } from "lucide-react"
 
 const taskSchema = z.object({
   title: z.string().min(3, "O título deve ter no mínimo 3 caracteres."),
   description: z.string().min(5, "A descrição deve ter no mínimo 5 caracteres."),
-  priority: z.enum(["high", "medium", "low"]),
-  status: z.enum(["todo", "in-progress", "done"]),
-  dueDate: z.string(),
-  assignee: z.string(),
+  priority: z.nativeEnum(ITaskPriority),
+  status: z.nativeEnum(ITaskStatus),
+  deadline: z.string().min(1, "Selecione a data de vencimento"),
+  company_acl_id: z.string().min(1, "Selecione o responsável"),
+  task_list_id: z.string().min(1, "Selecione a lista de tarefas"),
+  process_id: z.string().min(1, "Selecione o processo"),
 })
 
 type TaskFormValues = z.infer<typeof taskSchema>
@@ -45,36 +55,63 @@ type TaskFormValues = z.infer<typeof taskSchema>
 interface EditTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  task: {
-    id: number
-    title: string
-    description: string
-    priority: string
-    status: string
-    dueDate: string
-    assignee: string
-  }
+  task: ITask
 }
 
 export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps) {
+  const params = useParams()
+  const companyId = params.company_id as string
+
+  const { mutate: updateTask, isPending } = useUpdateTask()
+
+  const { data: taskListsData, isLoading: isLoadingTaskLists } = useTaskLists(companyId)
+  const { data: processesData, isLoading: isLoadingProcesses } = useProcesses(companyId)
+  const { data: attorneyACLData, isLoading: isLoadingACL } = useAttorneyACL(companyId)
+
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
       title: task.title,
       description: task.description,
-      priority: task.priority as any,
-      status: task.status as any,
-      dueDate: task.dueDate,
-      assignee: task.assignee,
+      priority: task.priority,
+      status: task.status,
+      // Format 2024-04-10T00:00:00.000Z to 2024-04-10
+      deadline: task.deadline ? task.deadline.split('T')[0] : "",
+      company_acl_id: task.company_acl_id,
+      task_list_id: task.task_list_id,
+      process_id: task.process_id,
     },
   })
 
+  // Update form values when task changes
+  useEffect(() => {
+    if (task) {
+      form.reset({
+        title: task.title,
+        description: task.description,
+        priority: task.priority,
+        status: task.status,
+        deadline: task.deadline ? task.deadline.split('T')[0] : "",
+        company_acl_id: task.company_acl_id,
+        task_list_id: task.task_list_id,
+        process_id: task.process_id,
+      })
+    }
+  }, [task, form])
+
   function onSubmit(values: TaskFormValues) {
-    toast.success("Tarefa atualizada com sucesso!", {
-      description: `${values.title} foi atualizada.`,
-    })
-    console.log(values)
-    onOpenChange(false)
+    updateTask(
+      { companyId, taskId: task.id, data: values },
+      {
+        onSuccess: () => {
+          toast.success("Tarefa atualizada com sucesso!")
+          onOpenChange(false)
+        },
+        onError: (error: any) => {
+          toast.error(error?.response?.data?.message || "Erro ao atualizar tarefa")
+        },
+      }
+    )
   }
 
   return (
@@ -96,7 +133,7 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                 <FormItem>
                   <FormLabel>Título *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Redigir petição inicial" {...field} />
+                    <Input placeholder="Ex: Redigir petição inicial" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,9 +148,8 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                   <FormLabel>Descrição *</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder="Descreva a tarefa..."
-                      className="resize-none"
-                      rows={3}
+                      placeholder="Descreva os detalhes da tarefa..."
+                      className="min-h-[100px]"
                       {...field}
                     />
                   </FormControl>
@@ -122,7 +158,7 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="priority"
@@ -136,9 +172,9 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="high">Alta</SelectItem>
-                        <SelectItem value="medium">Média</SelectItem>
-                        <SelectItem value="low">Baixa</SelectItem>
+                        <SelectItem value={ITaskPriority.LOW}>Baixa</SelectItem>
+                        <SelectItem value={ITaskPriority.MEDIUM}>Média</SelectItem>
+                        <SelectItem value={ITaskPriority.HIGH}>Alta</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -159,9 +195,9 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="todo">A Fazer</SelectItem>
-                        <SelectItem value="in-progress">Em Progresso</SelectItem>
-                        <SelectItem value="done">Concluída</SelectItem>
+                        <SelectItem value={ITaskStatus.TODO}>A Fazer</SelectItem>
+                        <SelectItem value={ITaskStatus.IN_PROGRESS}>Em Progresso</SelectItem>
+                        <SelectItem value={ITaskStatus.DONE}>Concluída</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -171,10 +207,10 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
 
               <FormField
                 control={form.control}
-                name="dueDate"
+                name="deadline"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Data de Vencimento *</FormLabel>
+                    <FormLabel>Vencimento *</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -182,27 +218,97 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                   </FormItem>
                 )}
               />
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="assignee"
+                name="company_acl_id"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Responsável *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Dr. João Silva" {...field} />
-                    </FormControl>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={isLoadingACL ? "Carregando..." : "Selecione o responsável"} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {attorneyACLData?.company_acls.map((acl: any) => (
+                          <SelectItem key={acl.id} value={acl.id}>
+                            {acl.user?.name || "Usuário sem nome"}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="task_list_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Lista de Tarefas *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder={isLoadingTaskLists ? "Carregando..." : "Selecione a lista"} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {taskListsData?.task_lists.map((list: any) => (
+                          <SelectItem key={list.id} value={list.id}>
+                            {list.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
 
+            <FormField
+              control={form.control}
+              name="process_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vincular a Processo *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={isLoadingProcesses ? "Carregando..." : "Selecione um processo"} />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {processesData?.processes.map((process: any) => (
+                        <SelectItem key={process.id} value={process.id}>
+                          {process.process_number} - {process.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
                 Cancelar
               </Button>
-              <Button type="submit">Salvar Alterações</Button>
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <Loader2 className="mr-2 size-4 animate-spin" />
+                ) : (
+                  <Save className="mr-2 size-4" />
+                )}
+                Salvar Alterações
+              </Button>
             </DialogFooter>
           </form>
         </Form>
@@ -210,3 +316,4 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
     </Dialog>
   )
 }
+
