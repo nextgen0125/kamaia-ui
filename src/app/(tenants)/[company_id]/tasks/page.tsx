@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, Plus, MoreVertical, Edit, Trash2, CheckCircle2, Clock, AlertCircle, ListTodo } from "lucide-react"
-import { AddTaskDialog } from "@/components/tasks/add-task-dialog"
+import { AddTaskDialog } from "@/components/companies/tasks/add-task-dialog"
 import { Progress } from "@/components/ui/progress"
 import { TaskCard } from "@/components/ui/mobile-card-variants"
 import { MobileCardList } from "@/components/ui/mobile-card-list"
