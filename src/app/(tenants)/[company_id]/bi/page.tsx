@@ -187,7 +187,7 @@ export default function BIDashboardPage() {
       </div>
 
       {/* KPIs Principais */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Receita</CardTitle>
@@ -282,7 +282,7 @@ export default function BIDashboardPage() {
       </div>
 
       {/* Tabs com Análises */}
-      <Tabs defaultValue="revenue" className="space-y-4">
+      <Tabs defaultValue="revenue" className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <TabsList>
           <TabsTrigger value="revenue">
             <BarChart3 className="mr-2 h-4 w-4" />

@@ -25,7 +25,7 @@ export default function WorkspacePage() {
       <CompanyWorkspaceKPIs />
 
       {/* Main Content */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Left Column - Activity & Chat */}
         <CompanyActivityAndChat />
 

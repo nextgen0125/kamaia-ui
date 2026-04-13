@@ -133,7 +133,7 @@ export default function DocumentPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Documentos</CardTitle>
@@ -180,7 +180,7 @@ export default function DocumentPage() {
       </div>
 
       {/* Folders */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <CardTitle>Pastas</CardTitle>
           <CardDescription>Organize seus documentos por categoria</CardDescription>
@@ -215,7 +215,7 @@ export default function DocumentPage() {
       </Card>
 
       {/* Documents */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>

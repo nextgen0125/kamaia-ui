@@ -31,7 +31,7 @@ export default function CompanySettingTabs() {
           <SkeletonList type="task" count={1} />
       </div>
     : (
-      <Tabs defaultValue="general" className="space-y-4">
+      <Tabs defaultValue="general" className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <TabsList>
             <TabsTrigger value="general">
               <Building className="mr-2 h-4 w-4" />

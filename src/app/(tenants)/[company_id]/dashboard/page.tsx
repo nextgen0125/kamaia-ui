@@ -20,7 +20,7 @@ export default function DashboardPage() {
       {/* Main Stats */}
       <CompanyDashboardKPIs />
 
-      <div className="grid gap-4 lg:grid-cols-7">
+      <div className="grid gap-4 lg:grid-cols-7 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Recent Cases */}
         <CardCompanyDashboardRecentCases />
 
@@ -28,7 +28,7 @@ export default function DashboardPage() {
         <CardCompanyProcessesByArea />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Upcoming Deadlines */}
         <CardCompanyUpcomingDeadlines />
 

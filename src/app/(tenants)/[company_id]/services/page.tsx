@@ -112,7 +112,7 @@ export default function ServicePage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Serviços</CardTitle>
@@ -159,7 +159,7 @@ export default function ServicePage() {
       </div>
 
       {/* Services List */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -256,7 +256,7 @@ export default function ServicePage() {
       </Card>
 
       {/* Categories Overview */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <CardTitle>Serviços por Categoria</CardTitle>
           <CardDescription>Distribuição dos serviços</CardDescription>

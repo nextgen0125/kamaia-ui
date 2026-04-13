@@ -158,7 +158,7 @@ export default function IntegrationsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total</CardTitle>
@@ -210,7 +210,7 @@ export default function IntegrationsPage() {
 
       {/* Integrations by Category */}
       {categories.map((category) => (
-        <div key={category} className="space-y-4">
+        <div key={category} className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-semibold">{category}</h2>
             <Badge variant="secondary">

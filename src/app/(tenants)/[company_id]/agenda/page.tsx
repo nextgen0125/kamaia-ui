@@ -227,7 +227,7 @@ export default function AgendaPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Hoje</CardTitle>
@@ -274,7 +274,7 @@ export default function AgendaPage() {
       </div>
 
       {/* Calendar and Events */}
-      <div className="grid gap-4 lg:grid-cols-7">
+      <div className="grid gap-4 lg:grid-cols-7 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Calendar */}
         <Card className="lg:col-span-5">
           <CardHeader>

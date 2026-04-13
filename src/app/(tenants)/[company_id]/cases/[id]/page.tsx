@@ -318,7 +318,7 @@ export default function CaseDetailsPage() {
       </div>
 
       {/* Quick Info Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Status</CardTitle>
@@ -365,7 +365,7 @@ export default function CaseDetailsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Left Column - Main Info */}
         <div className="md:col-span-2 space-y-4">
           <Card>

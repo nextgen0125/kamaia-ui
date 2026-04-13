@@ -160,7 +160,7 @@ export default function RealtimeDashboardPage() {
       </div>
 
       {/* Real-time Metrics */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Usuários Ativos</CardTitle>
@@ -223,7 +223,7 @@ export default function RealtimeDashboardPage() {
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Activity Stream */}
         <Card className="md:col-span-2">
           <CardHeader>
@@ -310,7 +310,7 @@ export default function RealtimeDashboardPage() {
       </div>
 
       {/* Hourly Activity Chart */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <CardTitle>Atividade por Hora</CardTitle>
           <CardDescription>Volume de ações nas últimas 24 horas</CardDescription>

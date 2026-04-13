@@ -28,7 +28,7 @@ export default function AdvancedBIPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-4">
+      <Tabs defaultValue="overview" className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <TabsList>
           <TabsTrigger value="overview">
             <BarChart3 className="mr-2 h-4 w-4" />

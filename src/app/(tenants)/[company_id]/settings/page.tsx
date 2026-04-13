@@ -1,6 +1,8 @@
 "use client"
 
-import CompanySettingTabs from "@/components/dasboard/company-setting-tabs"
+import CompanySettingTabs from "@/components/companies/dashboard/company-setting-tabs"
+
+
 
 export default function SettingsPage() {
 

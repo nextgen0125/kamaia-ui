@@ -202,7 +202,7 @@ export default function FinancePage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Receitas</CardTitle>
@@ -265,7 +265,7 @@ export default function FinancePage() {
       </div>
 
       {/* Main Content */}
-      <div className="grid gap-4 lg:grid-cols-7">
+      <div className="grid gap-4 lg:grid-cols-7 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card className="lg:col-span-5">
           <CardHeader>
             <CardTitle>Lançamentos</CardTitle>
@@ -465,7 +465,7 @@ export default function FinancePage() {
       </div>
 
       {/* Invoices */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>

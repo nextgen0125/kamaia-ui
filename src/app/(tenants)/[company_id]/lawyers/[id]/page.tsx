@@ -239,7 +239,7 @@ export default function LawyerDetailsPage() {
   return (
     <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between animate-in fade-in slide-in-from-bottom-4 duration-500">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-5 w-5" />
@@ -299,7 +299,7 @@ export default function LawyerDetailsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-5">
+      <div className="grid gap-4 md:grid-cols-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Casos Ativos</CardTitle>
@@ -369,7 +369,7 @@ export default function LawyerDetailsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Left Column */}
         <div className="md:col-span-2 space-y-4">
           <Tabs value={activeTab} onValueChange={setActiveTab}>

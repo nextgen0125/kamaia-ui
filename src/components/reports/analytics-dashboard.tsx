@@ -140,7 +140,7 @@ export function AnalyticsDashboard({ period = "month" }: AnalyticsDashboardProps
       </div>
 
       {/* Main Stats */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Receita Total</CardTitle>
@@ -206,7 +206,7 @@ export function AnalyticsDashboard({ period = "month" }: AnalyticsDashboardProps
       </div>
 
       {/* Detailed Analytics */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2 animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Cases by Area */}
         <Card>
           <CardHeader>
@@ -271,7 +271,7 @@ export function AnalyticsDashboard({ period = "month" }: AnalyticsDashboardProps
       </div>
 
       {/* Monthly Revenue Trend */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <CardTitle>Evolução da Receita</CardTitle>
           <CardDescription>Receita mensal nos últimos 3 meses</CardDescription>
@@ -309,7 +309,7 @@ export function AnalyticsDashboard({ period = "month" }: AnalyticsDashboardProps
       </Card>
 
       {/* Quick Insights */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Taxa de Conclusão</CardTitle>

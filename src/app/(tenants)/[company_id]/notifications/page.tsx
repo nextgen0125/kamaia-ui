@@ -210,7 +210,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Não Lidas</CardTitle>
@@ -255,7 +255,7 @@ export default function NotificationsPage() {
       </div>
 
       {/* Main Content */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>

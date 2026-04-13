@@ -233,7 +233,7 @@ export default function AuditLogsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Ações</CardTitle>
@@ -286,7 +286,7 @@ export default function AuditLogsPage() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <CardTitle>Filtrar Logs</CardTitle>
         </CardHeader>
@@ -336,7 +336,7 @@ export default function AuditLogsPage() {
       </Card>
 
       {/* Logs Table */}
-      <Card>
+      <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <CardHeader>
           <CardTitle>Registro de Atividades</CardTitle>
           <CardDescription>
