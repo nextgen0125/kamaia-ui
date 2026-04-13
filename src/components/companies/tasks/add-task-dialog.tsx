@@ -39,6 +39,7 @@ import { useTaskLists } from "@/hooks/queries/tasks/use-task-list"
 import { useProcesses } from "@/hooks/queries/use-process"
 import { useCompanyACL } from "@/hooks/queries/use-company-acl"
 import { ITaskStatus, ITaskPriority } from "@/interfaces/ITask"
+import { getFullName } from "../workspace/card-company-team-members"
 
 const taskSchema = z.object({
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
@@ -228,7 +229,7 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
                       <SelectContent>
                         {companyACLData?.company_acls?.map((acl: any) => (
                           <SelectItem key={acl.id} value={acl.id}>
-                            {acl.user?.name || "Usuário sem nome"}
+                            {getFullName(acl) || "Usuário sem nome"}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -251,7 +252,7 @@ export function AddTaskDialog({ onSuccess }: AddTaskDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {taskListsData?.task_lists.map((list: any) => (
+                        {taskListsData?.taskLists?.map((list: any) => (
                           <SelectItem key={list.id} value={list.id}>
                             {list.name}
                           </SelectItem>

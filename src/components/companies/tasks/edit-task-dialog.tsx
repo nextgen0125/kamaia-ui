@@ -38,6 +38,7 @@ import { useProcesses } from "@/hooks/queries/use-process"
 import { useCompanyACL } from "@/hooks/queries/use-company-acl"
 import { ITask, ITaskStatus, ITaskPriority } from "@/interfaces/ITask"
 import { Loader2, Save } from "lucide-react"
+import { getFullName } from "../workspace/card-company-team-members"
 
 const taskSchema = z.object({
   title: z.string().min(3, "O título deve ter no mínimo 3 caracteres."),
@@ -220,7 +221,7 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="company_acl_id"
@@ -236,7 +237,7 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                       <SelectContent>
                         {companyACLData?.company_acls?.map((acl: any) => (
                           <SelectItem key={acl.id} value={acl.id}>
-                            {acl.user?.name || "Usuário sem nome"}
+                            {getFullName(acl) || "Usuário sem nome"}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -259,7 +260,7 @@ export function EditTaskDialog({ open, onOpenChange, task }: EditTaskDialogProps
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {taskListsData?.task_lists.map((list: any) => (
+                        {taskListsData?.taskLists?.map((list: any) => (
                           <SelectItem key={list.id} value={list.id}>
                             {list.name}
                           </SelectItem>
