@@ -9,7 +9,7 @@ export interface ITaskList extends IBaseEntity {
 }
 
 export interface IPaginatedTaskLists {
-  task_lists: ITaskList[];
+  taskLists: ITaskList[];
   total: number;
   total_pages: number;
   remaining_pages: number;

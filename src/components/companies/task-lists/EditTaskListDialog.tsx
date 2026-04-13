@@ -35,6 +35,7 @@ import { useParams } from "next/navigation"
 import { useUpdateTaskList } from "@/hooks/queries/tasks/use-task-list"
 import { useCompanyACL } from "@/hooks/queries/use-company-acl"
 import { ITaskList } from "@/interfaces/ITaskList"
+import { getFullName } from "../workspace/card-company-team-members"
 
 const taskListSchema = z.object({
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
@@ -125,7 +126,7 @@ export function EditTaskListDialog({ open, onOpenChange, taskList }: EditTaskLis
                     <SelectContent>
                       {companyACLData?.company_acls?.map((acl: any) => (
                         <SelectItem key={acl.id} value={acl.id}>
-                          {acl.user?.name || "Usuário sem nome"}
+                          { getFullName(acl) || "Usuário sem nome"}
                         </SelectItem>
                       ))}
                     </SelectContent>

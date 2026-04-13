@@ -34,7 +34,7 @@ export function TaskListsCard() {
 
   const { data, isLoading } = useTaskLists(companyId)
 
-  const filteredLists = data?.task_lists.filter(list => 
+  const filteredLists = data?.taskLists?.filter(list => 
     list.name.toLowerCase().includes(search.toLowerCase())
   ) || []
 

@@ -26,8 +26,8 @@ export function useCreateTaskList() {
       queryClient.invalidateQueries({ queryKey: taskListQueryKeys.byCompany(companyId) });
       toast.success('Lista de tarefas criada com sucesso!');
     },
-    onError: () => {
-      toast.error('Erro ao criar lista de tarefas.');
+    onError: (error) => {
+      toast.error(error.message || 'Erro ao criar lista de tarefas.');
     },
   });
 }
@@ -42,8 +42,8 @@ export function useUpdateTaskList() {
       queryClient.invalidateQueries({ queryKey: taskListQueryKeys.byCompany(companyId) });
       toast.success('Lista de tarefas atualizada com sucesso!');
     },
-    onError: () => {
-      toast.error('Erro ao atualizar lista de tarefas.');
+    onError: (error) => {
+      toast.error(error.message || 'Erro ao atualizar lista de tarefas.');
     },
   });
 }
@@ -58,8 +58,8 @@ export function useDeleteTaskList() {
       queryClient.invalidateQueries({ queryKey: taskListQueryKeys.byCompany(companyId) });
       toast.success('Lista de tarefas removida com sucesso!');
     },
-    onError: () => {
-      toast.error('Erro ao remover lista de tarefas.');
+    onError: (error) => {
+      toast.error(error.message || 'Erro ao remover lista de tarefas.');
     },
   });
 }
