@@ -86,3 +86,47 @@ export interface IWorkspaceKPIs {
      */
     teamActivity: IKpiPercentDelta;
 }
+
+export interface ICompanyAgendaKPIs {
+    /**
+     * Total de eventos agendados para hoje.
+     * value = eventos de hoje.
+     */
+    todayEvents: {
+        value: number;
+    };
+
+    /**
+     * Total de eventos agendados para esta semana.
+     * numericChange = diferença em relação à semana passada.
+     * percentChange = variação percentual em relação à semana passada.
+     * trend = indicativo de tendência (up/down/neutral).
+     */
+    thisWeekEvents: {
+        value: number;
+        numericChange?: number;
+        percentChange?: number;
+        trend?: "up" | "down" | "neutral";
+    };
+
+    /**
+     * Total de eventos agendados para este mês.
+     * numericChange = diferença em relação ao mês passado.
+     * percentChange = variação percentual em relação ao mês passado.
+     * trend = indicativo de tendência (up/down/neutral).
+     */
+    thisMonthEvents: {
+        value: number;
+        numericChange?: number;
+        percentChange?: number;
+        trend?: "up" | "down" | "neutral";
+    };
+
+    /**
+     * Total de eventos do tipo "Prazo".
+     * value = eventos de prazo.
+     */
+    deadlines: {
+        value: number;
+    };
+}

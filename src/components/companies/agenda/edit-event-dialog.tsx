@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -12,7 +12,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -32,9 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { toast } from "sonner"
-import { Plus, Save } from "lucide-react"
+import { Save, Trash, Clock, MapPin, Calendar as CalendarIcon } from "lucide-react"
 import { eventService } from "@/services/event-service"
-import { IEventType, IEventPriority } from "@/interfaces/IEvent"
+import { IEvent, IEventType, IEventPriority } from "@/interfaces/IEvent"
 
 const eventSchema = z.object({
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
@@ -45,35 +44,67 @@ const eventSchema = z.object({
   location: z.string().optional(),
   process_id: z.string().optional(),
   priority: z.nativeEnum(IEventPriority),
-  notes: z.string().optional(),
+  observations: z.string().optional(),
 })
 
 type EventFormValues = z.infer<typeof eventSchema>
 
-interface AddEventDialogProps {
+interface EditEventDialogProps {
+  event: IEvent | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
   onSuccess?: () => void
   companyId: string
 }
 
-export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
-  const [open, setOpen] = useState(false)
+export function EditEventDialog({
+  event,
+  open,
+  onOpenChange,
+  onSuccess,
+  companyId
+}: EditEventDialogProps) {
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       title: "",
       type: IEventType.MEETING,
-      date: new Date().toISOString().split('T')[0],
-      time: "09:00",
+      date: "",
+      time: "",
       duration: "60",
       location: "",
       process_id: "",
       priority: IEventPriority.MEDIUM,
-      notes: "",
+      observations: "",
     },
   })
 
+  // Update form values when event changes
+  useEffect(() => {
+    if (event) {
+      const startDate = new Date(event.start_date)
+      const formattedDate = startDate.toISOString().split('T')[0]
+      const formattedTime = startDate.toTimeString().slice(0, 5)
+
+      form.reset({
+        title: event.title || "",
+        type: event.type || IEventType.MEETING,
+        date: formattedDate,
+        time: formattedTime,
+        duration: String(event.internal_advance_alerts || 60),
+        location: event.location || "",
+        process_id: event.process_id || "",
+        priority: event.priority || IEventPriority.MEDIUM,
+        observations: event.observations || "",
+      })
+    }
+  }, [event, form])
+
   async function onSubmit(values: EventFormValues) {
+    if (!event) return
+
     try {
       // Convert the form values to the expected format for the API
       const startDateString = `${values.date}T${values.time}:00.000Z`
@@ -81,44 +112,56 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
       const duration = parseInt(values.duration || "60", 10)
       const endDate = new Date(startDate.getTime() + duration * 60000) // Add duration in minutes
 
-      const eventData = {
-        company_id: companyId,
+      const updateData = {
         title: values.title,
         type: values.type,
         priority: values.priority,
         start_date: startDate,
         end_date: endDate,
         location: values.location,
-        observations: values.notes,
-        process_id: values.process_id || "", // May be empty if not associated with a process
+        observations: values.observations,
+        process_id: values.process_id,
         all_day: false, // We can extend this later if needed
         internal_advance_alerts: duration,
       }
 
-      await eventService.createEvent(companyId, eventData)
-      toast.success("Evento cadastrado com sucesso!")
-      setOpen(false)
+      await eventService.updateEvent(companyId, event.id, updateData)
+      toast.success("Evento atualizado com sucesso!")
+      onOpenChange(false)
       form.reset()
       onSuccess?.()
     } catch (error) {
-      console.error("Error creating event:", error)
-      toast.error("Erro ao cadastrar evento")
+      console.error("Error updating event:", error)
+      toast.error("Erro ao atualizar evento")
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!event) return
+
+    try {
+      setIsDeleting(true)
+      await eventService.deleteEvent(companyId, event.id)
+      toast.success("Evento excluído com sucesso!")
+      onOpenChange(false)
+      onSuccess?.()
+    } catch (error) {
+      console.error("Error deleting event:", error)
+      toast.error("Erro ao excluir evento")
+    } finally {
+      setIsDeleting(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 size-4" />
-          Novo Evento
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Novo Evento</DialogTitle>
+          <DialogTitle>{event ? "Editar Evento" : "Novo Evento"}</DialogTitle>
           <DialogDescription>
-            Agende um compromisso, audiência ou prazo
+            {event
+              ? "Atualize as informações do evento"
+              : "Agende um compromisso, audiência ou prazo"}
           </DialogDescription>
         </DialogHeader>
 
@@ -145,17 +188,20 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Tipo *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="hearing">Audiência</SelectItem>
-                        <SelectItem value="meeting">Reunião</SelectItem>
-                        <SelectItem value="deadline">Prazo</SelectItem>
-                        <SelectItem value="video">Videoconferência</SelectItem>
+                        <SelectItem value={IEventType.HEARING}>{IEventType.HEARING}</SelectItem>
+                        <SelectItem value={IEventType.MEETING}>{IEventType.MEETING}</SelectItem>
+                        <SelectItem value={IEventType.TERM}>{IEventType.TERM}</SelectItem>
+                        <SelectItem value={IEventType.VIDEO}>{IEventType.VIDEO}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -169,16 +215,19 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Prioridade *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="low">Baixa</SelectItem>
-                        <SelectItem value="medium">Média</SelectItem>
-                        <SelectItem value="high">Alta</SelectItem>
+                        <SelectItem value={IEventPriority.LOW}>Baixa</SelectItem>
+                        <SelectItem value={IEventPriority.MEDIUM}>Média</SelectItem>
+                        <SelectItem value={IEventPriority.HIGH}>Alta</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -192,10 +241,13 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="relative">
                     <FormLabel>Data *</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <>
+                        <Input type="date" className="pl-8" {...field} />
+                        <CalendarIcon className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
+                      </>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -206,10 +258,13 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
                 control={form.control}
                 name="time"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="relative">
                     <FormLabel>Horário *</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <>
+                        <Input type="time" className="pl-8" {...field} />
+                        <Clock className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
+                      </>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -235,41 +290,29 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
               control={form.control}
               name="location"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="relative">
                   <FormLabel>Local</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ex: Fórum Central - Sala 201" {...field} />
+                    <>
+                      <Input
+                        placeholder="Ex: Fórum Central - Sala 201"
+                        className="pl-8"
+                        {...field}
+                      />
+                      <MapPin className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
+                    </>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="caseId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Vincular a Processo (opcional)</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione um processo" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="1">0001234-56.2024.8.26.0100</SelectItem>
-                      <SelectItem value="2">0002345-67.2024.8.26.0000</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Process selection would go here */}
+            {/* For now, we'll skip the process selection since it requires additional data */}
 
             <FormField
               control={form.control}
-              name="notes"
+              name="observations"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Observações</FormLabel>
@@ -285,14 +328,38 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
               )}
             />
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit">
-                <Save className="mr-2 size-4" />
-                Salvar Evento
-              </Button>
+            <DialogFooter className="flex sm:justify-between gap-2">
+              {event && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? (
+                    <>Excluindo...</>
+                  ) : (
+                    <>
+                      <Trash className="mr-2 size-4" />
+                      Excluir
+                    </>
+                  )}
+                </Button>
+              )}
+
+              <div className="flex gap-2 ml-auto">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="submit">
+                  <Save className="mr-2 size-4" />
+                  Salvar Evento
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </Form>

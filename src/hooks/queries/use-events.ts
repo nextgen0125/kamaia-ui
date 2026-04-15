@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { ICreateEventData, IUpdateEventData, IEventFilters } from '@/interfaces/IEvent';
 import eventService from '@/services/event-service';
 
@@ -62,6 +62,37 @@ export function useAllEvents(companyId: string, filters?: IEventFilters) {
   return useQuery({
     queryKey: eventQueryKeys.allEvents(companyId, filters),
     queryFn: () => eventService.getAllEvents(companyId, filters),
+    enabled: !!companyId,
+    staleTime: 2 * 60 * 1000,
+    retry: (failureCount, error: any) => {
+      if (error?.status === 401 || error?.status === 403 || error?.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+/**
+ * Lista todos os eventos de uma empresa com paginação infinita.
+ * Endpoint: GET /v1/companies/:company_id/events
+ *
+ * @param companyId UUID da empresa/escritório de advocacia
+ * @param filters   Filtros de paginação opcionais (take)
+ * @returns         Query infinita com lista paginada de eventos
+ */
+export function useAllEventsInfinite(companyId: string, filters?: Omit<IEventFilters, 'page'>) {
+  return useInfiniteQuery({
+    queryKey: [...eventQueryKeys.allEvents(companyId), 'infinite', filters],
+    queryFn: ({ pageParam = 1 }) =>
+      eventService.getAllEvents(companyId, { ...filters, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
     enabled: !!companyId,
     staleTime: 2 * 60 * 1000,
     retry: (failureCount, error: any) => {
