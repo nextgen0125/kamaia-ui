@@ -34,6 +34,8 @@ import { toast } from "sonner"
 import { Save, Trash, Clock, MapPin, Calendar as CalendarIcon } from "lucide-react"
 import { eventService } from "@/services/event-service"
 import { IEvent, IEventType, IEventPriority } from "@/interfaces/IEvent"
+import { useAllProcessesInfinite } from "@/hooks/queries/processes/use-processes"
+import { Loader2 } from "lucide-react"
 
 const eventSchema = z.object({
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
@@ -41,7 +43,7 @@ const eventSchema = z.object({
   date: z.string().min(1, "Selecione a data"),
   time: z.string().min(1, "Selecione o horário"),
   duration: z.string().optional(),
-  location: z.string().optional(),
+  location: z.string().min(1, "Localização é obrigatória").optional(),
   process_id: z.string().optional(),
   priority: z.nativeEnum(IEventPriority),
   observations: z.string().optional(),
@@ -66,6 +68,9 @@ export function EditEventDialog({
 }: EditEventDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // Adicionando o hook para buscar os processos
+  const { data: processesData, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } = useAllProcessesInfinite(companyId)
+
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
@@ -80,6 +85,13 @@ export function EditEventDialog({
       observations: "",
     },
   })
+
+  // Função para carregar mais processos quando necessário
+  const loadMoreProcesses = () => {
+    if (hasNextPage) {
+      fetchNextPage()
+    }
+  }
 
   // Update form values when event changes
   useEffect(() => {
@@ -118,7 +130,7 @@ export function EditEventDialog({
         priority: values.priority,
         start_date: startDate,
         end_date: endDate,
-        location: values.location,
+        location: values.location || "",
         observations: values.observations,
         process_id: values.process_id,
         all_day: false, // We can extend this later if needed
@@ -291,7 +303,7 @@ export function EditEventDialog({
               name="location"
               render={({ field }) => (
                 <FormItem className="relative">
-                  <FormLabel>Local</FormLabel>
+                  <FormLabel>Local *</FormLabel>
                   <FormControl>
                     <>
                       <Input
@@ -307,8 +319,38 @@ export function EditEventDialog({
               )}
             />
 
-            {/* Process selection would go here */}
-            {/* For now, we'll skip the process selection since it requires additional data */}
+            <FormField
+              control={form.control}
+              name="process_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vincular a Processo (opcional)</FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione um processo" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {processesData?.pages.flatMap(page => page.processes).map((process) => (
+                        <SelectItem key={process.id} value={process.id}>
+                          {process.process_number} - {process.name}
+                        </SelectItem>
+                      ))}
+                      {isLoading && (
+                        <SelectItem value="" disabled>
+                          <div className="flex items-center">
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Carregando processos...
+                          </div>
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

@@ -35,6 +35,8 @@ import { toast } from "sonner"
 import { Plus, Save } from "lucide-react"
 import { eventService } from "@/services/event-service"
 import { IEventType, IEventPriority } from "@/interfaces/IEvent"
+import { useAllProcessesInfinite } from "@/hooks/queries/processes/use-processes"
+import { Loader2 } from "lucide-react"
 
 const eventSchema = z.object({
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
@@ -42,7 +44,7 @@ const eventSchema = z.object({
   date: z.string().min(1, "Selecione a data"),
   time: z.string().min(1, "Selecione o horário"),
   duration: z.string().optional(),
-  location: z.string().optional(),
+  location: z.string().min(1, "Localização é obrigatória").optional(),
   process_id: z.string().optional(),
   priority: z.nativeEnum(IEventPriority),
   notes: z.string().optional(),
@@ -57,6 +59,9 @@ interface AddEventDialogProps {
 
 export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
   const [open, setOpen] = useState(false)
+
+  // Adicionando o hook para buscar os processos
+  const { data: processesData, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } = useAllProcessesInfinite(companyId)
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
@@ -73,6 +78,13 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
     },
   })
 
+  // Função para carregar mais processos quando necessário
+  const loadMoreProcesses = () => {
+    if (hasNextPage) {
+      fetchNextPage()
+    }
+  }
+
   async function onSubmit(values: EventFormValues) {
     try {
       // Convert the form values to the expected format for the API
@@ -88,7 +100,7 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
         priority: values.priority,
         start_date: startDate,
         end_date: endDate,
-        location: values.location,
+        location: values.location || "",
         observations: values.notes,
         process_id: values.process_id || "", // May be empty if not associated with a process
         all_day: false, // We can extend this later if needed
@@ -236,7 +248,7 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Local</FormLabel>
+                  <FormLabel>Local *</FormLabel>
                   <FormControl>
                     <Input placeholder="Ex: Fórum Central - Sala 201" {...field} />
                   </FormControl>
@@ -247,19 +259,30 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
 
             <FormField
               control={form.control}
-              name="caseId"
+              name="process_id"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Vincular a Processo (opcional)</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione um processo" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="1">0001234-56.2024.8.26.0100</SelectItem>
-                      <SelectItem value="2">0002345-67.2024.8.26.0000</SelectItem>
+                      {processesData?.pages.flatMap(page => page.processes).map((process) => (
+                        <SelectItem key={process.id} value={process.id}>
+                          {process.process_number} - {process.name}
+                        </SelectItem>
+                      ))}
+                      {isLoading && (
+                        <SelectItem value="" disabled>
+                          <div className="flex items-center">
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Carregando processos...
+                          </div>
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                   <FormMessage />
