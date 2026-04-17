@@ -35,8 +35,8 @@ import { toast } from "sonner"
 import { Plus, Save } from "lucide-react"
 import { eventService } from "@/services/event-service"
 import { IEventType, IEventPriority } from "@/interfaces/IEvent"
-import { useAllProcessesInfinite } from "@/hooks/queries/processes/use-processes"
 import { Loader2 } from "lucide-react"
+import { useAllProcessesInfinite } from "@/hooks/queries/use-process"
 
 const eventSchema = z.object({
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
@@ -272,7 +272,7 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
                     <SelectContent>
                       {processesData?.pages.flatMap(page => page.processes).map((process) => (
                         <SelectItem key={process.id} value={process.id}>
-                          {process.process_number} - {process.name}
+                          {process.process_number} - {process.title}
                         </SelectItem>
                       ))}
                       {isLoading && (

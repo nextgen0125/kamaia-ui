@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { processService } from '@/services/process-service';
 import {
   ICreateProcessData,
@@ -63,6 +63,45 @@ export function useProcesses(companyId: string, filters?: IProcessFilters) {
         error?.status === 403 ||
         error?.status === 404
       ) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+
+/**
+ * Lista as notificações do utilizador autenticado dentro de uma empresa usando Infinite Scroll.
+ * Endpoint: GET /v1/companies/:company_id/notifications
+ *
+ * @param companyId UUID da empresa/escritório de advocacia
+ * @param filters   Filtros opcionais (page será sobreposto, type, priority, is_read)
+ * @returns         Query infinita com lista paginada de notificações
+ */
+export function useAllProcessesInfinite(
+  companyId: string,
+  filters?: Omit<IProcessFilters, 'page'>
+) {
+  return useInfiniteQuery({
+    queryKey: [...processQueryKeys.lists(companyId), 'infinite', filters],
+    queryFn: ({ pageParam }) =>
+      processService.getProcesses(companyId, { 
+        ...filters, 
+        page: pageParam as number, 
+        take: 10 
+      }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < lastPage.total_pages) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    enabled: !!companyId,
+    staleTime: 30 * 1000, // 30 segundos
+    retry: (failureCount, error: any) => {
+      if (error?.status === 401 || error?.status === 403) {
         return false;
       }
       return failureCount < 3;
@@ -297,5 +336,6 @@ export default {
   useDeleteProcess,
   useProcessOperations,
   useInvalidateProcesses,
-  useProcessesStatistics
+  useProcessesStatistics,
+  useAllProcessesInfinite
 };
