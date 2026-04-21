@@ -30,20 +30,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
-import { Save, Trash, Clock, MapPin, Calendar as CalendarIcon } from "lucide-react"
+import { Save, Trash, Clock, MapPin, Calendar as CalendarIcon, Loader2 } from "lucide-react"
 import { eventService } from "@/services/event-service"
 import { IEvent, IEventType, IEventPriority } from "@/interfaces/IEvent"
-import { Loader2 } from "lucide-react"
 import { useAllProcessesInfinite } from "@/hooks/queries/use-process"
 
 const eventSchema = z.object({
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
   type: z.nativeEnum(IEventType),
-  date: z.string().min(1, "Selecione a data"),
-  time: z.string().min(1, "Selecione o horário"),
-  duration: z.string().optional(),
-  location: z.string().min(1, "Localização é obrigatória").optional(),
+  startDate: z.string().min(1, "Selecione a data de início"),
+  startTime: z.string().min(1, "Selecione o horário de início"),
+  endDate: z.string().min(1, "Selecione a data de término"),
+  endTime: z.string().min(1, "Selecione o horário de término"),
+  all_day: z.boolean().default(false),
+  location: z.string().min(1, "Localização é obrigatória"),
   process_id: z.string().optional(),
   priority: z.nativeEnum(IEventPriority),
   observations: z.string().optional(),
@@ -68,17 +70,25 @@ export function EditEventDialog({
 }: EditEventDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false)
 
-  // Adicionando o hook para buscar os processos
-  const { data: processesData, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } = useAllProcessesInfinite(companyId)
+  // Hook para buscar os processos
+  const { 
+    data: processesData, 
+    hasNextPage, 
+    fetchNextPage, 
+    isFetchingNextPage, 
+    isLoading: isLoadingProcesses 
+  } = useAllProcessesInfinite(companyId)
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       title: "",
       type: IEventType.MEETING,
-      date: "",
-      time: "",
-      duration: "60",
+      startDate: "",
+      startTime: "",
+      endDate: "",
+      endTime: "",
+      all_day: false,
       location: "",
       process_id: "",
       priority: IEventPriority.MEDIUM,
@@ -86,26 +96,26 @@ export function EditEventDialog({
     },
   })
 
-  // Função para carregar mais processos quando necessário
-  const loadMoreProcesses = () => {
-    if (hasNextPage) {
-      fetchNextPage()
-    }
-  }
-
   // Update form values when event changes
   useEffect(() => {
     if (event) {
       const startDate = new Date(event.start_date)
-      const formattedDate = startDate.toISOString().split('T')[0]
-      const formattedTime = startDate.toTimeString().slice(0, 5)
+      const endDate = new Date(event.end_date)
+      
+      const formattedStartDate = startDate.toISOString().split('T')[0]
+      const formattedStartTime = startDate.toTimeString().slice(0, 5)
+      
+      const formattedEndDate = endDate.toISOString().split('T')[0]
+      const formattedEndTime = endDate.toTimeString().slice(0, 5)
 
       form.reset({
         title: event.title || "",
         type: event.type || IEventType.MEETING,
-        date: formattedDate,
-        time: formattedTime,
-        duration: String(event.internal_advance_alerts || 60),
+        startDate: formattedStartDate,
+        startTime: formattedStartTime,
+        endDate: formattedEndDate,
+        endTime: formattedEndTime,
+        all_day: event.all_day || false,
         location: event.location || "",
         process_id: event.process_id || "",
         priority: event.priority || IEventPriority.MEDIUM,
@@ -114,30 +124,29 @@ export function EditEventDialog({
     }
   }, [event, form])
 
+  const isAllDay = form.watch("all_day")
+
   async function onSubmit(values: EventFormValues) {
     if (!event) return
 
     try {
-      // Convert the form values to the expected format for the API
-      const startDateString = `${values.date}T${values.time}:00.000Z`
-      const startDate = new Date(startDateString)
-      const duration = parseInt(values.duration || "60", 10)
-      const endDate = new Date(startDate.getTime() + duration * 60000) // Add duration in minutes
+      const startIso = `${values.startDate}T${isAllDay ? "00:00:00.000Z" : `${values.startTime}:00.000Z`}`
+      const endIso = `${values.endDate}T${isAllDay ? "23:59:59.999Z" : `${values.endTime}:00.000Z`}`
 
       const updateData = {
         title: values.title,
         type: values.type,
         priority: values.priority,
-        start_date: startDate,
-        end_date: endDate,
-        location: values.location || "",
-        observations: values.observations,
+        start_date: new Date(startIso),
+        end_date: new Date(endIso),
+        location: values.location,
+        observations: values.observations || "",
         process_id: values.process_id,
-        all_day: false, // We can extend this later if needed
-        internal_advance_alerts: duration,
+        all_day: values.all_day,
+        internal_advance_alerts: 60,
       }
 
-      await eventService.updateEvent(companyId, event.id, updateData)
+      await eventService.updateEvent(companyId, event.id, updateData as any)
       toast.success("Evento atualizado com sucesso!")
       onOpenChange(false)
       form.reset()
@@ -165,9 +174,11 @@ export function EditEventDialog({
     }
   }
 
+  const allProcesses = processesData?.pages.flatMap(page => page.processes) || []
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{event ? "Editar Evento" : "Novo Evento"}</DialogTitle>
           <DialogDescription>
@@ -178,7 +189,7 @@ export function EditEventDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
@@ -202,7 +213,7 @@ export function EditEventDialog({
                     <FormLabel>Tipo *</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -210,10 +221,9 @@ export function EditEventDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value={IEventType.HEARING}>{IEventType.HEARING}</SelectItem>
-                        <SelectItem value={IEventType.MEETING}>{IEventType.MEETING}</SelectItem>
-                        <SelectItem value={IEventType.TERM}>{IEventType.TERM}</SelectItem>
-                        <SelectItem value={IEventType.VIDEO}>{IEventType.VIDEO}</SelectItem>
+                        {Object.values(IEventType).map((type) => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -229,7 +239,7 @@ export function EditEventDialog({
                     <FormLabel>Prioridade *</FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -248,71 +258,112 @@ export function EditEventDialog({
               />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="flex items-center space-x-2 py-2 border-y border-border/50">
               <FormField
                 control={form.control}
-                name="date"
+                name="all_day"
                 render={({ field }) => (
-                  <FormItem className="relative">
-                    <FormLabel>Data *</FormLabel>
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                     <FormControl>
-                      <>
-                        <Input type="date" className="pl-8" {...field} />
-                        <CalendarIcon className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
-                      </>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Dia Inteiro</FormLabel>
+                    </div>
                   </FormItem>
                 )}
               />
+            </div>
 
-              <FormField
-                control={form.control}
-                name="time"
-                render={({ field }) => (
-                  <FormItem className="relative">
-                    <FormLabel>Horário *</FormLabel>
-                    <FormControl>
-                      <>
-                        <Input type="time" className="pl-8" {...field} />
-                        <Clock className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
-                      </>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-4">
+                <FormLabel className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Início</FormLabel>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative">
+                            <Input type="date" className="pl-9" {...field} />
+                            <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {!isAllDay && (
+                    <FormField
+                      control={form.control}
+                      name="startTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="time" className="pl-9" {...field} />
+                              <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="duration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duração (min)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="60" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4">
+                <FormLabel className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Término</FormLabel>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative">
+                            <Input type="date" className="pl-9" {...field} />
+                            <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {!isAllDay && (
+                    <FormField
+                      control={form.control}
+                      name="endTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="time" className="pl-9" {...field} />
+                              <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
 
             <FormField
               control={form.control}
               name="location"
               render={({ field }) => (
-                <FormItem className="relative">
+                <FormItem>
                   <FormLabel>Local *</FormLabel>
                   <FormControl>
-                    <>
-                      <Input
-                        placeholder="Ex: Fórum Central - Sala 201"
-                        className="pl-8"
-                        {...field}
-                      />
-                      <MapPin className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
-                    </>
+                    <Input placeholder="Ex: Fórum Central - Sala 201" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -332,19 +383,37 @@ export function EditEventDialog({
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {processesData?.pages.flatMap(page => page.processes).map((process) => (
-                        <SelectItem key={process.id} value={process.id}>
-                          {process.process_number} - {process.title}
-                        </SelectItem>
-                      ))}
-                      {isLoading && (
-                        <SelectItem value="" disabled>
-                          <div className="flex items-center">
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Carregando processos...
+                      <div className="max-h-[200px] overflow-y-auto">
+                        {allProcesses.map((process) => (
+                          <SelectItem key={process.id} value={process.id}>
+                            {process.process_number} - {process.title}
+                          </SelectItem>
+                        ))}
+                        {hasNextPage && (
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            className="w-full text-xs py-1 h-8 text-primary"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              fetchNextPage()
+                            }}
+                            disabled={isFetchingNextPage}
+                          >
+                            {isFetchingNextPage ? (
+                              <Loader2 className="size-3 animate-spin mr-2" />
+                            ) : null}
+                            Carregar mais processos...
+                          </Button>
+                        )}
+                        {isLoadingProcesses && (
+                          <div className="p-2 text-center">
+                            <Loader2 className="size-4 animate-spin inline-block mr-2" />
+                            <span className="text-xs text-muted-foreground">Carregando...</span>
                           </div>
-                        </SelectItem>
-                      )}
+                        )}
+                      </div>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -377,15 +446,14 @@ export function EditEventDialog({
                   variant="destructive"
                   onClick={handleDelete}
                   disabled={isDeleting}
+                  className="px-6 border-red-500 text-red-500 hover:bg-red-50"
                 >
                   {isDeleting ? (
-                    <>Excluindo...</>
+                    <Loader2 className="size-4 animate-spin mr-2" />
                   ) : (
-                    <>
-                      <Trash className="mr-2 size-4" />
-                      Excluir
-                    </>
+                    <Trash className="mr-2 size-4" />
                   )}
+                  Excluir
                 </Button>
               )}
 
@@ -394,10 +462,11 @@ export function EditEventDialog({
                   type="button"
                   variant="outline"
                   onClick={() => onOpenChange(false)}
+                  className="px-6"
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">
+                <Button type="submit" className="px-6 bg-primary">
                   <Save className="mr-2 size-4" />
                   Salvar Evento
                 </Button>

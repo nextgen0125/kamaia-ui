@@ -17,6 +17,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -31,23 +32,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
-import { Plus, Save } from "lucide-react"
+import { Plus, Save, Loader2, Calendar as CalendarIcon, Clock } from "lucide-react"
 import { eventService } from "@/services/event-service"
 import { IEventType, IEventPriority } from "@/interfaces/IEvent"
-import { Loader2 } from "lucide-react"
 import { useAllProcessesInfinite } from "@/hooks/queries/use-process"
 
 const eventSchema = z.object({
   title: z.string().min(3, "Título deve ter no mínimo 3 caracteres"),
   type: z.nativeEnum(IEventType),
-  date: z.string().min(1, "Selecione a data"),
-  time: z.string().min(1, "Selecione o horário"),
-  duration: z.string().optional(),
-  location: z.string().min(1, "Localização é obrigatória").optional(),
+  startDate: z.string().min(1, "Selecione a data de início"),
+  startTime: z.string().min(1, "Selecione o horário de início"),
+  endDate: z.string().min(1, "Selecione a data de término"),
+  endTime: z.string().min(1, "Selecione o horário de término"),
+  all_day: z.boolean().default(false),
+  location: z.string().min(1, "Localização é obrigatória"),
   process_id: z.string().optional(),
   priority: z.nativeEnum(IEventPriority),
-  notes: z.string().optional(),
+  observations: z.string().optional(),
 })
 
 type EventFormValues = z.infer<typeof eventSchema>
@@ -60,54 +63,54 @@ interface AddEventDialogProps {
 export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
   const [open, setOpen] = useState(false)
 
-  // Adicionando o hook para buscar os processos
-  const { data: processesData, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } = useAllProcessesInfinite(companyId)
+  // Hook para buscar os processos
+  const { 
+    data: processesData, 
+    hasNextPage, 
+    fetchNextPage, 
+    isFetchingNextPage, 
+    isLoading: isLoadingProcesses 
+  } = useAllProcessesInfinite(companyId)
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventSchema),
     defaultValues: {
       title: "",
       type: IEventType.MEETING,
-      date: new Date().toISOString().split('T')[0],
-      time: "09:00",
-      duration: "60",
+      startDate: new Date().toISOString().split('T')[0],
+      startTime: "09:00",
+      endDate: new Date().toISOString().split('T')[0],
+      endTime: "10:00",
+      all_day: false,
       location: "",
       process_id: "",
       priority: IEventPriority.MEDIUM,
-      notes: "",
+      observations: "",
     },
   })
 
-  // Função para carregar mais processos quando necessário
-  const loadMoreProcesses = () => {
-    if (hasNextPage) {
-      fetchNextPage()
-    }
-  }
+  const isAllDay = form.watch("all_day")
 
   async function onSubmit(values: EventFormValues) {
     try {
-      // Convert the form values to the expected format for the API
-      const startDateString = `${values.date}T${values.time}:00.000Z`
-      const startDate = new Date(startDateString)
-      const duration = parseInt(values.duration || "60", 10)
-      const endDate = new Date(startDate.getTime() + duration * 60000) // Add duration in minutes
+      const startIso = `${values.startDate}T${isAllDay ? "00:00:00.000Z" : `${values.startTime}:00.000Z`}`
+      const endIso = `${values.endDate}T${isAllDay ? "23:59:59.999Z" : `${values.endTime}:00.000Z`}`
 
       const eventData = {
         company_id: companyId,
         title: values.title,
         type: values.type,
         priority: values.priority,
-        start_date: startDate,
-        end_date: endDate,
-        location: values.location || "",
-        observations: values.notes,
-        process_id: values.process_id || "", // May be empty if not associated with a process
-        all_day: false, // We can extend this later if needed
-        internal_advance_alerts: duration,
+        start_date: new Date(startIso),
+        end_date: new Date(endIso),
+        location: values.location,
+        observations: values.observations || "",
+        process_id: values.process_id || "",
+        all_day: values.all_day,
+        internal_advance_alerts: 60, // Default value
       }
 
-      await eventService.createEvent(companyId, eventData)
+      await eventService.createEvent(companyId, eventData as any)
       toast.success("Evento cadastrado com sucesso!")
       setOpen(false)
       form.reset()
@@ -118,6 +121,8 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
     }
   }
 
+  const allProcesses = processesData?.pages.flatMap(page => page.processes) || []
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -126,7 +131,7 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
           Novo Evento
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Novo Evento</DialogTitle>
           <DialogDescription>
@@ -135,7 +140,7 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
@@ -164,10 +169,9 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="hearing">Audiência</SelectItem>
-                        <SelectItem value="meeting">Reunião</SelectItem>
-                        <SelectItem value="deadline">Prazo</SelectItem>
-                        <SelectItem value="video">Videoconferência</SelectItem>
+                        {Object.values(IEventType).map((type) => (
+                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -188,9 +192,9 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="low">Baixa</SelectItem>
-                        <SelectItem value="medium">Média</SelectItem>
-                        <SelectItem value="high">Alta</SelectItem>
+                        <SelectItem value={IEventPriority.LOW}>Baixa</SelectItem>
+                        <SelectItem value={IEventPriority.MEDIUM}>Média</SelectItem>
+                        <SelectItem value={IEventPriority.HIGH}>Alta</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -199,48 +203,102 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
               />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
+            <div className="flex items-center space-x-2 py-2 border-y border-border/50">
               <FormField
                 control={form.control}
-                name="date"
+                name="all_day"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Data *</FormLabel>
+                  <FormItem className="flex flex-row items-center space-x-3 space-y-0">
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
                     </FormControl>
-                    <FormMessage />
+                    <div className="space-y-1 leading-none">
+                      <FormLabel>Dia Inteiro</FormLabel>
+                    </div>
                   </FormItem>
                 )}
               />
+            </div>
 
-              <FormField
-                control={form.control}
-                name="time"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Horário *</FormLabel>
-                    <FormControl>
-                      <Input type="time" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-4">
+                <FormLabel className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Início</FormLabel>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="startDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative">
+                            <Input type="date" className="pl-9" {...field} />
+                            <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {!isAllDay && (
+                    <FormField
+                      control={form.control}
+                      name="startTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="time" className="pl-9" {...field} />
+                              <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+              </div>
 
-              <FormField
-                control={form.control}
-                name="duration"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Duração (min)</FormLabel>
-                    <FormControl>
-                      <Input type="number" placeholder="60" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="space-y-4">
+                <FormLabel className="text-xs font-semibold uppercase text-muted-foreground tracking-wider">Término</FormLabel>
+                <div className="grid gap-2">
+                  <FormField
+                    control={form.control}
+                    name="endDate"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative">
+                            <Input type="date" className="pl-9" {...field} />
+                            <CalendarIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {!isAllDay && (
+                    <FormField
+                      control={form.control}
+                      name="endTime"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <div className="relative">
+                              <Input type="time" className="pl-9" {...field} />
+                              <Clock className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
 
             <FormField
@@ -270,19 +328,37 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {processesData?.pages.flatMap(page => page.processes).map((process) => (
-                        <SelectItem key={process.id} value={process.id}>
-                          {process.process_number} - {process.title}
-                        </SelectItem>
-                      ))}
-                      {isLoading && (
-                        <SelectItem value="" disabled>
-                          <div className="flex items-center">
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Carregando processos...
+                      <div className="max-h-[200px] overflow-y-auto">
+                        {allProcesses.map((process) => (
+                          <SelectItem key={process.id} value={process.id}>
+                            {process.process_number} - {process.title}
+                          </SelectItem>
+                        ))}
+                        {hasNextPage && (
+                          <Button 
+                            type="button" 
+                            variant="ghost" 
+                            className="w-full text-xs py-1 h-8 text-primary"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              fetchNextPage()
+                            }}
+                            disabled={isFetchingNextPage}
+                          >
+                            {isFetchingNextPage ? (
+                              <Loader2 className="size-3 animate-spin mr-2" />
+                            ) : null}
+                            Carregar mais processos...
+                          </Button>
+                        )}
+                        {isLoadingProcesses && (
+                          <div className="p-2 text-center">
+                            <Loader2 className="size-4 animate-spin inline-block mr-2" />
+                            <span className="text-xs text-muted-foreground">Carregando...</span>
                           </div>
-                        </SelectItem>
-                      )}
+                        )}
+                      </div>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -292,7 +368,7 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
 
             <FormField
               control={form.control}
-              name="notes"
+              name="observations"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Observações</FormLabel>
@@ -309,10 +385,10 @@ export function AddEventDialog({ onSuccess, companyId }: AddEventDialogProps) {
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="px-6">
                 Cancelar
               </Button>
-              <Button type="submit">
+              <Button type="submit" className="px-6 bg-primary">
                 <Save className="mr-2 size-4" />
                 Salvar Evento
               </Button>
