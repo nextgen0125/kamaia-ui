@@ -34,7 +34,7 @@ import { Switch } from "@/components/ui/switch"
 import { toast } from "sonner"
 import { Save, Trash, Clock, MapPin, Calendar as CalendarIcon, Loader2 } from "lucide-react"
 import { eventService } from "@/services/event-service"
-import { IEvent, IEventType, IEventPriority } from "@/interfaces/IEvent"
+import { IEvent, IEventType, IEventPriority, IEventTypeLabels } from "@/interfaces/IEvent"
 import { useAllProcessesInfinite } from "@/hooks/queries/use-process"
 
 const eventSchema = z.object({
@@ -222,7 +222,9 @@ export function EditEventDialog({
                       </FormControl>
                       <SelectContent>
                         {Object.values(IEventType).map((type) => (
-                          <SelectItem key={type} value={type}>{type}</SelectItem>
+                          <SelectItem key={type} value={type}>
+                            {IEventTypeLabels[type] || type}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>

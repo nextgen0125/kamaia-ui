@@ -12,11 +12,18 @@ import { IProcess } from './IProcess';
  * Espelha o enum da entidade Event no backend.
  */
 export enum IEventType {
-  HEARING  = 'Audiência',
-  MEETING  = 'Reunião',
-  TERM     = 'Prazo',
-  VIDEO    = 'Videoconferência',
+  HEARING  = 'AUDIENCIA',
+  MEETING  = 'REUNIAO',
+  TERM     = 'PRAZO',
+  VIDEO    = 'VIDEOCONFERENCIA',
 }
+
+export const IEventTypeLabels: Record<string, string> = {
+  [IEventType.HEARING]: 'Audiência',
+  [IEventType.MEETING]: 'Reunião',
+  [IEventType.TERM]: 'Prazo',
+  [IEventType.VIDEO]: 'Videoconferência',
+};
 
 /**
  * Níveis de prioridade de um evento.

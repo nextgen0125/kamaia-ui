@@ -17,6 +17,7 @@ import {
   FileText,
   Bell,
 } from "lucide-react"
+import { IEventType, IEventTypeLabels } from "@/interfaces/IEvent"
 
 // Quick Stats Widget
 export function QuickStatsWidget() {
@@ -282,7 +283,7 @@ export function UpcomingEventsWidget() {
       time: "09:30",
       date: "Hoje",
       location: "TRT 2ª Região",
-      type: "hearing",
+      type: IEventType.HEARING,
     },
     {
       id: 2,
@@ -290,7 +291,7 @@ export function UpcomingEventsWidget() {
       time: "14:00",
       date: "Hoje",
       location: "Escritório",
-      type: "meeting",
+      type: IEventType.MEETING,
     },
     {
       id: 3,
@@ -298,7 +299,7 @@ export function UpcomingEventsWidget() {
       time: "10:00",
       date: "Amanhã",
       location: "Fórum Central",
-      type: "hearing",
+      type: IEventType.HEARING,
     },
   ]
 
@@ -329,7 +330,7 @@ export function UpcomingEventsWidget() {
                   <p className="text-sm font-medium">{event.title}</p>
                   <p className="text-xs text-muted-foreground">{event.location}</p>
                   <Badge variant="outline" className="mt-1">
-                    {event.type === "hearing" ? "Audiência" : "Reunião"}
+                    {IEventTypeLabels[event.type] || event.type}
                   </Badge>
                 </div>
               </div>

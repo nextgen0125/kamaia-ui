@@ -14,7 +14,7 @@ import {
   MoreHorizontal
 } from "lucide-react";
 import { useAllEventsInfinite } from "@/hooks/queries/use-events";
-import { IEvent } from "@/interfaces/IEvent";
+import { IEvent, IEventType, IEventTypeLabels } from "@/interfaces/IEvent";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { EditEventDialog } from "./edit-event-dialog";
@@ -55,13 +55,13 @@ export default function CompanyCalendarUpcomingEvents({ companyId }: CompanyCale
   // Funções auxiliares para formatar os eventos
   const getEventTypeIcon = (type: string) => {
     switch (type) {
-      case "Audiência":
+      case IEventType.HEARING:
         return <CalendarIcon className="size-4" />;
-      case "Reunião":
+      case IEventType.MEETING:
         return <Users className="size-4" />;
-      case "Prazo":
+      case IEventType.TERM:
         return <AlertCircle className="size-4" />;
-      case "Videoconferência":
+      case IEventType.VIDEO:
         return <Video className="size-4" />;
       default:
         return <Clock className="size-4" />;
@@ -70,13 +70,13 @@ export default function CompanyCalendarUpcomingEvents({ companyId }: CompanyCale
 
   const getEventTypeColor = (type: string) => {
     switch (type) {
-      case "Audiência":
+      case IEventType.HEARING:
         return "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400";
-      case "Reunião":
+      case IEventType.MEETING:
         return "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400";
-      case "Prazo":
+      case IEventType.TERM:
         return "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400";
-      case "Videoconferência":
+      case IEventType.VIDEO:
         return "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-400";
       default:
         return "bg-gray-100 text-gray-700 dark:bg-gray-950 dark:text-gray-400";
