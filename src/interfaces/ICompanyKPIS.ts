@@ -31,6 +31,11 @@ export interface ICompanyDashboardIKPIs {
     lawyers: IKpiComparativeNumeric;
     /** Soma das receitas (AccessTypeFinance.income) no mês corrente vs. anterior. */
     monthlyRevenue: IKpiComparativePercent;
+
+    totalDocuments?: number;
+    totalFolders?: number;
+    documentsThisMonth?: number;
+    totalStorageUsed?: number;
 }
 
 
