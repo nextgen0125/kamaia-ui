@@ -3,11 +3,11 @@
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   DropdownMenu,
@@ -36,9 +36,7 @@ import {
   Phone,
   Mail,
   MapPin,
-  Briefcase,
 } from "lucide-react"
-import Link from "next/link"
 
 // Mock data - substituir por API real
 const getCaseDetails = (id: string) => ({
@@ -522,15 +520,15 @@ export default function CaseDetailsPage() {
                                     task.status === "completed"
                                       ? "outline"
                                       : task.status === "in_progress"
-                                      ? "default"
-                                      : "secondary"
+                                        ? "default"
+                                        : "secondary"
                                   }
                                 >
                                   {task.status === "completed"
                                     ? "Concluída"
                                     : task.status === "in_progress"
-                                    ? "Em Andamento"
-                                    : "Pendente"}
+                                      ? "Em Andamento"
+                                      : "Pendente"}
                                 </Badge>
                                 <Badge variant={getPriorityBadge(task.priority).variant}>
                                   {getPriorityBadge(task.priority).label}

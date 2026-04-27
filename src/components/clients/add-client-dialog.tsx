@@ -4,55 +4,39 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
-import { Plus, Save, Building2, User } from "lucide-react"
+import { useCreateClient } from "@/hooks/queries/clients/use-clients"
+import { useCompanyDashboardContext } from "@/contexts/company-contexts/company-dashboard"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Building2, User, Plus, Save, Fingerprint, MapPin, Users2 } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const clientSchema = z.object({
-  type: z.enum(["individual", "legal"]),
+  type: z.enum(["pf", "pj"]),
   name: z.string().min(3, "Nome deve ter no mínimo 3 caracteres"),
-  email: z.string().email("Email inválido"),
-  phone: z.string().min(10, "Telefone inválido"),
-  cpfCnpj: z.string().min(11, "CPF/CNPJ inválido"),
-  dateOfBirth: z.string().optional(),
+  email: z.string().email("Email inválido").min(1, "Email é obrigatório"),
+  phone: z.string().min(1, "Número do telefone é obrigatório"),
+  nif: z.string().min(1, "NIF é obrigatório"),
+  Identity_card_number: z.string().optional(),
+  Id_validity: z.string().optional(),
+  nacionality: z.string().default("Angolana"),
+  marital_status: z.string().optional(),
+  birth_place: z.string().optional(),
   address: z.string().optional(),
-  city: z.string().optional(),
-  state: z.string().optional(),
-  zipCode: z.string().optional(),
-  notes: z.string().optional(),
-  status: z.enum(["active", "inactive"]),
-  companyName: z.string().optional(),
-  tradeName: z.string().optional(),
+  city: z.string().optional(), // Província
+  country: z.string().default("Angola"),
+  profile: z.string().optional(),
+  father_name: z.string().optional(),
+  mother_name: z.string().optional(),
+  profession: z.string().optional(),
+  company_name: z.string().optional(),
 })
 
 type ClientFormValues = z.infer<typeof clientSchema>
@@ -63,169 +47,157 @@ interface AddClientDialogProps {
 
 export function AddClientDialog({ onSuccess }: AddClientDialogProps) {
   const [open, setOpen] = useState(false)
-  const [clientType, setClientType] = useState<"individual" | "legal">("individual")
+  const [clientType, setClientType] = useState<"pf" | "pj">("pf")
+  const { company } = useCompanyDashboardContext()
+  const { mutate: createClient, isPending } = useCreateClient()
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
     defaultValues: {
-      type: "individual",
+      type: "pf",
       name: "",
       email: "",
       phone: "",
-      cpfCnpj: "",
-      dateOfBirth: "",
+      nif: "",
+      Identity_card_number: "",
+      Id_validity: "1",
+      nacionality: "Angolana",
+      marital_status: "Solteiro(a)",
+      birth_place: "",
       address: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      notes: "",
-      status: "active",
-      companyName: "",
-      tradeName: "",
+      city: "Luanda",
+      country: "Angola",
+      profile: "",
+      father_name: "",
+      mother_name: "",
+      profession: "",
+      company_name: "",
     },
   })
 
   function onSubmit(values: ClientFormValues) {
-    console.log(values)
-    toast.success("Cliente cadastrado com sucesso!")
-    setOpen(false)
-    form.reset()
-    onSuccess?.()
+    if (!company?.id) return;
+
+    createClient({
+      companyId: company.id,
+      data: values
+    }, {
+      onSuccess: () => {
+        toast.success("Cliente cadastrado com sucesso!")
+        setOpen(false)
+        form.reset()
+        onSuccess?.()
+      },
+      onError: (error: any) => {
+        toast.error("Erro ao cadastrar cliente", {
+          description: error.response?.data?.message || error.message
+        })
+      }
+    })
   }
 
-  const brazilianStates = [
-    "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
-    "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN",
-    "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+  const angolanProvinces = [
+    "Bengo", "Benguela", "Bié", "Cabinda", "Cuando Cubango", "Cuanza Norte",
+    "Cuanza Sul", "Cunene", "Huambo", "Huíla", "Luanda", "Lunda Norte",
+    "Lunda Sul", "Malanje", "Moxico", "Namibe", "Uíge", "Zaire"
   ]
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button className="font-semibold shadow-lg transition-all hover:scale-105">
           <Plus className="mr-2 size-4" />
-          Adicionar Cliente
+          Novo Cliente
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto w-[95vw] sm:w-full">
-        <DialogHeader>
-          <DialogTitle>Adicionar Cliente</DialogTitle>
-          <DialogDescription>
-            Preencha os dados do novo cliente
+      <DialogContent className="min-w-5xl max-h-[92vh] overflow-hidden p-0 gap-0 shadow-2xl border-none">
+        <DialogHeader className="p-8 pb-4 bg-muted/30">
+          <DialogTitle className="text-3xl font-extrabold tracking-tight">Cadastro de Cliente</DialogTitle>
+          <DialogDescription className="text-base">
+            Registe um novo cliente singular ou colectivo com todos os detalhes jurídicos necessários para o sistema.
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <ScrollArea className="h-[60vh] pr-4">
-              <div className="space-y-6">
-                {/* Tipo de Cliente */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+            <ScrollArea className="flex-1 max-h-[70vh] p-10 pt-4">
+              <div className="space-y-8">
+                {/* Tipo de Cliente Selection */}
                 <FormField
                   control={form.control}
                   name="type"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de Cliente *</FormLabel>
+                    <FormItem className="space-y-3">
+                      <FormLabel className="text-base font-bold">Tipo de Entidade</FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={(value) => {
                             field.onChange(value)
-                            setClientType(value as "individual" | "legal")
+                            setClientType(value as any)
                           }}
                           defaultValue={field.value}
                           className="grid grid-cols-2 gap-4"
                         >
                           <Label
-                            htmlFor="individual"
-                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer [&:has([data-state=checked])]:border-primary"
+                            htmlFor="pf"
+                            className={`flex flex-col items-center justify-between rounded-xl border-2 p-4 transition-all cursor-pointer hover:bg-accent ${field.value === "pf" ? "border-primary bg-primary/5" : "border-muted"}`}
                           >
-                            <RadioGroupItem value="individual" id="individual" className="sr-only" />
-                            <User className="mb-3 size-6" />
-                            <div className="space-y-1 text-center">
-                              <p className="text-sm font-medium">Pessoa Física</p>
-                            </div>
+                            <RadioGroupItem value="pf" id="pf" className="sr-only" />
+                            <User className={`mb-2 size-8 ${field.value === "pf" ? "text-primary" : "text-muted-foreground"}`} />
+                            <div className="text-center font-semibold">Pessoa Singular</div>
                           </Label>
                           <Label
-                            htmlFor="legal"
-                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground cursor-pointer [&:has([data-state=checked])]:border-primary"
+                            htmlFor="pj"
+                            className={`flex flex-col items-center justify-between rounded-xl border-2 p-4 transition-all cursor-pointer hover:bg-accent ${field.value === "pj" ? "border-primary bg-primary/5" : "border-muted"}`}
                           >
-                            <RadioGroupItem value="legal" id="legal" className="sr-only" />
-                            <Building2 className="mb-3 size-6" />
-                            <div className="space-y-1 text-center">
-                              <p className="text-sm font-medium">Pessoa Jurídica</p>
-                            </div>
+                            <RadioGroupItem value="pj" id="pj" className="sr-only" />
+                            <Building2 className={`mb-2 size-8 ${field.value === "pj" ? "text-primary" : "text-muted-foreground"}`} />
+                            <div className="text-center font-semibold">Pessoa Colectiva</div>
                           </Label>
                         </RadioGroup>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                <Tabs defaultValue="basic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="basic">Dados Básicos</TabsTrigger>
-                    <TabsTrigger value="address">Endereço</TabsTrigger>
+                <Tabs defaultValue="perfil" className="w-full">
+                  <TabsList className="grid w-full grid-cols-3 h-12 bg-muted/50 p-1">
+                    <TabsTrigger value="perfil" className="gap-2 cursor-pointer">
+                      <User className="size-4" /> Perfil & Contacto
+                    </TabsTrigger>
+                    <TabsTrigger value="identidade" className="gap-2 cursor-pointer">
+                      <Fingerprint className="size-4" /> BI & Família
+                    </TabsTrigger>
+                    <TabsTrigger value="origem" className="gap-2 cursor-pointer">
+                      <MapPin className="size-4" /> Residência & Empresa
+                    </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="basic" className="space-y-4 mt-4">
-                    {clientType === "legal" && (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="companyName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Razão Social *</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Empresa ABC Ltda" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                  {/* TAB 1: PERFIL & CONTACTO */}
+                  <TabsContent value="perfil" className="space-y-6 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem className="md:col-span-2">
+                            <FormLabel className="font-bold">Nome Completo / Denominação Activa *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ex: Abel João Kiala" {...field} className="h-11" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                        <FormField
-                          control={form.control}
-                          name="tradeName"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Nome Fantasia</FormLabel>
-                              <FormControl>
-                                <Input placeholder="ABC Soluções" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </>
-                    )}
-
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            {clientType === "legal" ? "Nome do Representante *" : "Nome Completo *"}
-                          </FormLabel>
-                          <FormControl>
-                            <Input placeholder="João Silva" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid gap-4 md:grid-cols-2">
                       <FormField
                         control={form.control}
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email *</FormLabel>
+                            <FormLabel className="font-bold">Email Institucional/Pessoal *</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="contato@exemplo.com" {...field} />
+                              <Input type="email" placeholder="cliente@provedor.ao" {...field} className="h-11" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -237,116 +209,66 @@ export function AddClientDialog({ onSuccess }: AddClientDialogProps) {
                         name="phone"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Telefone *</FormLabel>
+                            <FormLabel className="font-bold">Telemóvel (WhatsApp) *</FormLabel>
                             <FormControl>
-                              <Input placeholder="(11) 99999-9999" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <FormField
-                        control={form.control}
-                        name="cpfCnpj"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>{clientType === "legal" ? "CNPJ *" : "CPF *"}</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder={clientType === "legal" ? "00.000.000/0000-00" : "000.000.000-00"} 
-                                {...field} 
-                              />
+                              <Input placeholder="+244 9XX XXX XXX" {...field} className="h-11" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
-                      {clientType === "individual" && (
-                        <FormField
-                          control={form.control}
-                          name="dateOfBirth"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Data de Nascimento</FormLabel>
-                              <FormControl>
-                                <Input type="date" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-
                       <FormField
                         control={form.control}
-                        name="status"
+                        name="marital_status"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Status *</FormLabel>
+                            <FormLabel className="font-bold">Estado Civil</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue />
+                                <SelectTrigger className="h-11">
+                                  <SelectValue placeholder="Selecione" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="active">Ativo</SelectItem>
-                                <SelectItem value="inactive">Inativo</SelectItem>
+                                <SelectItem value="Solteiro(a)">Solteiro(a)</SelectItem>
+                                <SelectItem value="Casado(a)">Casado(a)</SelectItem>
+                                <SelectItem value="Divorciado(a)">Divorciado(a)</SelectItem>
+                                <SelectItem value="Viúvo(a)">Viúvo(a)</SelectItem>
                               </SelectContent>
                             </Select>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                    </div>
 
-                    <FormField
-                      control={form.control}
-                      name="notes"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Observações</FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Informações adicionais..."
-                              className="min-h-[80px]"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </TabsContent>
-
-                  <TabsContent value="address" className="space-y-4 mt-4">
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Endereço</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Rua, número, complemento" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <div className="grid gap-4 md:grid-cols-3">
                       <FormField
                         control={form.control}
-                        name="city"
+                        name="profession"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Cidade</FormLabel>
+                            <FormLabel className="font-bold">Profissão / Cargo</FormLabel>
                             <FormControl>
-                              <Input placeholder="São Paulo" {...field} />
+                              <Input placeholder="Ex: Contabilista Sénior" {...field} className="h-11" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </TabsContent>
+
+                  {/* TAB 2: BI & FAMÍLIA */}
+                  <TabsContent value="identidade" className="space-y-6 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="nif"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-bold">NIF (Número de Identificação Fiscal) *</FormLabel>
+                            <FormControl>
+                              <Input placeholder="00XXXXXX" {...field} className="h-11" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -355,20 +277,114 @@ export function AddClientDialog({ onSuccess }: AddClientDialogProps) {
 
                       <FormField
                         control={form.control}
-                        name="state"
+                        name="Identity_card_number"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Estado</FormLabel>
+                            <FormLabel className="font-bold">Nº do Bilhete de Identidade (BI)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ex: 009XXX563LA052" {...field} className="h-11" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="Id_validity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-bold">Validade do Documento (Anos)</FormLabel>
+                            <FormControl>
+                              <Input type="number" min="1" {...field} className="h-11" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="nacionality"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-bold">Nacionalidade</FormLabel>
+                            <FormControl>
+                              <Input {...field} className="h-11" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 border-l-2 border-primary/20 pl-4 bg-primary/5 py-4 rounded-r-lg">
+                        <div className="flex items-center gap-2 mb-2 md:col-span-2">
+                          <Users2 className="size-5 text-primary" />
+                          <h3 className="font-bold text-sm uppercase tracking-wide">Filiação</h3>
+                        </div>
+                        <FormField
+                          control={form.control}
+                          name="father_name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-semibold">Nome do Pai</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Nome completo do progenitor" {...field} className="h-10 bg-background" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="mother_name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-semibold">Nome da Mãe</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Nome completo da progenitora" {...field} className="h-10 bg-background" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  {/* TAB 3: RESIDÊNCIA & EMPRESA */}
+                  <TabsContent value="origem" className="space-y-6 mt-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <FormField
+                        control={form.control}
+                        name="birth_place"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-bold">Naturalidade (Local de Nascimento)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ex: Cazenga, Luanda" {...field} className="h-11" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="city" // Província
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="font-bold">Província de Residência</FormLabel>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                               <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Selecione" />
+                                <SelectTrigger className="h-11">
+                                  <SelectValue placeholder="Selecione a província" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                {brazilianStates.map((state) => (
-                                  <SelectItem key={state} value={state}>
-                                    {state}
+                                {angolanProvinces.map((prov) => (
+                                  <SelectItem key={prov} value={prov}>
+                                    {prov}
                                   </SelectItem>
                                 ))}
                               </SelectContent>
@@ -380,12 +396,26 @@ export function AddClientDialog({ onSuccess }: AddClientDialogProps) {
 
                       <FormField
                         control={form.control}
-                        name="zipCode"
+                        name="address"
                         render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>CEP</FormLabel>
+                          <FormItem className="md:col-span-2">
+                            <FormLabel className="font-bold">Bairro / Rua / Edifício</FormLabel>
                             <FormControl>
-                              <Input placeholder="00000-000" {...field} />
+                              <Input placeholder="Ex: Talatona, Rua do SIAC, Edifício Cristal" {...field} className="h-11" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="company_name"
+                        render={({ field }) => (
+                          <FormItem className="md:col-span-2">
+                            <FormLabel className="font-bold">Empresa / Instituição Vinculada</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Onde o cliente trabalha ou é sócio" {...field} className="h-11" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -397,13 +427,22 @@ export function AddClientDialog({ onSuccess }: AddClientDialogProps) {
               </div>
             </ScrollArea>
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            <DialogFooter className="p-6 bg-muted/20 border-t">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="h-12 px-8">
                 Cancelar
               </Button>
-              <Button type="submit">
-                <Save className="mr-2 size-4" />
-                Salvar Cliente
+              <Button type="submit" disabled={isPending} className="h-12 px-8 min-w-[150px]">
+                {isPending ? (
+                  <span className="flex items-center gap-2">
+                    <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    A processar...
+                  </span>
+                ) : (
+                  <>
+                    <Save className="mr-2 size-5" />
+                    Registar Cliente
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>

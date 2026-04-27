@@ -1,4 +1,5 @@
 import { ICompany } from "./ICompany"
+import { IInvolved } from "./IInvolved"
 import { IUser } from "./IUser"
 
 
@@ -15,12 +16,12 @@ export interface IClient {
     city: string
     profile: string
     marital_status: string
-    father_name:string
+    father_name: string
     mother_name: string
     profission: string
-    company_name: string 
+    company_name: string
 
     user: IUser
     company: ICompany
-    involved: any[]
+    involved: IInvolved[]
 }

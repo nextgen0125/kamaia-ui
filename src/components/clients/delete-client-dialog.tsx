@@ -11,24 +11,36 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
+import { useDeleteClient } from "@/hooks/queries/clients/use-clients"
+import { useCompanyDashboardContext } from "@/contexts/company-contexts/company-dashboard"
 
 interface DeleteClientDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  client: {
-    id: number
-    name: string
-    cases: number
-  }
+  clientId: string
 }
 
-export function DeleteClientDialog({ open, onOpenChange, client }: DeleteClientDialogProps) {
+export function DeleteClientDialog({ open, onOpenChange, clientId }: DeleteClientDialogProps) {
+  const { company } = useCompanyDashboardContext()
+  const { mutate: deleteClient, isPending } = useDeleteClient()
+
   const handleDelete = () => {
-    toast.success("Cliente removido com sucesso!", {
-      description: `${client.name} foi removido do sistema.`,
+    if (!company?.id) return;
+
+    deleteClient({
+      companyId: company.id,
+      clientId
+    }, {
+      onSuccess: () => {
+        toast.success("Cliente desativado com sucesso!")
+        onOpenChange(false)
+      },
+      onError: (error: any) => {
+        toast.error("Erro ao desativar cliente", {
+          description: error.response?.data?.message || error.message
+        })
+      }
     })
-    console.log("Deleting client:", client.id)
-    onOpenChange(false)
   }
 
   return (
@@ -37,18 +49,20 @@ export function DeleteClientDialog({ open, onOpenChange, client }: DeleteClientD
         <AlertDialogHeader>
           <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
           <AlertDialogDescription>
-            Esta ação não pode ser desfeita. O cliente <strong>{client.name}</strong> será permanentemente removido do sistema.
-            {client.cases > 0 && (
-              <span className="block mt-2 text-amber-600">
-                ⚠️ Este cliente tem {client.cases} processo(s) associado(s).
-              </span>
-            )}
+            Esta ação irá desativar o cliente no sistema. Ele deixará de aparecer nas listagens principais, mas seus dados permanecerão arquivados por segurança.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancelar</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
-            Remover
+          <AlertDialogCancel onClick={() => onOpenChange(false)}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={(e) => {
+                e.preventDefault();
+                handleDelete();
+            }} 
+            disabled={isPending}
+            className="bg-destructive hover:bg-destructive/90 text-white"
+          >
+            {isPending ? "Desativando..." : "Desativar"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

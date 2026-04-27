@@ -19,10 +19,10 @@ interface AuthGuardProps {
    * Se especificado, o usuário deve ter pelo menos uma das permissões
    */
   requiredCompanyPermissions?: string[];
-    /**
-   * Cargos Tenants necessárias para acessar a rota (opcional)
-   * Se especificado, o usuário deve ter pelo menos uma das permissões
-   */
+  /**
+ * Cargos Tenants necessárias para acessar a rota (opcional)
+ * Se especificado, o usuário deve ter pelo menos uma das permissões
+ */
   requiredCompanyRoles?: string[];
   /**
    * URL para redirecionamento em caso de não autenticado
@@ -40,10 +40,10 @@ interface AuthGuardProps {
    */
   showLoading?: boolean;
 
-    /**
-   * Acessar Somente se for cliente.
-   * padrão: false
-   */
+  /**
+ * Acessar Somente se for cliente.
+ * padrão: false
+ */
   onlyCoustumer?: boolean;
 
 
@@ -116,18 +116,18 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
   const [hasAccess, setHasAccess] = useState(false);
   const [accessDeniedReason, setAccessDeniedReason] = useState<string>('');
 
-  const handleAccessDenied = (accessDeniedReason: string, ) => {
+  const handleAccessDenied = (accessDeniedReason: string,) => {
     setAccessDeniedReason(accessDeniedReason);
     onUnauthorized?.();
-    
+
     if (!showUnauthorized) {
-    router.replace(unauthorizedRedirectTo);
-    return;
+      router.replace(unauthorizedRedirectTo);
+      return;
     }
-    
+
     setHasAccess(false);
     setIsChecking(false);
-  } 
+  }
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -141,11 +141,11 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
       // Verificar se está autenticado
       if (!isAuthenticated) {
         // console.log('AuthGuard: Usuário não autenticado, redirecionando para login');
-        
+
         // Salvar URL atual para redirecionamento após login
         const returnUrl = encodeURIComponent(pathname);
         const loginUrl = `${redirectTo}?returnUrl=${returnUrl}`;
-        
+
         onUnauthenticated?.();
         router.replace(loginUrl);
         return;
@@ -155,15 +155,16 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
       if (requiredSuperAdminRoles.length > 0) {
         const hasRequiredRole = requiredSuperAdminRoles?.some(role => hasSuperAdminRole(role));
         if (!hasRequiredRole) {
-            handleAccessDenied(`Acesso negado. Cargos necessários: ${requiredSuperAdminRoles.join(', ')}`)
-            return;
+          handleAccessDenied(`Acesso negado. Cargos necessários: ${requiredSuperAdminRoles.join(', ')}`)
+          return;
         }
       }
 
 
-        // Verificar permissões se especificadas
+      // Verificar permissões se especificadas
       if (requiredCompanyRoles.length > 0) {
         const hasRequiredRole = requiredCompanyRoles?.some(role => hasCompanyRole(role, company_id as string));
+        // console.log("hasRequiredRole", hasRequiredRole)
         if (!hasRequiredRole) {
           handleAccessDenied(`Acesso negado. Permissões necessárias: ${requiredCompanyRoles.join(', ')}`)
           return;
@@ -174,16 +175,16 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
       if (requiredCompanyPermissions.length > 0) {
         const hasRequiredPermission = requiredCompanyPermissions?.some(permission => hasCompanyPermission(permission, company_id as string));
         if (!hasRequiredPermission) {
-            handleAccessDenied(`Acesso negado. Permissões necessárias: ${requiredCompanyPermissions.join(', ')}`)
+          handleAccessDenied(`Acesso negado. Permissões necessárias: ${requiredCompanyPermissions.join(', ')}`)
           return;
         }
       }
 
-        // Verificar se o usuário é um cliente
+      // Verificar se o usuário é um cliente
       if (onlyCoustumer) {
         if (!isCostumer()) {
-            handleAccessDenied(`Acesso negado. O usuário precisa ser um cliente`)
-            return;
+          handleAccessDenied(`Acesso negado. O usuário precisa ser um cliente`)
+          return;
         }
       }
 
@@ -217,6 +218,8 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
     }
   }, [logout]);
 
+
+
   // Mostrar loading enquanto verifica
   if (isLoading || isChecking) {
     if (!showLoading) {
@@ -229,7 +232,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
           <div className="inline-flex items-center justify-center mb-4">
             <Logo />
 
-          </div> 
+          </div>
           {/* <div className="grid flex-1 text-left text-sm leading-tight">
             <Logo />
             </div> */}
@@ -268,7 +271,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
             >
               Voltar
             </button>
-            
+
             <button
               onClick={() => logout.mutateAsync()}
               className="w-full bg-red-500 border border-red-200 rounded-lg p-2 cursor-pointer"
