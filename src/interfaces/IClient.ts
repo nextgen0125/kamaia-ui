@@ -4,6 +4,7 @@ import { IUser } from "./IUser"
 
 
 export interface IClient {
+    name: string
     user_id: string
     company_id: string
     nacionality: string

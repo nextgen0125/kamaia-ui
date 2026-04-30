@@ -30,17 +30,20 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
+import { useUpdateProcess } from "@/hooks/queries/use-process"
+import { useAuth } from "@/contexts/auth-context"
+import { IProcessPriority, AccessTypeProcecess, ILegalArea } from "@/interfaces/IProcess"
+import { Loader2 } from "lucide-react"
 
 const caseSchema = z.object({
-  number: z.string().min(10, "Por favor, insira um número de processo válido."),
-  title: z.string().min(5, "O título deve ter no mínimo 5 caracteres."),
-  client: z.string().min(2, "Por favor, selecione um cliente."),
-  lawyer: z.string().min(2, "Por favor, selecione um advogado."),
+  number: z.string().min(5, "Por favor, insira um número de processo válido."),
+  title: z.string().min(3, "O título deve ter no mínimo 3 caracteres."),
   court: z.string().min(3, "Por favor, insira o tribunal."),
-  status: z.enum(["active", "pending", "completed"]),
-  priority: z.enum(["high", "medium", "low"]),
-  phase: z.string(),
+  status: z.string().min(1, "Selecione o status"),
+  priority: z.nativeEnum(IProcessPriority),
+  phase: z.string().optional(),
   value: z.string(),
+  instance: z.string().min(1, "Informe a instância"),
 })
 
 type CaseFormValues = z.infer<typeof caseSchema>
@@ -48,42 +51,64 @@ type CaseFormValues = z.infer<typeof caseSchema>
 interface EditCaseDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  case_: {
-    id: number
-    number: string
-    title: string
-    client: string
-    lawyer: string
-    court: string
-    status: string
-    priority: string
-    phase: string
-    value: number
-  }
+  case_: any // Using any for flexibility during transition
 }
 
 export function EditCaseDialog({ open, onOpenChange, case_ }: EditCaseDialogProps) {
+  const { user } = useAuth()
+  const companyId = user?.company_acls?.[0]?.company_id || ""
+  const updateProcess = useUpdateProcess()
+
   const form = useForm<CaseFormValues>({
     resolver: zodResolver(caseSchema),
     defaultValues: {
-      number: case_.number,
-      title: case_.title,
-      client: case_.client,
-      lawyer: case_.lawyer,
-      court: case_.court,
-      status: case_.status as any,
-      priority: case_.priority as any,
-      phase: case_.phase,
-      value: case_.value.toString(),
+      number: case_.process_number || case_.number || "",
+      title: case_.title || "",
+      court: case_.action || case_.court || "",
+      status: case_.status || "Pendente",
+      priority: (case_.priority as IProcessPriority) || IProcessPriority.MEDIUM,
+      phase: case_.phase || "",
+      value: (case_.case_value || case_.value || 0).toString(),
+      instance: (case_.instance || 1).toString(),
     },
   })
 
-  function onSubmit(values: CaseFormValues) {
-    toast.success("Processo atualizado com sucesso!", {
-      description: `${values.title} foi atualizado.`,
-    })
-    console.log(values)
-    onOpenChange(false)
+  async function onSubmit(values: CaseFormValues) {
+    if (!companyId) {
+      toast.error("Empresa não identificada.")
+      return
+    }
+
+    try {
+      await updateProcess.mutateAsync({
+        companyId,
+        processId: case_.id,
+        processData: {
+          id: case_.id,
+          company_id: companyId,
+          company_acl_id: case_.company_acl_id, // Keep existing lawyer
+          title: values.title,
+          process_number: values.number,
+          instance: Number(values.instance),
+          legal_area: case_.legal_area || ILegalArea.OUTRO,
+          action: values.court,
+          object: case_.object || "",
+          case_value: Number(values.value),
+          sentence_value: case_.sentence_value || 0,
+          access: case_.access || AccessTypeProcecess.PUBLIC,
+          distributed_in: case_.distributed_in || new Date(),
+          status: values.status,
+          priority: values.priority,
+        },
+      })
+
+      toast.success("Processo atualizado com sucesso!")
+      onOpenChange(false)
+    } catch (error: any) {
+      toast.error("Erro ao atualizar processo", {
+        description: error.message || "Tente novamente mais tarde."
+      })
+    }
   }
 
   return (
@@ -129,34 +154,6 @@ export function EditCaseDialog({ open, onOpenChange, case_ }: EditCaseDialogProp
 
               <FormField
                 control={form.control}
-                name="client"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cliente *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Nome do cliente" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="lawyer"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Advogado Responsável *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Dr. João Silva" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="court"
                 render={({ field }) => (
                   <FormItem>
@@ -171,13 +168,22 @@ export function EditCaseDialog({ open, onOpenChange, case_ }: EditCaseDialogProp
 
               <FormField
                 control={form.control}
-                name="phase"
+                name="instance"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Fase Processual *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Contestação" {...field} />
-                    </FormControl>
+                    <FormLabel>Instância *</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="1">1ª Instância</SelectItem>
+                        <SelectItem value="2">2ª Instância</SelectItem>
+                        <SelectItem value="3">3ª Instância</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -196,9 +202,9 @@ export function EditCaseDialog({ open, onOpenChange, case_ }: EditCaseDialogProp
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="active">Em Andamento</SelectItem>
-                        <SelectItem value="pending">Aguardando</SelectItem>
-                        <SelectItem value="completed">Concluído</SelectItem>
+                        <SelectItem value="Pendente">Aguardando</SelectItem>
+                        <SelectItem value="Em Andamento">Em Andamento</SelectItem>
+                        <SelectItem value="Concluído">Concluído</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -219,9 +225,9 @@ export function EditCaseDialog({ open, onOpenChange, case_ }: EditCaseDialogProp
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="high">Alta</SelectItem>
-                        <SelectItem value="medium">Média</SelectItem>
-                        <SelectItem value="low">Baixa</SelectItem>
+                        <SelectItem value={IProcessPriority.HIGH}>Alta</SelectItem>
+                        <SelectItem value={IProcessPriority.MEDIUM}>Média</SelectItem>
+                        <SelectItem value={IProcessPriority.LOW}>Baixa</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -248,7 +254,10 @@ export function EditCaseDialog({ open, onOpenChange, case_ }: EditCaseDialogProp
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancelar
               </Button>
-              <Button type="submit">Salvar Alterações</Button>
+              <Button type="submit" disabled={updateProcess.isPending}>
+                {updateProcess.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Salvar Alterações
+              </Button>
             </DialogFooter>
           </form>
         </Form>

@@ -110,6 +110,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({
     isCostumer
   } = useAuth();
 
+
   const logout = useLogout();
 
   const [isChecking, setIsChecking] = useState(true);

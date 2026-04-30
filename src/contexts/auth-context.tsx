@@ -1,9 +1,9 @@
 "use client"
 
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
-import { 
-  LoginCredentials, 
-  AuthContextType 
+import {
+  LoginCredentials,
+  AuthContextType
 } from '../interfaces/IAuth';
 import { IUser } from '@/interfaces/IUser';
 import authService from '@/services/auth-service';
@@ -126,9 +126,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       try {
         if (authService.isAuthenticated()) {
           dispatch({ type: 'AUTH_START' });
-          
+
           const validation = await authService.validateToken();
-          
+
           if (validation.valid && validation.user) {
             dispatch({ type: 'AUTH_SUCCESS', payload: validation.user });
           } else {
@@ -153,24 +153,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (credentials: LoginCredentials): Promise<void> => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       const response = await authService.login(credentials);
-      
+
       dispatch({ type: 'AUTH_SUCCESS', payload: response.user });
-      
+
       // Login bem-sucedido - não fazer throw
       return;
-      
+
     } catch (error: any) {
       console.error('Erro no AuthContext login:', error);
-      
+
       const errorMessage = error.message || 'Erro ao fazer login';
       dispatch({ type: 'AUTH_FAILURE', payload: errorMessage });
-      
+
       // CORREÇÃO: NÃO fazer throw do erro para evitar recarregamento
       // O erro deve ser tratado pelos componentes que chamam esta função
       // através do estado `error` do contexto
-      
+
       // throw error; ← REMOVIDO - Esta linha causava o recarregamento!
     }
   };
@@ -194,10 +194,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const refreshToken = async (): Promise<void> => {
     try {
       await authService.refreshToken();
-      
+
       // Revalidar usuário após refresh
       const validation = await authService.validateToken();
-      
+
       if (validation.valid && validation.user) {
         dispatch({ type: 'AUTH_SUCCESS', payload: validation.user });
       } else {
@@ -232,25 +232,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
    */
   const hasRole = (roleSlug: string): boolean => {
     return state.user?.roles?.some(
-      (role: IRole) => typeof role === "string" 
+      (role: IRole) => typeof role === "string"
         ? (role as string)?.toLowerCase() === roleSlug.toLowerCase()
         : role?.type?.toLowerCase() === roleSlug.toLowerCase()
     ) || false;
   };
 
-    /**
-   * Verifica se o usuário tem uma role de superAdmin específica
-   * @param roleSlug Slug da role
-   * @returns True se o usuário tem a role
-   */
+  /**
+ * Verifica se o usuário tem uma role de superAdmin específica
+ * @param roleSlug Slug da role
+ * @returns True se o usuário tem a role
+ */
   const hasSuperAdminRole = (roleSlug: string): boolean => {
     return state.user?.roles?.some(
-      (role: IRole) => typeof role === "string" 
+      (role: IRole) => typeof role === "string"
         ? (role as string)?.toLowerCase() === roleSlug.toLowerCase()
         : role?.type?.toLowerCase() === roleSlug.toLowerCase()
     ) || false;
   };
-  
+
 
   /**
    * Verifica se o usuário tem uma permissão específica
@@ -258,7 +258,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
    * @returns True se o usuário tem a permissão
    */
   const hasCompanyPermission = (permissionSlug: string, companyId: string): boolean => {
-    const acl: ICompanyACL = state.user?.company_acls?.find(
+    const acl: ICompanyACL | undefined = state.user?.company_acls?.find(
       (companyACL: ICompanyACL) => companyACL?.company_id === companyId
     );
 
@@ -275,14 +275,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return hasDirectPermission /*|| hasRolePermission*/ || false;
   };
 
-  
-   /**
-   * Verifica se o usuário tem uma role específica
-   * @param roleSlug Slug da role
-   * @returns True se o usuário tem a role
-   */
+
+  /**
+  * Verifica se o usuário tem uma role específica
+  * @param roleSlug Slug da role
+  * @returns True se o usuário tem a role
+  */
   const hasCompanyRole = (roleSlug: string, companyId: string): boolean => {
-    const acl: ICompanyACL = state.user?.company_acls?.find(
+    const acl: ICompanyACL | undefined = state.user?.company_acls?.find(
       (companyACL: ICompanyACL) => companyACL?.company_id === companyId
     );
 
@@ -309,7 +309,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
 
-  
+
 
   //@ts-ignore
   const contextValue: AuthContextType = {
@@ -348,11 +348,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
  */
 export function useAuth() {
   const context = useContext(AuthContext);
-  
+
   if (context === undefined) {
     throw new Error('useAuth deve ser usado dentro de um AuthProvider');
   }
-  
+
   return context as AuthContextType & {
     error: string | null;
     clearError: () => void;

@@ -64,6 +64,29 @@ class ProcessService {
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // GET /v1/companies/:company_id/processes/:id
+  // Obter detalhe de um processo  [SUPER_ADMIN | ADMINISTRATOR | ATTORNEY | ASSISTANT | VISUALIZER]
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Obtém os detalhes de um processo jurídico.
+   *
+   * @param companyId UUID da empresa
+   * @param processId UUID do processo
+   * @returns         Dados do processo
+   */
+  async getProcessById(companyId: string, processId: string): Promise<IProcess> {
+    try {
+      const response: AxiosResponse<IProcess> = await this.api.get(
+        `/v1/companies/${companyId}/processes/${processId}`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // GET /v1/companies/:company_id/processes?page=1&take=10
   // Listar processos  [SUPER_ADMIN | ADMINISTRATOR | ATTORNEY | ASSISTANT | VISUALIZER]
   // ─────────────────────────────────────────────────────────────────────────────
@@ -97,7 +120,7 @@ class ProcessService {
     }
   }
 
-    // ─────────────────────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────────────────
   // GET /v1/companies/:company_id/processes/statistics
   // Listar processos  [SUPER_ADMIN | ADMINISTRATOR | ATTORNEY | ASSISTANT | VISUALIZER]
   // ─────────────────────────────────────────────────────────────────────────────
@@ -131,7 +154,39 @@ class ProcessService {
     }
   }
 
-  
+  // ─────────────────────────────────────────────────────────────────────────────
+  // GET /v1/companies/:company_id/processes/statistics
+  // Listar processos  [SUPER_ADMIN | ADMINISTRATOR | ATTORNEY | ASSISTANT | VISUALIZER]
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /**
+   * Lista as estatiticas dos processos jurídicos de uma empresa.
+   * Acessível a múltiplos roles via canOrIs (process:view | process:manage).
+   *
+   * @param companyId UUID da empresa/escritório de advocacia
+   * @param filters   Filtros de paginação opcionais (page, take)
+   * @returns         Lista paginada de processos
+   */
+  async getProcessesKPIs(
+    companyId: string,
+  ): Promise<any> {
+    try {
+      const response: AxiosResponse<any> = await this.api.get(
+        `/v1/companies/${companyId}/processes/kpis`,
+      );
+
+      const data = response.data;
+      if (data) {
+        return data;
+      }
+
+      throw new Error('Erro ao buscar estatísticas de processos');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
 
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -177,14 +232,14 @@ class ProcessService {
   // ─────────────────────────────────────────────────────────────────────────────
 
   /**
-   * Remove um processo jurídico de uma empresa.
+   * Arquiva um processo jurídico de uma empresa.
    * Requer role SUPER_ADMIN, ADMINISTRATOR, ATTORNEY ou ASSISTANT
    * com permissão process:manage.
    *
    * @param companyId UUID da empresa/escritório de advocacia
    * @param processId UUID do processo a ser removido
    */
-  async deleteProcess(companyId: string, processId: string): Promise<void> {
+  async archiveProcess(companyId: string, processId: string): Promise<void> {
     try {
       await this.api.delete(
         `/v1/companies/${companyId}/processes/${processId}`

@@ -3,62 +3,79 @@ import { ICompany } from "./ICompany";
 import { ICompanyACL } from "./ICompanyACL";
 import { IInvolved } from "./IInvolved";
 
-
 export interface IProcess extends IBaseEntity {
     company_id: string
     company_acl_id: string
     title: string
     instance: number
-    process_number: string
-    action: string
+    process_number?: string
+    action?: string
     object: string
     case_value: number
     sentence_value: number
     distributed_in: Date
-    status: string
+    description?: string
+    court?: string
+    court_type: "Federal" | "Estadual" | "Trabalho"
+    jurisdiction?: string
 
-    priority: IProcessPriority;
-    legal_area: ILegalArea;
+    status: "active" | "pending" | "completed"
+    priority: IProcessPriority
+    legal_area: ILegalArea
+    access: AccessTypeProcecess
+
+    is_archived: boolean
+    archived_at?: Date
+    updated_at: Date
 
     company: ICompany
     company_acl: ICompanyACL
-    access: AccessTypeProcecess
     service: any[]
     involveds: IInvolved[]
     finance: any
 }
 
 export interface ICreateProcessData {
-    priority: IProcessPriority,
-    company_id: string,
-    company_acl_id: string,
-    title: string,
-    instance: number,
-    action: string,
-    object: string,
-    case_value: number,
-    sentence_value: number,
-    access: AccessTypeProcecess,
-    distributed_in: Date,
-    status: string,
-    legal_area: ILegalArea;
+    priority: IProcessPriority
+    company_id: string
+    company_acl_id: string
+    title: string
+    instance: number
+    action?: string
+    object: string
+    case_value: number
+    sentence_value: number
+    access: AccessTypeProcecess
+    distributed_in: Date
+    status: "active" | "pending" | "completed"
+    legal_area: ILegalArea
+    process_number?: string
+    description?: string
+    court_type: "Federal" | "Estadual" | "Trabalho"
+    court?: string
+    jurisdiction?: string
 }
 
 export interface IUpdateProcessData {
-    id: string,
-   company_id: string,
-   company_acl_id: string,
-   title: string,
-   instance: number,
-   legal_area: ILegalArea;
-   action: string,
-   object: string,
-   case_value: number,
-   sentence_value: number,
-   access: AccessTypeProcecess,
-   distributed_in: Date,
-   status: string
-   priority: IProcessPriority;
+    id: string
+    company_id: string
+    company_acl_id: string
+    title: string
+    instance: number
+    legal_area: ILegalArea
+    action?: string
+    object: string
+    case_value: number
+    sentence_value: number
+    access: AccessTypeProcecess
+    distributed_in: Date
+    status: "active" | "pending" | "completed"
+    priority: IProcessPriority
+    process_number?: string
+    description?: string
+    court_type: "Federal" | "Estadual" | "Trabalho"
+    court?: string
+    jurisdiction?: string
 }
 
 export interface IProcessFilters {
@@ -68,20 +85,19 @@ export interface IProcessFilters {
 }
 
 export interface IPaginatedProcesses {
-    processes: IProcess[],
-   total: number,
-   total_pages: number,    // total de páginas calculadas
-   remaining_pages: number,     // páginas que ainda faltam
-   last_page: number,          // última página (igual a totalPages)
-   page: number
+    processes: IProcess[]
+    total: number
+    total_pages: number
+    remaining_pages: number
+    last_page: number
+    page: number
 }
 
-export  enum  AccessTypeProcecess {
+export enum AccessTypeProcecess {
     PRIVATE = "private",
     PUBLIC = "public",
     INVOLVED = "involved"
 }
-
 
 /**
  * Enum para os tipos de prioridades dos processos
@@ -91,7 +107,6 @@ export enum IProcessPriority {
    MEDIUM = 'medium',
    LOW = 'low'
 }
-
 
 /**
  * Enum para as diferentes áreas legais dos processos ou casos

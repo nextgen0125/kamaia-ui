@@ -70,6 +70,23 @@ export function useProcesses(companyId: string, filters?: IProcessFilters) {
   });
 }
 
+/**
+ * Busca os detalhes de um processo jurídico.
+ * Endpoint: GET /v1/companies/:company_id/processes/:id
+ *
+ * @param companyId UUID da empresa/escritório de advocacia
+ * @param processId UUID do processo
+ * @returns         Query com processo
+ */
+export function useProcess(companyId: string, processId: string) {
+  return useQuery({
+    queryKey: processQueryKeys.detail(companyId, processId),
+    queryFn: () => processService.getProcessById(companyId, processId),
+    enabled: !!companyId && !!processId,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 
 /**
  * Lista as notificações do utilizador autenticado dentro de uma empresa usando Infinite Scroll.
@@ -86,10 +103,10 @@ export function useAllProcessesInfinite(
   return useInfiniteQuery({
     queryKey: [...processQueryKeys.lists(companyId), 'infinite', filters],
     queryFn: ({ pageParam }) =>
-      processService.getProcesses(companyId, { 
-        ...filters, 
-        page: pageParam as number, 
-        take: 10 
+      processService.getProcesses(companyId, {
+        ...filters,
+        page: pageParam as number,
+        take: 10
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => {
@@ -138,6 +155,37 @@ export function useProcessesStatistics(companyId: string, filters?: IProcessFilt
     },
   });
 }
+
+/**
+ * Busca todas as estatísticas dos processos jurídicos de uma empresa.
+ * Endpoint: GET /v1/companies/:company_id/processes/statistics
+ * Acessível a SUPER_ADMIN, ADMINISTRATOR, ATTORNEY, ASSISTANT e VISUALIZER
+ * com permissão process:view ou process:manage.
+ *
+ * @param companyId UUID da empresa/escritório de advocacia
+ * @param filters   Filtros de paginação opcionais (page, take)
+ * @returns         Query com lista paginada de processos
+ */
+export function useProcessesKPIs(companyId: string) {
+  return useQuery({
+    queryKey: processQueryKeys.statistics(companyId, { companyId: "kpis" }),
+    queryFn: () => processService.getProcessesKPIs(companyId),
+    enabled: !!companyId,
+    staleTime: 2 * 60 * 1000, // 2 minutos
+    retry: (failureCount, error: any) => {
+      if (
+        error?.status === 401 ||
+        error?.status === 403 ||
+        error?.status === 404
+      ) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Mutations
@@ -211,13 +259,13 @@ export function useUpdateProcess() {
 }
 
 /**
- * Remove um processo jurídico de uma empresa.
+ * Arquiva um processo jurídico de uma empresa.
  * Endpoint: DELETE /v1/companies/:company_id/processes/:id
  * Requer role SUPER_ADMIN, ADMINISTRATOR, ATTORNEY ou ASSISTANT com process:manage.
  *
- * @returns Mutation para remoção de processo
+ * @returns Mutation para arquivar processo
  */
-export function useDeleteProcess() {
+export function useArchiveProcess() {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -227,7 +275,7 @@ export function useDeleteProcess() {
     }: {
       companyId: string;
       processId: string;
-    }) => processService.deleteProcess(companyId, processId),
+    }) => processService.archiveProcess(companyId, processId),
     onSuccess: (_, { companyId, processId }) => {
       // Remove o detalhe do processo do cache
       queryClient.removeQueries({
@@ -239,7 +287,7 @@ export function useDeleteProcess() {
       });
     },
     onError: (error) => {
-      console.error('Erro ao remover processo:', error);
+      console.error('Erro ao arquivar processo:', error);
     },
   });
 }
@@ -299,29 +347,29 @@ export function useInvalidateProcesses() {
 export function useProcessOperations() {
   const createProcessMutation = useCreateProcess();
   const updateProcessMutation = useUpdateProcess();
-  const deleteProcessMutation = useDeleteProcess();
+  const archiveProcessMutation = useArchiveProcess();
 
   return {
     // Mutations
     createProcess: createProcessMutation,
     updateProcess: updateProcessMutation,
-    deleteProcess: deleteProcessMutation,
+    archiveProcess: archiveProcessMutation,
 
     // Estados combinados
     isLoading:
       createProcessMutation.isPending ||
       updateProcessMutation.isPending ||
-      deleteProcessMutation.isPending,
+      archiveProcessMutation.isPending,
 
     isError:
       createProcessMutation.isError ||
       updateProcessMutation.isError ||
-      deleteProcessMutation.isError,
+      archiveProcessMutation.isError,
 
     error:
       createProcessMutation.error?.message ||
       updateProcessMutation.error?.message ||
-      deleteProcessMutation.error?.message,
+      archiveProcessMutation.error?.message,
   };
 }
 
@@ -331,9 +379,10 @@ export function useProcessOperations() {
 
 export default {
   useProcesses,
+  useProcess,
   useCreateProcess,
   useUpdateProcess,
-  useDeleteProcess,
+  useArchiveProcess,
   useProcessOperations,
   useInvalidateProcesses,
   useProcessesStatistics,
