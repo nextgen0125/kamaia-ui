@@ -69,12 +69,12 @@ export function CreateCaseDialog({ onSuccess }: CreateCaseDialogProps) {
   const { data: clientsData, isLoading: isLoadingClients } = useClients(
     company?.id as string,
     1,
-    100
+    10000
   )
 
   const { data: lawyersData, isLoading: isLoadingLawyers, error } = useAttorneyACL(
     company?.id as string,
-    { page: 1, take: 100 }
+    { page: 1, take: 10000 }
   )
 
   // Mapear dados para o formato esperado pelo formulário
