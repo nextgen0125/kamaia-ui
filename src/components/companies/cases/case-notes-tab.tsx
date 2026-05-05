@@ -8,7 +8,7 @@ import { ptBR } from "date-fns/locale";
 
 export function CaseNotesTab({ companyId, caseId }: { companyId: string; caseId: string }) {
   const { data: notes, isLoading } = useCaseNotes(companyId, caseId);
-  const { mutate: createNote, isPending } = useCreateCaseNote();
+  const { mutate: createNote, isPending, error } = useCreateCaseNote();
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
 
@@ -32,10 +32,10 @@ export function CaseNotesTab({ companyId, caseId }: { companyId: string; caseId:
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <Input 
-          placeholder="Título da anotação (Opcional)" 
-          value={title} 
-          onChange={(e) => setTitle(e.target.value)} 
+        <Input
+          placeholder="Título da anotação (Opcional)"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
         <Textarea
           placeholder="Escreva sua anotação aqui..."
@@ -60,14 +60,14 @@ export function CaseNotesTab({ companyId, caseId }: { companyId: string; caseId:
           notes?.map((note) => (
             <div key={note.id} className="p-4 rounded-lg border bg-card">
               <div className="flex items-center justify-between mb-2">
-                 <div className="flex items-center gap-2">
-                    <span className="font-semibold text-sm">
-                      {note.company_acl?.user?.first_name} {note.company_acl?.user?.last_name}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                        {format(new Date(note.created_at), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
-                    </span>
-                 </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-sm">
+                    {note.company_acl?.user?.first_name} {note.company_acl?.user?.last_name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {format(new Date(note.created_at), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                  </span>
+                </div>
               </div>
               {note.title && <h5 className="font-medium text-sm mb-1">{note.title}</h5>}
               <p className="text-sm whitespace-pre-wrap text-muted-foreground">{note.content}</p>

@@ -17,6 +17,14 @@ class DocumentService {
     return response.data;
   }
 
+  async getClientDocuments(companyId: string, clientId: string, filters?: IDocumentFilters): Promise<IDocument[]> {
+    const response: AxiosResponse<{ documents: IDocument[] }> = await this.api.get(
+      `/v1/companies/${companyId}/clients/${clientId}/documents`,
+      { params: filters }
+    );
+    return response.data.documents || [];
+  }
+
   async getDocumentById(companyId: string, id: string): Promise<IDocument> {
     const response: AxiosResponse<IDocument> = await this.api.get(
       `/v1/companies/${companyId}/documents/${id}`

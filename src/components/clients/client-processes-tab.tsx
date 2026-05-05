@@ -4,9 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus, Eye, Briefcase } from "lucide-react";
+import { Eye, Briefcase } from "lucide-react";
 import Link from "next/link";
 import { IClient } from "@/services/clients.service";
+import { IProcess } from "@/interfaces/IProcess";
+import { useState } from "react";
+import { CreateCaseDialog } from "@/components/companies/cases/create-case-dialog";
 
 interface ClientProcessesTabProps {
   companyId: string;
@@ -40,10 +43,7 @@ export function ClientProcessesTab({ companyId, client }: ClientProcessesTabProp
             <Briefcase className="h-5 w-5" />
             Processos do Cliente
           </CardTitle>
-          <Button size="sm">
-            <Plus className="mr-2 h-4 w-4" />
-            Novo Processo
-          </Button>
+          <CreateCaseDialog onSuccess={() => setIsCreateDialogOpen(false)} />
         </div>
       </CardHeader>
       <CardContent>
@@ -66,7 +66,7 @@ export function ClientProcessesTab({ companyId, client }: ClientProcessesTabProp
                 </TableCell>
               </TableRow>
             ) : (
-              processes.map((proc: any) => (
+              processes.map((proc: IProcess) => (
                 <TableRow key={proc.id}>
                   <TableCell className="font-mono text-xs">
                     {proc.process_number || "N/A"}
@@ -81,7 +81,7 @@ export function ClientProcessesTab({ companyId, client }: ClientProcessesTabProp
                   <TableCell>{formatCurrency(proc.case_value || 0)}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" asChild>
-                      <Link href={`/${companyId}/processes/${proc.id}`}>
+                      <Link href={`/${companyId}/cases/${proc.id}`}>
                         <Eye className="h-4 w-4" />
                       </Link>
                     </Button>

@@ -7,6 +7,8 @@ export const documentQueryKeys = {
   byCompany: (companyId: string) => [...documentQueryKeys.all, companyId] as const,
   lists: (companyId: string) => [...documentQueryKeys.byCompany(companyId), 'list'] as const,
   list: (companyId: string, filters?: IDocumentFilters) => [...documentQueryKeys.lists(companyId), filters] as const,
+  byClient: (companyId: string, clientId: string) => [...documentQueryKeys.byCompany(companyId), 'client', clientId] as const,
+  clientList: (companyId: string, clientId: string, filters?: IDocumentFilters) => [...documentQueryKeys.byClient(companyId, clientId), filters] as const,
   detail: (companyId: string, id: string) => [...documentQueryKeys.byCompany(companyId), 'detail', id] as const,
   kpis: (companyId: string) => ['kpis', companyId, 'dashboard'] as const,
 };
@@ -16,6 +18,15 @@ export function useDocuments(companyId: string, filters?: IDocumentFilters) {
     queryKey: documentQueryKeys.list(companyId, filters),
     queryFn: () => documentService.getDocuments(companyId, filters),
     enabled: !!companyId,
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useClientDocuments(companyId: string, clientId: string, filters?: IDocumentFilters) {
+  return useQuery({
+    queryKey: documentQueryKeys.clientList(companyId, clientId, filters),
+    queryFn: () => documentService.getClientDocuments(companyId, clientId, filters),
+    enabled: !!companyId && !!clientId,
     staleTime: 5 * 60 * 1000,
   });
 }

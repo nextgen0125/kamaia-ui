@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useDocuments } from "@/hooks/queries/documents/use-documents";
+import { useClientDocuments } from "@/hooks/queries/documents/use-documents";
 import { useParams } from "next/navigation";
 import {
   Table,
@@ -35,36 +35,37 @@ import { DeleteDocumentDialog } from "@/components/companies/documents/delete-do
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { IDocument } from "@/interfaces/IDocument";
+import { IClient } from "@/services/clients.service";
 
-interface CaseDocumentsTabProps {
-  companyId?: string;
-  caseId?: string;
+interface ClientDocumentsTabProps {
+  companyId: string;
+  client?: IClient;
 }
 
-export function CaseDocumentsTab({
-  companyId: propCompanyId,
-  caseId: propCaseId,
-}: CaseDocumentsTabProps) {
+export function ClientDocumentsTab({
+  companyId,
+  client,
+}: ClientDocumentsTabProps) {
   const params = useParams();
-  const companyId = propCompanyId || (params.company_id as string);
-  const caseId = propCaseId || (params.id as string);
+  const actualCompanyId = companyId || (params.company_id as string);
+  const clientId = client?.id;
 
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<IDocument | null>(null);
 
-  // Carregar documentos da empresa
-  const { data: documentsData, isLoading } = useDocuments(companyId, {
-    page: currentPage,
-    take: 10,
-  });
+  // Carregar documentos do cliente
+  const { data: documentsData, isLoading } = useClientDocuments(
+    actualCompanyId,
+    clientId || "",
+    {
+      page: currentPage,
+      take: 10,
+    }
+  );
 
-  // Filtrar documentos associados a este processo
-  const documents = documentsData?.documents?.filter(
-    (doc: IDocument) => doc.process_id === caseId
-  ) || [];
-
-  const totalPages = documentsData?.total_pages || 1;
+  const documents = Array.isArray(documentsData) ? documentsData : [];
+  const totalPages = Math.ceil(documents.length / 10);
 
   const handleDeleteClick = (doc: IDocument) => {
     setSelectedDocument(doc);
@@ -75,6 +76,14 @@ export function CaseDocumentsTab({
     // Implementar download se houver função
     console.log("Baixar documento:", doc);
   };
+
+  if (!client) {
+    return (
+      <div className="py-8 text-center text-muted-foreground">
+        Cliente não encontrado
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -91,7 +100,7 @@ export function CaseDocumentsTab({
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <FileText className="h-5 w-5" />
-              Documentos do Processo
+              Documentos dos Processos
             </CardTitle>
             <UploadDocumentDialog />
           </div>
@@ -101,9 +110,9 @@ export function CaseDocumentsTab({
           {documents.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-20" />
-              <p>Nenhum documento encontrado para este processo.</p>
+              <p>Nenhum documento encontrado para este cliente.</p>
               <p className="text-sm mt-1">
-                Comece adicionando um novo documento usando o botão acima.
+                Os documentos associados aos processos deste cliente aparecerão aqui.
               </p>
             </div>
           ) : (
@@ -113,6 +122,7 @@ export function CaseDocumentsTab({
                   <TableHeader>
                     <TableRow>
                       <TableHead>Nome</TableHead>
+                      <TableHead>Processo</TableHead>
                       <TableHead>Tipo</TableHead>
                       <TableHead>Tamanho</TableHead>
                       <TableHead>Data</TableHead>
@@ -123,6 +133,9 @@ export function CaseDocumentsTab({
                     {documents.map((doc: IDocument) => (
                       <TableRow key={doc.id}>
                         <TableCell className="font-medium">{doc.name}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {doc.process?.process_number || "-"}
+                        </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {doc.mime_type || "Documento"}
                         </TableCell>

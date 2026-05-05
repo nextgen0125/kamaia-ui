@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Clock, Edit, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, Edit, FileText, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { IProcess } from "@/interfaces/IProcess";
 import { EditCaseDialog } from "./edit-case-dialog";
+import { ArchiveCaseDialog } from "./archive-case-dialog";
 import { useState } from "react";
 
 interface CaseProfileHeaderProps {
@@ -13,6 +14,7 @@ interface CaseProfileHeaderProps {
 
 export function CaseProfileHeader({ companyId, caseData }: CaseProfileHeaderProps) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
 
   return (
     <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -41,7 +43,7 @@ export function CaseProfileHeader({ companyId, caseData }: CaseProfileHeaderProp
           <Edit className="mr-2 size-4" />
           Editar Processo
         </Button>
-        <Button variant="destructive">
+        <Button variant="destructive" onClick={() => setIsArchiveDialogOpen(true)}>
           <Trash2 className="mr-2 size-4" />
           Arquivar
         </Button>
@@ -51,6 +53,12 @@ export function CaseProfileHeader({ companyId, caseData }: CaseProfileHeaderProp
         caseData={caseData} 
         open={isEditDialogOpen} 
         onOpenChange={setIsEditDialogOpen} 
+      />
+      
+      <ArchiveCaseDialog
+        caseData={caseData}
+        open={isArchiveDialogOpen}
+        onOpenChange={setIsArchiveDialogOpen}
       />
     </div>
   );

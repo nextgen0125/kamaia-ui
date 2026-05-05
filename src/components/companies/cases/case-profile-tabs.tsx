@@ -43,10 +43,10 @@ export function CaseProfileTabs({ companyId, caseId }: CaseProfileTabsProps) {
         <CaseTimelineTab companyId={companyId} caseId={caseId} />
       </TabsContent>
       <TabsContent value="documents" className="m-0 focus-visible:outline-none focus-visible:ring-0 pb-10">
-        <CaseDocumentsTab />
+        <CaseDocumentsTab companyId={companyId} caseId={caseId} />
       </TabsContent>
       <TabsContent value="tasks" className="m-0 focus-visible:outline-none focus-visible:ring-0 pb-10">
-        <CaseTasksTab />
+        <CaseTasksTab companyId={companyId} caseId={caseId} />
       </TabsContent>
       <TabsContent value="notes" className="m-0 focus-visible:outline-none focus-visible:ring-0 pb-10">
         <CaseNotesTab companyId={companyId} caseId={caseId} />

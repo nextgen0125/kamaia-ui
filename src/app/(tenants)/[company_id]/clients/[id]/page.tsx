@@ -10,10 +10,11 @@ import { ClientProfileSidebar } from "@/components/clients/client-profile-sideba
 import { ClientOverviewTab } from "@/components/clients/client-overview-tab";
 import { ClientNotesTab } from "@/components/clients/client-notes-tab";
 import { ClientProcessesTab } from "@/components/clients/client-processes-tab";
+import { ClientDocumentsTab } from "@/components/clients/client-documents-tab";
 import { EditClientDialog } from "@/components/clients/edit-client-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import { FileText, DollarSign } from "lucide-react";
+import { DollarSign } from "lucide-react";
 
 export default function ClientDetailsPage() {
   const params = useParams();
@@ -58,17 +59,7 @@ export default function ClientDetailsPage() {
             </TabsContent>
 
             <TabsContent value="documents">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Documentos</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12 text-muted-foreground">
-                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                    <p>Funcionalidade de documentos vinculada aos processos.</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <ClientDocumentsTab companyId={companyId} client={client} />
             </TabsContent>
 
             <TabsContent value="financial">
