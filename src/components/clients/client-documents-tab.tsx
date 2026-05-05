@@ -29,13 +29,14 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MoreVertical, Download, Trash2, FileText } from "lucide-react";
-import { UploadDocumentDialog } from "@/components/documents/upload-document-dialog";
+import { MoreVertical, Download, Trash2, FileText, Upload } from "lucide-react";
 import { DeleteDocumentDialog } from "@/components/companies/documents/delete-document-dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { IDocument } from "@/interfaces/IDocument";
 import { IClient } from "@/services/clients.service";
+import { UploadDocumentDialog } from "../companies/documents/upload-document-dialog";
+import { formatBytes, formatMime } from "@/utils/documentUtils";
 
 interface ClientDocumentsTabProps {
   companyId: string;
@@ -53,6 +54,7 @@ export function ClientDocumentsTab({
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<IDocument | null>(null);
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
 
   // Carregar documentos do cliente
   const { data: documentsData, isLoading } = useClientDocuments(
@@ -102,7 +104,17 @@ export function ClientDocumentsTab({
               <FileText className="h-5 w-5" />
               Documentos dos Processos
             </CardTitle>
-            <UploadDocumentDialog />
+            <Button
+              onClick={() => setUploadDialogOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Upload className="size-4" />
+              Fazer Upload
+            </Button>
+            <UploadDocumentDialog
+              open={uploadDialogOpen}
+              onOpenChange={setUploadDialogOpen}
+            />
           </div>
         </CardHeader>
 
@@ -137,10 +149,10 @@ export function ClientDocumentsTab({
                           {doc.process?.process_number || "-"}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {doc.file_mimetype || "Documento"}
+                          {formatMime(doc.file_mimetype)}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {doc.file_size ? `${(Number(doc.file_size || 0) / 1024 / 1024).toFixed(2)} MB` : "N/A"}
+                          {formatBytes(Number(doc.file_size || 0))}
                         </TableCell>
                         <TableCell className="text-sm">
                           {doc.created_at

@@ -29,12 +29,13 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MoreVertical, Download, Trash2, FileText } from "lucide-react";
-import { UploadDocumentDialog } from "@/components/documents/upload-document-dialog";
+import { MoreVertical, Download, Trash2, FileText, Upload } from "lucide-react";
 import { DeleteDocumentDialog } from "@/components/companies/documents/delete-document-dialog";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { IDocument } from "@/interfaces/IDocument";
+import { UploadDocumentDialog } from "../documents/upload-document-dialog";
+import { formatBytes, formatMime } from "@/utils/documentUtils";
 
 interface CaseDocumentsTabProps {
   companyId?: string;
@@ -49,6 +50,8 @@ export function CaseDocumentsTab({
   const companyId = propCompanyId || (params.company_id as string);
   const caseId = propCaseId || (params.id as string);
 
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
+
   const [currentPage, setCurrentPage] = useState(1);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<IDocument | null>(null);
@@ -57,7 +60,6 @@ export function CaseDocumentsTab({
   const { data: documentsData, isLoading } = useProcessDocuments(companyId, caseId, {
     page: currentPage,
     take: 10,
-
   });
 
 
@@ -93,7 +95,17 @@ export function CaseDocumentsTab({
               <FileText className="h-5 w-5" />
               Documentos do Processo
             </CardTitle>
-            <UploadDocumentDialog />
+            <Button
+              onClick={() => setUploadDialogOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Upload className="size-4" />
+              Fazer Upload
+            </Button>
+            <UploadDocumentDialog
+              open={uploadDialogOpen}
+              onOpenChange={setUploadDialogOpen}
+            />
           </div>
         </CardHeader>
 
@@ -124,10 +136,10 @@ export function CaseDocumentsTab({
                       <TableRow key={doc.id}>
                         <TableCell className="font-medium">{doc.name}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {doc.file_mimetype || "Documento"}
+                          {formatMime(doc.file_mimetype)}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {doc.file_size ? `${(Number(doc.file_size || 0) / 1024 / 1024).toFixed(2)} MB` : "N/A"}
+                          {formatBytes(Number(doc.file_size || 0))}
                         </TableCell>
                         <TableCell className="text-sm">
                           {doc.created_at

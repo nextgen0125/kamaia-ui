@@ -13,6 +13,14 @@ import { DocumentsList } from "@/components/companies/documents/documents-list"
 import { DocumentsGrid } from "@/components/companies/documents/documents-grid"
 import { DocumentsSearch } from "@/components/companies/documents/documents-search"
 import { useDocuments } from "@/hooks/queries/documents/use-documents"
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export default function DocumentPage() {
   const params = useParams()
@@ -21,11 +29,18 @@ export default function DocumentPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<"grid" | "list">("list")
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: documents, isLoading } = useDocuments(companyId, {
+  const { data, isLoading } = useDocuments(companyId, {
     search: searchQuery,
     folder_id: selectedFolderId || undefined,
+    page: currentPage,
+    take: 10,
   })
+
+  const documents = data?.documents || [];
+
+  const totalPages = data?.total_pages || 1;
 
   return (
     <div className="space-y-6 container mx-auto py-6">
@@ -62,7 +77,7 @@ export default function DocumentPage() {
                     {selectedFolderId ? "Documentos da Pasta" : "Todos os Documentos"}
                   </CardTitle>
                   <CardDescription>
-                    {documents?.length || 0} documento{documents?.length !== 1 ? "s" : ""} encontrado{documents?.length !== 1 ? "s" : ""}
+                    {totalPages || 0} documento{totalPages !== 1 ? "s" : ""} encontrado{totalPages !== 1 ? "s" : ""}
                   </CardDescription>
                 </div>
 
@@ -104,6 +119,47 @@ export default function DocumentPage() {
                     <DocumentsList documents={documents || []} />
                   ) : (
                     <DocumentsGrid documents={documents || []} />
+                  )}
+
+                  {/* Paginação */}
+                  {totalPages > 1 && (
+                    <div className="mt-4 flex justify-center">
+                      <Pagination>
+                        <PaginationContent>
+                          {currentPage > 1 && (
+                            <PaginationItem>
+                              <PaginationPrevious
+                                onClick={() => setCurrentPage(currentPage - 1)}
+                                className="cursor-pointer"
+                              />
+                            </PaginationItem>
+                          )}
+
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                            (page) => (
+                              <PaginationItem key={page}>
+                                <PaginationLink
+                                  onClick={() => setCurrentPage(page)}
+                                  isActive={page === currentPage}
+                                  className="cursor-pointer"
+                                >
+                                  {page}
+                                </PaginationLink>
+                              </PaginationItem>
+                            )
+                          )}
+
+                          {currentPage < totalPages && (
+                            <PaginationItem>
+                              <PaginationNext
+                                onClick={() => setCurrentPage(currentPage + 1)}
+                                className="cursor-pointer"
+                              />
+                            </PaginationItem>
+                          )}
+                        </PaginationContent>
+                      </Pagination>
+                    </div>
                   )}
                 </>
               )}
