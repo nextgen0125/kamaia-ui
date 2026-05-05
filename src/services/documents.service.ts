@@ -1,6 +1,7 @@
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { authService } from './auth-service';
 import { IDocument, IDocumentFilters, IDownloadData } from '@/interfaces/IDocument';
+import { IPaginatedDocuments } from '@/interfaces/IDocument';
 
 class DocumentService {
   private api: AxiosInstance;
@@ -9,21 +10,30 @@ class DocumentService {
     this.api = authService.getApiInstance();
   }
 
-  async getDocuments(companyId: string, filters?: IDocumentFilters): Promise<IDocument[]> {
-    const response: AxiosResponse<IDocument[]> = await this.api.get(
+  async getDocuments(companyId: string, filters?: IDocumentFilters): Promise<IPaginatedDocuments> {
+    const response: AxiosResponse<IPaginatedDocuments> = await this.api.get(
       `/v1/companies/${companyId}/documents`,
       { params: filters }
     );
     return response.data;
   }
 
-  async getClientDocuments(companyId: string, clientId: string, filters?: IDocumentFilters): Promise<IDocument[]> {
-    const response: AxiosResponse<{ documents: IDocument[] }> = await this.api.get(
+  async getClientDocuments(companyId: string, clientId: string, filters?: IDocumentFilters): Promise<IPaginatedDocuments> {
+    const response: AxiosResponse<{ documents: IPaginatedDocuments }> = await this.api.get(
       `/v1/companies/${companyId}/clients/${clientId}/documents`,
       { params: filters }
     );
     return response.data.documents || [];
   }
+
+  async getProcessDocuments(companyId: string, processId: string, filters?: IDocumentFilters): Promise<IPaginatedDocuments> {
+    const response: AxiosResponse<{ documents: IPaginatedDocuments }> = await this.api.get(
+      `/v1/companies/${companyId}/processes/${processId}/documents`,
+      { params: filters }
+    );
+    return response.data.documents || [];
+  }
+
 
   async getDocumentById(companyId: string, id: string): Promise<IDocument> {
     const response: AxiosResponse<IDocument> = await this.api.get(

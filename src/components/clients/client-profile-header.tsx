@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { IClient } from "@/services/clients.service";
+import { CreateCaseDialog } from "../companies/cases";
+import { useState } from "react";
 
 interface ClientProfileHeaderProps {
   client?: IClient;
@@ -23,6 +25,7 @@ interface ClientProfileHeaderProps {
 
 export function ClientProfileHeader({ client, isLoading, onEdit }: ClientProfileHeaderProps) {
   const router = useRouter();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   if (isLoading || !client) {
     return (
@@ -35,8 +38,8 @@ export function ClientProfileHeader({ client, isLoading, onEdit }: ClientProfile
           </div>
         </div>
         <div className="flex gap-2">
-           <Skeleton className="h-10 w-24" />
-           <Skeleton className="h-10 w-10" />
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-10 w-10" />
         </div>
       </div>
     );
@@ -84,10 +87,12 @@ export function ClientProfileHeader({ client, isLoading, onEdit }: ClientProfile
               <Download className="mr-2 h-4 w-4" />
               Exportar dados
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Plus className="mr-2 h-4 w-4" />
-              Novo processo
-            </DropdownMenuItem>
+            {/* <DropdownMenuItem>
+              {/* <Plus className="mr-2 h-4 w-4" />
+              Novo processo 
+
+              <CreateCaseDialog onSuccess={() => setIsCreateDialogOpen(false)} />
+            </DropdownMenuItem> */}
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive">
               <Trash2 className="mr-2 h-4 w-4" />

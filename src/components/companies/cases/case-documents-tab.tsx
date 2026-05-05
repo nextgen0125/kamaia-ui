@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useDocuments } from "@/hooks/queries/documents/use-documents";
+import { useProcessDocuments } from "@/hooks/queries/documents/use-documents";
 import { useParams } from "next/navigation";
 import {
   Table,
@@ -54,15 +54,15 @@ export function CaseDocumentsTab({
   const [selectedDocument, setSelectedDocument] = useState<IDocument | null>(null);
 
   // Carregar documentos da empresa
-  const { data: documentsData, isLoading } = useDocuments(companyId, {
+  const { data: documentsData, isLoading } = useProcessDocuments(companyId, caseId, {
     page: currentPage,
     take: 10,
+
   });
 
+
   // Filtrar documentos associados a este processo
-  const documents = documentsData?.documents?.filter(
-    (doc: IDocument) => doc.process_id === caseId
-  ) || [];
+  const documents = documentsData?.documents || [];
 
   const totalPages = documentsData?.total_pages || 1;
 
@@ -124,16 +124,16 @@ export function CaseDocumentsTab({
                       <TableRow key={doc.id}>
                         <TableCell className="font-medium">{doc.name}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {doc.mime_type || "Documento"}
+                          {doc.file_mimetype || "Documento"}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {doc.size ? `${(doc.size / 1024 / 1024).toFixed(2)} MB` : "N/A"}
+                          {doc.file_size ? `${(Number(doc.file_size || 0) / 1024 / 1024).toFixed(2)} MB` : "N/A"}
                         </TableCell>
                         <TableCell className="text-sm">
                           {doc.created_at
                             ? format(new Date(doc.created_at), "dd/MM/yyyy", {
-                                locale: ptBR,
-                              })
+                              locale: ptBR,
+                            })
                             : "-"}
                         </TableCell>
                         <TableCell className="text-right">

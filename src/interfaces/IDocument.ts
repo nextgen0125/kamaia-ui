@@ -1,4 +1,8 @@
 import { IBaseEntity } from './IBaseEntity';
+import { ICompany } from './ICompany';
+import { ICompanyACL } from './ICompanyACL';
+import { IFolder } from './IFolder';
+import { IProcess } from './IProcess';
 
 export interface IDocument extends IBaseEntity {
     company_id: string;
@@ -11,6 +15,20 @@ export interface IDocument extends IBaseEntity {
     file_key: string;
     file_mimetype: string;
     file_size: string;
+
+    company?: ICompany;
+    company_acl?: ICompanyACL;
+    folder?: IFolder;
+    process?: IProcess;
+}
+
+export interface IPaginatedDocuments {
+    documents: IDocument[];
+    total: number;
+    total_pages: number;
+    remaining_pages: number;
+    last_page: number;
+    page: number;
 }
 
 export interface IDocumentFilters {
@@ -18,6 +36,8 @@ export interface IDocumentFilters {
     folder_id?: string;
     orderBy?: 'name' | 'created_at' | 'file_size';
     order?: 'ASC' | 'DESC';
+    page?: number;
+    take?: number;
 }
 
 export interface IDownloadData {

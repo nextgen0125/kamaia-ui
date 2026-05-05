@@ -64,7 +64,7 @@ export function ClientDocumentsTab({
     }
   );
 
-  const documents = Array.isArray(documentsData) ? documentsData : [];
+  const documents = Array.isArray(documentsData?.documents) ? documentsData.documents : [];
   const totalPages = Math.ceil(documents.length / 10);
 
   const handleDeleteClick = (doc: IDocument) => {
@@ -137,16 +137,16 @@ export function ClientDocumentsTab({
                           {doc.process?.process_number || "-"}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
-                          {doc.mime_type || "Documento"}
+                          {doc.file_mimetype || "Documento"}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {doc.size ? `${(doc.size / 1024 / 1024).toFixed(2)} MB` : "N/A"}
+                          {doc.file_size ? `${(Number(doc.file_size || 0) / 1024 / 1024).toFixed(2)} MB` : "N/A"}
                         </TableCell>
                         <TableCell className="text-sm">
                           {doc.created_at
                             ? format(new Date(doc.created_at), "dd/MM/yyyy", {
-                                locale: ptBR,
-                              })
+                              locale: ptBR,
+                            })
                             : "-"}
                         </TableCell>
                         <TableCell className="text-right">

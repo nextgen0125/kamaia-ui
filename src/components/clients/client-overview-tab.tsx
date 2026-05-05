@@ -34,7 +34,7 @@ export function ClientOverviewTab({ client }: ClientOverviewTabProps) {
             </div>
             <div>
               <h4 className="text-sm font-medium text-muted-foreground mb-1">BI (Bilhete de Identidade)</h4>
-              <p className="text-sm font-medium">{client.rg || "N/A"}</p>
+              <p className="text-sm font-medium">{client.Identity_card_number || "N/A"}</p>
             </div>
             <div>
               <h4 className="text-sm font-medium text-muted-foreground mb-1">Nacionalidade</h4>

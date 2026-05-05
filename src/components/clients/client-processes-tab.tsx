@@ -19,6 +19,8 @@ interface ClientProcessesTabProps {
 export function ClientProcessesTab({ companyId, client }: ClientProcessesTabProps) {
   if (!client) return null;
 
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
   const processes = client.involved?.map(inv => inv.process).filter(Boolean) || [];
 
   const getStatusBadge = (status?: string) => {
