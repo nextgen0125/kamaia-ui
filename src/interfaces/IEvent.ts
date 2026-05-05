@@ -12,10 +12,10 @@ import { IProcess } from './IProcess';
  * Espelha o enum da entidade Event no backend.
  */
 export enum IEventType {
-  HEARING  = 'AUDIENCIA',
-  MEETING  = 'REUNIAO',
-  TERM     = 'PRAZO',
-  VIDEO    = 'VIDEOCONFERENCIA',
+  HEARING = 'AUDIENCIA',
+  MEETING = 'REUNIAO',
+  TERM = 'PRAZO',
+  VIDEO = 'VIDEOCONFERENCIA',
 }
 
 export const IEventTypeLabels: Record<string, string> = {
@@ -30,9 +30,9 @@ export const IEventTypeLabels: Record<string, string> = {
  * Espelha o enum da entidade Event no backend.
  */
 export enum IEventPriority {
-  HIGH   = 'high',
+  HIGH = 'high',
   MEDIUM = 'medium',
-  LOW    = 'low',
+  LOW = 'low',
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -44,23 +44,23 @@ export enum IEventPriority {
  * Inclui os relacionamentos hidratados (company, company_acl, process).
  */
 export interface IEvent extends IBaseEntity {
-  company_id:               string;
-  company_acl_id:           string;
-  process_id:               string;
-  title:                    string;
-  observations:             string;
-  all_day:                  boolean;
-  start_date:               Date;
-  end_date:                 Date;
-  internal_advance_alerts:  number;
-  location:                 string;
-  type:                     IEventType;
-  priority:                 IEventPriority;
+  company_id: string;
+  company_acl_id: string;
+  process_id: string;
+  title: string;
+  observations: string;
+  all_day: boolean;
+  start_date: Date;
+  end_date: Date;
+  internal_advance_alerts: number;
+  location: string;
+  type: IEventType;
+  priority: IEventPriority;
 
   // Relacionamentos hidratados
-  company:     ICompany;
+  company: ICompany;
   company_acl: ICompanyACL;
-  process:     IProcess;
+  process: IProcess;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -72,17 +72,17 @@ export interface IEvent extends IBaseEntity {
  * Endpoint: POST /v1/companies/:company_id/events
  */
 export interface ICreateEventData {
-  company_id:               string;
-  process_id:               string;
-  title:                    string;
-  observations:             string;
-  all_day:                  boolean;
-  start_date:               Date;
-  end_date:                 Date;
-  internal_advance_alerts:  number;
-  location:                 string;
-  type:                     IEventType;
-  priority:                 IEventPriority;
+  company_id: string;
+  process_id: string;
+  title: string;
+  observations: string;
+  all_day: boolean;
+  start_date: Date;
+  end_date: Date;
+  internal_advance_alerts: number;
+  location: string;
+  type: IEventType;
+  priority: IEventPriority;
 }
 
 /**
@@ -91,17 +91,17 @@ export interface ICreateEventData {
  * Todos os campos são opcionais — envie apenas o que for alterar.
  */
 export interface IUpdateEventData {
-  company_acl_id?:          string;
-  process_id?:              string;
-  title?:                   string;
-  observations?:            string;
-  all_day?:                 boolean;
-  start_date?:              Date;
-  end_date?:                Date;
+  company_acl_id?: string;
+  process_id?: string;
+  title?: string;
+  observations?: string;
+  all_day?: boolean;
+  start_date?: Date;
+  end_date?: Date;
   internal_advance_alerts?: number;
-  location?:                string;
-  type?:                    IEventType;
-  priority?:                IEventPriority;
+  location?: string;
+  type?: IEventType;
+  priority?: IEventPriority;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -114,6 +114,9 @@ export interface IUpdateEventData {
 export interface IEventFilters {
   page?: number;
   take?: number;
+  search?: string;
+  orderBy?: "title" | "created_at";
+  order?: "ASC" | "DESC";
 }
 
 /**
@@ -123,10 +126,10 @@ export interface IEventFilters {
  * unificadas aqui pois são estruturalmente idênticas.
  */
 export interface IPaginatedEvents {
-  events:          IEvent[];
-  total:           number;
-  total_pages:     number;
+  events: IEvent[];
+  total: number;
+  total_pages: number;
   remaining_pages: number;
-  last_page:       number;
-  page:            number;
+  last_page: number;
+  page: number;
 }

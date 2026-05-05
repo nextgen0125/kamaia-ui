@@ -8,8 +8,12 @@ import { Mail, Phone, MapPin, MessageSquare, Calendar } from "lucide-react";
 import { IClient } from "@/services/clients.service";
 import { useClientProfileKPIs } from "@/hooks/queries/clients/use-client-kpis";
 import { useClientAttorneys } from "@/hooks/queries/clients/use-clients";
-import { ProfileCardSkeleton } from "../ui/skeleton-cards";
+import { ProfileCardSkeleton, TaskCardSkeleton } from "../ui/skeleton-cards";
 import { Badge } from "../ui/badge";
+import { useAllClientEvents } from "@/hooks/queries/use-events";
+import { IEvent } from "@/interfaces/IEvent";
+import { getEventTypeColor, getEventTypeIcon, getPriorityColor, getPriorityText } from "@/utils/eventUtils";
+import { format } from "date-fns";
 
 interface ClientProfileSidebarProps {
   companyId: string;
@@ -18,8 +22,9 @@ interface ClientProfileSidebarProps {
 }
 
 export function ClientProfileSidebar({ companyId, clientId, client }: ClientProfileSidebarProps) {
-  const { data: stats } = useClientProfileKPIs(companyId, clientId);
+
   const { data, isLoading } = useClientAttorneys(companyId, clientId, { take: 100, page: 1 });
+  const { data: eventsData, isLoading: eventsLoading } = useAllClientEvents(companyId, clientId, { take: 10, page: 1, order: "DESC", orderBy: "created_at" });
 
   if (!client) return null;
 
@@ -98,26 +103,68 @@ export function ClientProfileSidebar({ companyId, clientId, client }: ClientProf
 
 
       {/* Upcoming Meetings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">Próximas Atividades</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {stats?.upcoming_meetings === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhuma reunião agendada.</p>
-            ) : (
-              <div className="flex items-start space-x-3 p-3 border rounded-lg">
-                <Calendar className="h-5 w-5 text-primary mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{stats?.upcoming_meetings} reuniões/prazos</p>
-                  <p className="text-xs text-muted-foreground">Consulte a agenda</p>
+      {
+        eventsLoading
+          ? <TaskCardSkeleton />
+          : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Próximas Atividades</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {
+                    !eventsData?.total
+                      ? (
+                        <p className="text-sm text-muted-foreground">Nenhuma reunião agendada.</p>
+                      )
+                      : (
+                        eventsData?.events?.map((event: IEvent) => (
+                          <div
+                            key={event.id}
+                            className="p-3 border rounded-lg hover:bg-muted/50 transition-colors space-y-2 group"
+                          >
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-2">
+                                <div className={`size-8 rounded flex items-center justify-center ${getEventTypeColor(event.type)}`}>
+                                  {getEventTypeIcon(event.type)}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-sm">{event.title}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {format(new Date(event.start_date), "dd/MM/yyyy")} às {format(new Date(event.start_date), "HH:mm")}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={getPriorityColor(event.priority)} className="text-xs">
+                                  {getPriorityText(event.priority)}
+                                </Badge>
+                              </div>
+                            </div>
+
+                            {event.location && (
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                <MapPin className="size-3" />
+                                {event.location}
+                              </div>
+                            )}
+
+                            {event.process?.title && (
+                              <div className="text-xs">
+                                <Badge variant="outline">{event.process.title}</Badge>
+                              </div>
+                            )}
+                          </div>
+                        ))
+                      )
+                  }
                 </div>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+              </CardContent>
+            </Card>
+          )
+      }
+
     </div>
   );
 }

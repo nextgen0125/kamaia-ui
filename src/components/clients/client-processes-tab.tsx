@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Eye, Briefcase } from "lucide-react";
 import Link from "next/link";
 import { IClient } from "@/services/clients.service";
-import { IProcess } from "@/interfaces/IProcess";
-import { useState } from "react";
 import { CreateCaseDialog } from "@/components/companies/cases/create-case-dialog";
+import { IProcess } from "@/interfaces/IProcess";
 
 interface ClientProcessesTabProps {
   companyId: string;
@@ -18,8 +17,6 @@ interface ClientProcessesTabProps {
 
 export function ClientProcessesTab({ companyId, client }: ClientProcessesTabProps) {
   if (!client) return null;
-
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   const processes = client.involved?.map(inv => inv.process).filter(Boolean) || [];
 

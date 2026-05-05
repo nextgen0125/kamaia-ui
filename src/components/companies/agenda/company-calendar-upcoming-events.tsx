@@ -6,23 +6,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   MapPin,
-  Calendar as CalendarIcon,
-  Clock,
-  Users,
-  Video,
-  AlertCircle,
   MoreHorizontal
 } from "lucide-react";
 import { useAllEventsInfinite } from "@/hooks/queries/use-events";
-import { IEvent, IEventType, IEventTypeLabels } from "@/interfaces/IEvent";
+import { IEvent } from "@/interfaces/IEvent";
 import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { EditEventDialog } from "./edit-event-dialog";
 import { useQueryClient } from "@tanstack/react-query";
+import { getEventTypeColor, getEventTypeIcon, getPriorityText } from "@/utils/eventUtils";
+import { getPriorityColor } from "@/utils/getPriorityColor";
 
 interface CompanyCalendarUpcomingEventsProps {
   companyId: string;
 }
+
+
 
 export default function CompanyCalendarUpcomingEvents({ companyId }: CompanyCalendarUpcomingEventsProps) {
   const [allEvents, setAllEvents] = useState<IEvent[]>([]);
@@ -52,63 +50,6 @@ export default function CompanyCalendarUpcomingEvents({ companyId }: CompanyCale
     }
   }, [data]);
 
-  // Funções auxiliares para formatar os eventos
-  const getEventTypeIcon = (type: string) => {
-    switch (type) {
-      case IEventType.HEARING:
-        return <CalendarIcon className="size-4" />;
-      case IEventType.MEETING:
-        return <Users className="size-4" />;
-      case IEventType.TERM:
-        return <AlertCircle className="size-4" />;
-      case IEventType.VIDEO:
-        return <Video className="size-4" />;
-      default:
-        return <Clock className="size-4" />;
-    }
-  };
-
-  const getEventTypeColor = (type: string) => {
-    switch (type) {
-      case IEventType.HEARING:
-        return "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400";
-      case IEventType.MEETING:
-        return "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400";
-      case IEventType.TERM:
-        return "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400";
-      case IEventType.VIDEO:
-        return "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-400";
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-950 dark:text-gray-400";
-    }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "destructive";
-      case "medium":
-        return "default";
-      case "low":
-        return "secondary";
-      default:
-        return "secondary";
-    }
-  };
-
-  // Função para obter texto da prioridade
-  const getPriorityText = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "Alta";
-      case "medium":
-        return "Média";
-      case "low":
-        return "Baixa";
-      default:
-        return "";
-    }
-  };
 
   // Função para carregar mais eventos
   const loadMore = () => {

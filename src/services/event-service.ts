@@ -99,6 +99,42 @@ class EventService {
     }
   }
 
+
+  /**
+   * Lista todos os eventos jurídicos de um cliente com paginação,
+   * independentemente do tipo (audiência, reunião, prazo, videoconferência).
+   *
+   * Nota: no backend esta rota está registada com o método PUT e o controller
+   * GetAllEventsController — o frontend consome-a corretamente como GET.
+   *
+   * @param companyId UUID da empresa/escritório de advocacia
+   * @param clientId  UUID do cliente
+   * @param filters   Filtros de paginação opcionais (page, take)
+   * @returns         Lista paginada de eventos
+   */
+  async getAllClientEvents(
+    companyId: string,
+    clientId: string,
+    filters?: IEventFilters
+  ): Promise<IPaginatedEvents> {
+    try {
+      const response: AxiosResponse<IPaginatedEvents> = await this.api.get(
+        `/v1/companies/${companyId}/events/clients/${clientId}`,
+        { params: filters }
+      );
+
+      const data = response.data;
+      if (data) {
+        return data;
+      }
+
+      throw new Error('Erro ao listar eventos');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
   // ─────────────────────────────────────────────────────────────────────────────
   // GET /v1/companies/:company_id/events/hearing
   // Listar audiências  [SUPER_ADMIN | ADMINISTRATOR | ATTORNEY | ASSISTANT | VISUALIZER]

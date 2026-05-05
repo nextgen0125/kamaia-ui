@@ -31,6 +31,9 @@ export const eventQueryKeys = {
   allEvents: (companyId: string, filters?: IEventFilters) =>
     [...eventQueryKeys.byCompany(companyId), 'all', filters] as const,
 
+  allClientEvents: (companyId: string, clientId: string, filters?: IEventFilters) =>
+    [...eventQueryKeys.byCompany(companyId), 'client', clientId, filters] as const,
+
   // Listagens por tipo
   hearings: (companyId: string, filters?: IEventFilters) =>
     [...eventQueryKeys.byCompany(companyId), 'hearing', filters] as const,
@@ -72,6 +75,32 @@ export function useAllEvents(companyId: string, filters?: IEventFilters) {
     },
   });
 }
+
+/**
+ * Lista todos os eventos de um cliente, independente do tipo.
+ * Endpoint: GET /v1/companies/:company_id/events
+ *
+ * @param companyId UUID da empresa/escritório de advocacia
+ * @param clientId  UUID do cliente
+ * @param filters   Filtros de paginação opcionais (page, take)
+ * @returns         Query com lista paginada de eventos
+ */
+export function useAllClientEvents(companyId: string, clientId: string, filters?: IEventFilters) {
+  return useQuery({
+    queryKey: eventQueryKeys.allClientEvents(companyId, clientId, filters),
+    queryFn: () => eventService.getAllClientEvents(companyId, clientId, filters),
+    enabled: !!companyId,
+    staleTime: 2 * 60 * 1000,
+    retry: (failureCount, error: any) => {
+      if (error?.status === 401 || error?.status === 403 || error?.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+}
+
+// 
 
 /**
  * Lista todos os eventos de uma empresa com paginação infinita.
@@ -316,6 +345,12 @@ export function useInvalidateEvents() {
         queryKey: [...eventQueryKeys.byCompany(companyId), 'all'],
       });
     },
+    /** Invalida apenas a listagem de um cliente */
+    invalidateAllClientEvents: (companyId: string, clientId: string) => {
+      queryClient.invalidateQueries({
+        queryKey: [...eventQueryKeys.byCompany(companyId), 'client', clientId, 'all'],
+      });
+    },
     /** Invalida apenas as audiências de uma empresa */
     invalidateHearings: (companyId: string) => {
       queryClient.invalidateQueries({
@@ -394,4 +429,5 @@ export default {
   useDeleteEvent,
   useEventOperations,
   useInvalidateEvents,
+  useAllClientEvents
 };
