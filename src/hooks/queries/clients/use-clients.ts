@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { clientsService, ICreateClientData } from '@/services/clients.service';
+import { IClientFilters } from '@/interfaces/IClient';
 
 export function useClients(companyId: string, page = 1, take = 50) {
   return useQuery({
@@ -13,6 +14,14 @@ export function useClient(companyId: string, clientId: string) {
   return useQuery({
     queryKey: ['client', companyId, clientId],
     queryFn: () => clientsService.getClientById(companyId, clientId),
+    enabled: !!companyId && !!clientId,
+  });
+}
+
+export function useClientAttorneys(companyId: string, clientId: string, filters?: IClientFilters) {
+  return useQuery({
+    queryKey: ['client-attorneys', companyId, clientId, filters],
+    queryFn: () => clientsService.getClientAttorneys(companyId, clientId, filters),
     enabled: !!companyId && !!clientId,
   });
 }

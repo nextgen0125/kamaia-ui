@@ -17,8 +17,20 @@ export default function DashboardLayout({
       requiredCompanyRoles={
         [
           "ADMINISTRATOR",
+          "PARTNER",
+          "MANAGING_PARTNER",
           "ATTORNEY",
+          "SENIOR_ATTORNEY",
+          "JUNIOR_ATTORNEY",
+          "CORRESPONDENT_ATTORNEY",
+          "LEGAL_CONSULTANT",
+          "LAW_INTERN",
+          "LEGAL_ASSISTANT",
+          "PARALEGAL",
+          "LEGAL_SECRETARY",
+          "FINANCIAL_MANAGER",
           "ASSISTANT",
+          "RECEPTIONIST",
           "VISUALIZER",
         ]
       }

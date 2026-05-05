@@ -1,5 +1,7 @@
 import { AxiosInstance, AxiosResponse } from 'axios';
 import { authService } from './auth-service';
+import { IClientFilters } from '@/interfaces/IClient';
+import { IPaginatedCompanyACL } from '@/interfaces/ICompanyACL';
 
 export interface IClient {
   id: string;
@@ -29,26 +31,26 @@ export interface IClient {
 }
 
 export interface ICreateClientData {
-    name?: string;
-    type?: "pf" | "pj";
-    email?: string;
-    phone?: string;
-    cpf?: string;
-    rg?: string;
-    nacionality?: string;
-    birth_place?: string;
-    address?: string;
-    Identity_card_number?: string;
-    Id_validity?: string;
-    nif?: string;
-    country?: string;
-    city?: string;
-    profile?: string;
-    marital_status?: string;
-    father_name?: string;
-    mother_name?: string;
-    profession?: string;
-    company_name?: string;
+  name?: string;
+  type?: "pf" | "pj";
+  email?: string;
+  phone?: string;
+  cpf?: string;
+  rg?: string;
+  nacionality?: string;
+  birth_place?: string;
+  address?: string;
+  Identity_card_number?: string;
+  Id_validity?: string;
+  nif?: string;
+  country?: string;
+  city?: string;
+  profile?: string;
+  marital_status?: string;
+  father_name?: string;
+  mother_name?: string;
+  profession?: string;
+  company_name?: string;
 }
 
 export interface IPaginatedClients {
@@ -69,7 +71,14 @@ class ClientsService {
 
   async getClients(companyId: string, page = 1, take = 10): Promise<IPaginatedClients> {
     const response = await this.api.get(`/v1/companies/${companyId}/clients`, {
-        params: { page, take }
+      params: { page, take }
+    });
+    return response.data;
+  }
+
+  async getClientAttorneys(companyId: string, clientId: string, filters?: IClientFilters): Promise<IPaginatedCompanyACL> {
+    const response: AxiosResponse<IPaginatedCompanyACL> = await this.api.get(`/v1/companies/${companyId}/clients/${clientId}/attorneys`, {
+      params: filters
     });
     return response.data;
   }

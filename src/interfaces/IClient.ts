@@ -26,3 +26,12 @@ export interface IClient {
     company: ICompany
     involved: IInvolved[]
 }
+
+export interface IClientFilters {
+    search?: string;
+    folder_id?: string;
+    orderBy?: 'name' | 'created_at';
+    order?: 'ASC' | 'DESC';
+    page?: number;
+    take?: number;
+}

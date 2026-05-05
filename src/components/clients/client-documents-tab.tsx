@@ -67,7 +67,7 @@ export function ClientDocumentsTab({
   );
 
   const documents = Array.isArray(documentsData?.documents) ? documentsData.documents : [];
-  const totalPages = Math.ceil(documents.length / 10);
+  const totalPages = documentsData?.total_pages || 1;
 
   const handleDeleteClick = (doc: IDocument) => {
     setSelectedDocument(doc);

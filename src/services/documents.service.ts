@@ -19,19 +19,19 @@ class DocumentService {
   }
 
   async getClientDocuments(companyId: string, clientId: string, filters?: IDocumentFilters): Promise<IPaginatedDocuments> {
-    const response: AxiosResponse<{ documents: IPaginatedDocuments }> = await this.api.get(
+    const response: AxiosResponse<IPaginatedDocuments> = await this.api.get(
       `/v1/companies/${companyId}/clients/${clientId}/documents`,
       { params: filters }
     );
-    return response.data.documents || [];
+    return response.data || [];
   }
 
   async getProcessDocuments(companyId: string, processId: string, filters?: IDocumentFilters): Promise<IPaginatedDocuments> {
-    const response: AxiosResponse<{ documents: IPaginatedDocuments }> = await this.api.get(
+    const response: AxiosResponse<IPaginatedDocuments> = await this.api.get(
       `/v1/companies/${companyId}/processes/${processId}/documents`,
       { params: filters }
     );
-    return response.data.documents || [];
+    return response.data || [];
   }
 
 
